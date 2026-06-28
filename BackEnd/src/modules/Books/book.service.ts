@@ -1,9 +1,11 @@
+import { CursorTimeoutMode } from "mongodb";
 import appError from "../../utils/errorClass";
 import { responseStatus } from "../../utils/responseStatus";
-import { findBookByName, insertBook } from "./book.repo";
-import { bookT } from "./book.types";
-
-export const addBook_S=async(body:bookT,file?:Express.Multer.File)=>{  
+import { deleteBook, findBookById, findBookByName, findBooks, getBooksCount, insertBook, updateBook } from "./book.repo";
+import { editBookI, bookI, queryI } from "./book.types";
+import fs from "fs"
+import path from "path";
+export const addBook_S=async(body:bookI,file?:Express.Multer.File)=>{  
     const {title,author,genre,price,description,stock}=body
     const oldBook=await findBookByName(title)
     if(oldBook){
@@ -26,4 +28,71 @@ export const addBook_S=async(body:bookT,file?:Express.Multer.File)=>{
     return result
     
 
+}
+export const editBook_S=async(body:editBookI,file?:Express.Multer.File)=>{
+    const book=await findBookById(body.id)
+    if(!book)
+    {
+        throw new appError("Book Not Found",400,responseStatus.FAILED)
+    }
+    const newBook:bookI={
+        title:book.title,
+        author:body.author?body.author:book.author,
+        genre:body.genre?body.genre:book.genre,
+        price:body.price?body.price:book.price,
+        description:body.description?body.description:book.description,
+        stock:body.stock?body.stock:book.stock,
+        coverImage:book.coverImage
+    }
+    if(body.title){
+        const oldBook=await findBookByName(body.title)
+        if(oldBook){
+            throw new appError("Book Already Exists",400,responseStatus.FAILED)
+        }
+        newBook.title=body.title
+    }
+    if(file){
+        const oldImagePath = path.join(__dirname, '../../Uploads', book.coverImage);
+        if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath)
+        newBook.coverImage=file.filename
+    }
+    const result=await updateBook(newBook,body.id)
+    return result
+}
+export const deleteBook_S=async(id:string)=>{
+    const book=await findBookById(id)
+    if(!book){
+        throw new appError("Book Not Found",400,responseStatus.FAILED)
+    }
+    const imagePath = path.join(__dirname, '../../Uploads', book.coverImage);
+    if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath)
+    await deleteBook(id)
+}
+export const getBook_S=async(id:string)=>{
+    const book=await findBookById(id)
+    if(!book){
+        throw new appError("Book Not Found",400,responseStatus.FAILED)
+    }
+    return book
+}
+export const getBooks_S=async(query:queryI)=>{
+ const pageSize=query.pageSize?parseInt(String(query.pageSize)):10
+    const currentPage=query.currentPage?parseInt(String(query.currentPage)):1
+    const skip=(pageSize*(currentPage-1))
+     const filter: any = {};
+    if (query.searchText) {
+        const searchText = query.searchText;
+        filter.$or = [{title:{$regex:searchText,$options:"i"}},{author:{$regex:searchText,$options:"i"}},{genre:{$regex:searchText,$options:"i"}}]
+    }
+    query.pageSize=pageSize
+    const resultData=await findBooks(query,skip,filter)
+    const totalCount=await getBooksCount(filter)
+    const result={
+        data:resultData,
+       currentPage:query.currentPage?parseInt(String(query.currentPage)):1,
+       pageSize:query.pageSize?query.pageSize:10,
+       totalPage:Math.ceil(totalCount/(query.pageSize?query.pageSize:10)),
+       totalCount
+    }
+    return result
 }
