@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { SidebarNavItem, SidebarProps } from "@/Types/HeaderTypes";
 import { renderItem } from "../userHeader/sidebarItem";
+import Image from "next/image";
 
 
 
@@ -91,7 +92,13 @@ export default function AdminSidebar({
         <div className="border-t border-slate-200 bg-[#eff4ff] p-6">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#b6c4ff]/30">
-              {user!.image ? <img src={`http://localhost:4000/api/Uploads/${user!.image}`} alt="avatar" /> : <User size={32} />}
+              {user!.image ? <Image  
+                        width={48}
+                        height={48}
+                        sizes="48px"
+                        priority
+                        unoptimized
+                        src={`http://localhost:4000/api/Uploads/${user!.image}`} alt="avatar" /> : <User size={32} />}
             </div>
             <div className="flex-1 overflow-hidden">
               <p className="truncate font-body text-sm font-bold text-[#0b1c30]">
