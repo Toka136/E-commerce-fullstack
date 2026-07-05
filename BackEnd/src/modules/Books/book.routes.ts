@@ -7,7 +7,7 @@ const router=express.Router()
 router.route("/addBook").post(adminPermision,imageUpload.single("coverImage"),Wrapper(addBook_C))
 router.route("/updateBook").patch(adminPermision,imageUpload.single("coverImage"),Wrapper(updateBook_C))
 router.route("/deleteBook/:id").delete(adminPermision,Wrapper(deleteBook_C))
-router.route("/geteBook/:id").get(Wrapper(getBook_C))
-router.route("/geteBooks/").get(Wrapper(getBooks_C))
+router.route("/getBook/:id").get(Wrapper(getBook_C))
+router.route("/getBooks/").get(Wrapper(getBooks_C))
 
 export default router

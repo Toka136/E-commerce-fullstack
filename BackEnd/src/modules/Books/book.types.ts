@@ -15,7 +15,7 @@ export interface editBookI{
     description?:string,
     coverImage?:string,
     stock?:number,
-    id:string
+    _id:string
 }
 export interface queryI{
     searchText?:string,
