@@ -4,9 +4,10 @@ import appError from "../../utils/errorClass"
 import { responseStatus } from "../../utils/responseStatus"
 
 export const addBook_C=async(req:Request,res:Response,next:NextFunction)=>{
+    console.log("req.file",req.file)
     try{
        const result=await addBook_S(req.body,req.file)
-
+       console.log("result add book",result)
         res.status(200).json({
             status:"success",
             message:"Book Added Successfully",
