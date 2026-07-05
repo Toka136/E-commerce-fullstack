@@ -30,7 +30,8 @@ export const addBook_S=async(body:bookI,file?:Express.Multer.File)=>{
 
 }
 export const editBook_S=async(body:editBookI,file?:Express.Multer.File)=>{
-    const book=await findBookById(body.id)
+    console.log("body of edited book",body)
+    const book=await findBookById(body._id)
     if(!book)
     {
         throw new appError("Book Not Found",400,responseStatus.FAILED)
@@ -44,19 +45,13 @@ export const editBook_S=async(body:editBookI,file?:Express.Multer.File)=>{
         stock:body.stock?body.stock:book.stock,
         coverImage:book.coverImage
     }
-    if(body.title){
-        const oldBook=await findBookByName(body.title)
-        if(oldBook){
-            throw new appError("Book Already Exists",400,responseStatus.FAILED)
-        }
-        newBook.title=body.title
-    }
+    
     if(file){
         const oldImagePath = path.join(__dirname, '../../Uploads', book.coverImage);
         if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath)
         newBook.coverImage=file.filename
     }
-    const result=await updateBook(newBook,body.id)
+    const result=await updateBook(newBook,body._id)
     return result
 }
 export const deleteBook_S=async(id:string)=>{
