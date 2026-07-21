@@ -7,7 +7,7 @@ export  async function authFetch(url:RequestInfo,options:RequestInit){
         credentials:"include"
     })
     console.log("response in refresh token",response)
-    if(response.status===401){
+    if(response.status===401||response.status===500){
         const refreshResponse=await fetch("http://localhost:4000/api/auth/refreshToken",{
             method:"POST",
             credentials:"include"

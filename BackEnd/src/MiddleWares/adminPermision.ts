@@ -12,11 +12,11 @@ export const adminPermision= async(req:Request,res:Response,Next:NextFunction)=>
     console.log("userInfo",userInfo)
     if(userInfo){
         if(userInfo.role!=="admin"){
-            throw new appError("You are not admin",403,responseStatus.FAILED)
+             Next( new appError("You are not admin",403,responseStatus.FAILED))
         }
-        Next()
+       
     }else{
-        throw new appError("You are not admin",403,responseStatus.FAILED)
+        Next( new appError("You are not admin",403,responseStatus.FAILED))
     }
 
     }catch(err){

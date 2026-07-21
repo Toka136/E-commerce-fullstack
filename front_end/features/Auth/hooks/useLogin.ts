@@ -16,7 +16,7 @@ export const useLogin=()=>{
     setUserData(res.data.newUser.userName,res.data.newUser.image,res.data.newUser.role);
      toast.success("User logged in Successfully")
             setTimeout(() => {
-                router.push("/admin/dashboard")
+                router.push("/dashboard")
     
             }, 2000);
   }catch(err){

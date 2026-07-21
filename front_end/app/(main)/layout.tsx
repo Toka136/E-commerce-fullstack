@@ -16,6 +16,9 @@ export default function MainLayout({
     if (role === "admin") {
       router.replace("/admin");
     }
+    if(role==="user"){
+      router.replace("/dashboard")
+    }
   }, [role]);
   return (
  

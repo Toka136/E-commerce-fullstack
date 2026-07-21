@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/features/Auth/store/auth-store';
 import AdminNavbar from '../adminHeader/adminNavbar';
 import AdminSidebar from '../adminHeader/adminSidebar';
+import { useCartStore } from '@/features/Cart/store/cart-store';
 const Header = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [cartOpen, setCartOpen] = useState(false);
@@ -61,6 +62,7 @@ const Header = () => {
    const onSearch=(query:string)=>{
        console.log("query",query)
    }
+   const cartCount=useCartStore((state)=>state.cartCount)
   return (
     <>
     {useData.userRole==="admin"?(
@@ -71,7 +73,7 @@ const Header = () => {
       
     ):(
     <div>
-    <Navbar onCartClick={()=>setCartOpen(true)} onMenuClick={()=>setMenuOpen(true)} onSearch={onSearch}/>
+    <Navbar cartCount={cartCount} onCartClick={()=>setCartOpen(true)} onMenuClick={()=>setMenuOpen(true)} onSearch={onSearch}/>
     <Sidebar activeId={activeId} onNavigate={onNavigate} open={menuOpen} onClose={() => setMenuOpen(false)} navItems={defaultNavItems} accountItems={defaultAccountItems} user={defaultUser} />
        </div>)}
         </>

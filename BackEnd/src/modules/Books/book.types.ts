@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb"
+
 export interface bookI{
     title:string,
     author:string,
@@ -5,7 +7,8 @@ export interface bookI{
     price:number,
     description:string,
     coverImage:string,
-    stock:number
+    stock:number,
+    _id?:ObjectId
 }
 export interface editBookI{
     title?:string,
