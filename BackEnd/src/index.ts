@@ -5,6 +5,8 @@ import authRoutes from "./modules/Auth/Auth.routes"
 import bookRoutes from "./modules/Books/book.routes"
 import cartRoutes from "./modules/Cart/Cart.routes"
 import orderRoutes from "./modules/Orders/order.routes"
+import reviewRoutes from "./modules/reviews/review.routes"
+import categoryRoutes from "./modules/categories/Category.routes"
 import { responseStatus } from "./utils/responseStatus"
 import appError from "./utils/errorClass"
 import cookieParser from 'cookie-parser'
@@ -29,6 +31,8 @@ app.use("/api/auth",authRoutes)
 app.use("/api/books",bookRoutes)
 app.use("/api/cart",cartRoutes)
 app.use("/api/order",orderRoutes)
+app.use("/api/category",categoryRoutes)
+app.use("/api/review",reviewRoutes)
 app.use("/api/Uploads", express.static(path.join(__dirname, "Uploads")));
 app.use((req, res) => {
   

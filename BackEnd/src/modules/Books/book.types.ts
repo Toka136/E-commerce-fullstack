@@ -3,17 +3,24 @@ import { ObjectId } from "mongodb"
 export interface bookI{
     title:string,
     author:string,
-    genre:string,
     price:number,
     description:string,
     coverImage:string,
     stock:number,
     _id?:ObjectId
 }
+export interface addBookBodyI extends bookI{
+    slug:string,
+    
+}
+export interface insertBookI extends bookI{
+    category:ObjectId
+    
+}
 export interface editBookI{
     title?:string,
     author?:string,
-    genre?:string,
+    slug?:string,
     price?:number,
     description?:string,
     coverImage?:string,
@@ -21,7 +28,11 @@ export interface editBookI{
     _id:string
 }
 export interface queryI{
-    searchText?:string,
-    pageSize?:number,
-    currentPage?:number
+     pageSize?: number;
+    currentPage?: number;
+    searchText?: string;
+    category?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    sort?: string;
 }

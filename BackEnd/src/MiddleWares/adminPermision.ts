@@ -14,6 +14,7 @@ export const adminPermision= async(req:Request,res:Response,Next:NextFunction)=>
         if(userInfo.role!=="admin"){
              Next( new appError("You are not admin",403,responseStatus.FAILED))
         }
+        Next()
        
     }else{
         Next( new appError("You are not admin",403,responseStatus.FAILED))
@@ -21,7 +22,8 @@ export const adminPermision= async(req:Request,res:Response,Next:NextFunction)=>
 
     }catch(err){
         console.log(err)
-        Next(new appError("jwt expired",401,responseStatus.FAILED))
+        const error =err as Error
+        Next(new appError(error.message,401,responseStatus.FAILED))
     }
   
 }
