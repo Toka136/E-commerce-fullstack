@@ -6,6 +6,7 @@ import bookRoutes from "./modules/Books/book.routes"
 import cartRoutes from "./modules/Cart/Cart.routes"
 import orderRoutes from "./modules/Orders/order.routes"
 import reviewRoutes from "./modules/reviews/review.routes"
+import wishlistRoutes from "./modules/wishlist/WishList.routes"
 import categoryRoutes from "./modules/categories/Category.routes"
 import { responseStatus } from "./utils/responseStatus"
 import appError from "./utils/errorClass"
@@ -33,6 +34,7 @@ app.use("/api/cart",cartRoutes)
 app.use("/api/order",orderRoutes)
 app.use("/api/category",categoryRoutes)
 app.use("/api/review",reviewRoutes)
+app.use("/api/wishlist",wishlistRoutes)
 app.use("/api/Uploads", express.static(path.join(__dirname, "Uploads")));
 app.use((req, res) => {
   

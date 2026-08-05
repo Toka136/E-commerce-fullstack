@@ -9,8 +9,8 @@ export const insertBook=async(book:insertBookI)=>{
      await newBook.save()
      return newBook
 }
-export const findBookById=async(id:string)=>{
-    return await Book.findById(id).populate({path:"category",select:{__v:0,description:0}})
+export const findBookById=async(id:string,session?:ClientSession)=>{
+    return await Book.findById(id,null).populate({path:"category",select:{__v:0,description:0}}).session(session??null)
 }
 export const updateBook=async(book:bookI,id:string)=>{
      const newbook=await Book.findByIdAndUpdate(id,book,{new:true})
