@@ -25,6 +25,7 @@ export const GetSingleBook=async(id:string)=>{
         credentials:"include"
     })
     const result = await res.json();
+    console.log("result",result)
     if(!res.ok)
       throw new Error(result.message);
     return result

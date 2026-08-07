@@ -2,31 +2,24 @@
 
 import { useState } from "react";
 import { Menu, Search, ShoppingBag } from "lucide-react";
+import { useCartStore } from "@/features/cart/store/cart-store";
+import { userNavbarProps } from "@/Types/HeaderTypes";
 
-export interface NavbarProps {
-  /** Number shown on the cart badge. Pass 0 to hide the badge. */
-  cartCount?: number;
-  /** Called when the hamburger menu button is clicked. */
-  onMenuClick?: () => void;
-  /** Called when the cart button is clicked. */
-  onCartClick?: () => void;
-  /** Called when the search form is submitted, with the current query. */
-  onSearch?: (query: string) => void;
-}
+
 
 export default function Navbar({
-  cartCount = 2,
+ 
   onMenuClick,
   onCartClick,
   onSearch,
-}: NavbarProps) {
+}: userNavbarProps) {
   const [query, setQuery] = useState("");
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     onSearch?.(query);
   }
-
+  const cartCount=2
   return (
     <header className="relative w-full border-b border-tertiary-300 bg-white px-8">
       {/* Signature accent line */}
@@ -80,7 +73,7 @@ export default function Navbar({
           <button
             type="button"
             onClick={onCartClick}
-            aria-label={`Cart, ${cartCount} item${cartCount === 1 ? "" : "s"}`}
+            aria-label={`Cart, ${cartCount} item${cartCount}`}
             className="relative rounded-full bg-transparent p-2.5 text-[#3F5FBD] transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300"
           >
             <ShoppingBag size={18} strokeWidth={2} />

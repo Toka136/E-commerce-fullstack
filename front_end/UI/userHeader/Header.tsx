@@ -23,9 +23,12 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/features/Auth/store/auth-store';
 import AdminNavbar from '../adminHeader/adminNavbar';
 import AdminSidebar from '../adminHeader/adminSidebar';
+import SideCart from '@/features/cart/components/cartDrawer';
+import { CartItem } from '@/features/cart/types/cart';
+import { useCartStore } from '@/features/cart/store/cart-store';
 const Header = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [cartOpen, setCartOpen] = useState(false);
+   const {onOpen}=useCartStore()
     const [notificationOpen, setNotificationOpen] = useState(false);
     const[activeId,setActiveId]=useState("explore")
     const useData=useAuthStore((state)=>state.userData)
@@ -44,7 +47,7 @@ const Header = () => {
       { id: "settings", label: "Account Settings", icon: Settings },
       { id: "logout", label: "Logout", icon: LogOut, variant: "danger" },
     ];
-    
+ 
     const defaultUser: SidebarUser = {
       name: useData.userName,
       role: "Reader",
@@ -71,8 +74,9 @@ const Header = () => {
       
     ):(
     <div>
-    <Navbar onCartClick={()=>setCartOpen(true)} onMenuClick={()=>setMenuOpen(true)} onSearch={onSearch}/>
+    <Navbar onCartClick={()=>onOpen()} onMenuClick={()=>setMenuOpen(true)} onSearch={onSearch}/>
     <Sidebar activeId={activeId} onNavigate={onNavigate} open={menuOpen} onClose={() => setMenuOpen(false)} navItems={defaultNavItems} accountItems={defaultAccountItems} user={defaultUser} />
+      <SideCart    /> 
        </div>)}
         </>
   )

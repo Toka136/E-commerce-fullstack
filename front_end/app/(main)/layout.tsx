@@ -12,11 +12,11 @@ export default function MainLayout({
    const router = useRouter();
   const role = useAuthStore((state) => state.userData?.userRole);
 
-  useEffect(() => {
-    if (role === "admin") {
-      router.replace("/admin");
-    }
-  }, [role]);
+  // useEffect(() => {
+  //   if (role === "admin") {
+  //     router.replace("/admin");
+  //   }
+  // }, [role]);
   return (
  
     <>

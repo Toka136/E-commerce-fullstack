@@ -13,7 +13,11 @@ export default function AdminLayout({
   const role = useAuthStore((state) => state.userData?.userRole);
 
   useEffect(() => {
-    if (role !== "admin") {
+    console.log("role", role === "admin");
+    if (role === "admin") {
+      
+    }
+    else{
       router.replace("/dashboard");
     }
   }, [role]);
