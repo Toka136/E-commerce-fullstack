@@ -1,29 +1,35 @@
 import { cartI } from "./Cart.types";
 import { GetUserInfo } from "../../utils/userInfo";
-import {  findCartByUserId, getCartByUserId, insertCart, insertEmptyCart, removeProductFromCart } from "./Cart.repo";
+import {  addProductToCart, findCartByUserId, getCartByUserId, insertCart, insertEmptyCart, removeProductFromCart, updateQuantity } from "./Cart.repo";
 import { ObjectId } from "mongodb";
 import appError from "../../utils/errorClass";
 import { responseStatus } from "../../utils/responseStatus";
+import { findBookById, findOnlyBookById } from "../Books/book.repo";
 
-export const addProductInCart_S=async({productId,token}:cartI)=>{
+export const addProductInCart_S=async({productId,token,quantity}:cartI)=>{
     const userInfo=await GetUserInfo(token)
     const userId=new ObjectId(userInfo.id).toString()
     console.log("userId in cart",userId)
-
+        const product = await findOnlyBookById(productId)
+ if (!product) {
+            throw new appError("Product Not Found", 404, responseStatus.FAILED);
+        }
     const cart=await findCartByUserId(userId)
+    console.log("quantity",quantity)
     if(!cart)
     {
-        const newCart=await insertCart({userId:userId,productId:productId})
+        
+       
+        const newCart=await insertCart({userId:userId,productId:productId,quantity:quantity??1,price:product.price})
         return newCart
     }
+
     if(cart.items.find((item)=>item.product.toString()===productId))
     {
-        cart.items.find((item)=>item.product.toString()===productId)!.quantity++
-        await cart.save()
+        await updateQuantity({userId:userId,productId:productId,quantity:quantity??1,price:product.price},product.stock)
         return cart
     }
-    cart.items.push({product:productId,quantity:1})
-    await cart.save()
+   await addProductToCart({userId:userId,productId:productId,quantity:quantity??1,price:product.price})
     return cart
     
 }
@@ -40,27 +46,7 @@ export const getCartS=async({token}:{token:string})=>{
 export const removeProductFromCartS=async({productId,token}:cartI)=>{
     const userInfo=await GetUserInfo(token)
     const userId=new ObjectId(userInfo.id).toString()
-    const cart=removeProductFromCart({userId:userId,productId:productId})
+    const cart=removeProductFromCart(userId,productId)
     return cart
 
-}
-export const decreaseQuantityS=async({productId,token}:cartI)=>{
-    const userInfo=await GetUserInfo(token)
-    const userId=new ObjectId(userInfo.id).toString()
-    const cart=await findCartByUserId(userId)
-    if(!cart){
-        throw new appError("Cart Not Found",404,responseStatus.FAILED)
-    }
-    if( cart.items.find((item)=>item.product.toString()===productId)===undefined)
-    {
-        throw new appError("Product Not Found",404,responseStatus.FAILED)
-    }
-    if( cart.items.find((item)=>item.product.toString()===productId)!.quantity===1)
-    {
-        await removeProductFromCart({userId:userId,productId:productId})
-        return cart
-    }
-    cart.items.find((item)=>item.product.toString()===productId)!.quantity--
-    await cart.save()
-    return cart
 }

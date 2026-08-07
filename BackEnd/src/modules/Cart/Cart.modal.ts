@@ -17,8 +17,17 @@ const cartSchem=new mongoose.Schema({
             type:Number,
             default:1,
             min:1
-        } 
+        } ,
+        priceAtPurchase:{
+            type:Number,
+            default:0,
+            required:true
+        }
     }
-   ]
+   ],
+   subtotal:{
+    type:Number,
+    default:0   
+   }
 })
 export default mongoose.model("Cart",cartSchem)

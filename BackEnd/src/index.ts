@@ -16,6 +16,9 @@ import path from "path"
 const app = express()
 app.use(cookieParser())
 dotenv.config()
+// console.log("env",process.env);
+// console.log("url",process.env.MONGO_URL);
+// console.log(process.env.PORT);
 app.use(cors(
     {
         origin:"http://localhost:3000",
@@ -35,7 +38,7 @@ app.use("/api/order",orderRoutes)
 app.use("/api/category",categoryRoutes)
 app.use("/api/review",reviewRoutes)
 app.use("/api/wishlist",wishlistRoutes)
-app.use("/api/Uploads", express.static(path.join(__dirname, "Uploads")));
+app.use("/api/Uploads/", express.static(path.join(__dirname, "Uploads")));
 app.use((req, res) => {
   
   res.status(404).json({

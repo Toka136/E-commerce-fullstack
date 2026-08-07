@@ -20,7 +20,7 @@ export const S_register=async (user:UserData,file?:Express.Multer.File)=>{
         user.image= image
     }
     const newUser=await R_register(user)
-    const accessToken=TokenCreation({id:newUser._id,email:newUser.email,role:newUser.role},"15m")
+    const accessToken=TokenCreation({id:newUser._id,email:newUser.email,role:newUser.role},"1m")
     const refreshToken=TokenCreation({id:newUser._id,email:newUser.email,role:newUser.role},"7d")
     const returnedUser={newUser,accessToken,refreshToken}
         console.log("returnedUser",returnedUser)
@@ -36,7 +36,7 @@ export const S_login=async(user:loginBody)=>{
     if(!checkPass){
         throw new appError("Invalid Credentials",400,responseStatus.FAILED)
     }
-    const accessToken=TokenCreation({id:existUser._id,email:existUser.email,role:existUser.role},"15m")
+    const accessToken=TokenCreation({id:existUser._id,email:existUser.email,role:existUser.role},"1m")
     const refreshToken=TokenCreation({id:existUser._id,email:existUser.email,role:existUser.role},"7d")
     const returnedUser={newUser:existUser,accessToken,refreshToken}
         console.log("returnedUser",returnedUser)
@@ -55,8 +55,8 @@ export const S_refreshToken=async(token:string)=>{
       if(!user){
           throw new appError("User Not Found",400,responseStatus.FAILED)
       }
-      const accessToken=TokenCreation({id:user._id ,email:user.email,role:user.role},"15m")
-      const refreshToken=TokenCreation({id:user._id,email:user.email,role:user.role},"7d")
+      const accessToken=TokenCreation({id:user._id ,email:user.email,role:user.role},"1m")
+      const refreshToken=TokenCreation({id:user._id,email:user.email,role:user.role},"1m")
       const returnedUser={newUser:user,accessToken,refreshToken}
       console.log("returnedUser",returnedUser)
     return returnedUser

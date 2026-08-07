@@ -72,7 +72,7 @@ export const checkQuantity=async(books:bookI[],bookId:string,quantity:number,id:
     if(!book){
         console.log("bookId");
 // console.log(typeof bookId);
-         await removeProductFromCart({userId:id,productId:bookId})
+         await removeProductFromCart(id,bookId)
         throw new appError("Book Not Found",400,responseStatus.FAILED)
     }
     if(book.stock<quantity){
