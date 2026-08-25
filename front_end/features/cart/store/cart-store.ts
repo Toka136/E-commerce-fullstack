@@ -9,6 +9,9 @@ export const useCartStore=create<cartStore>()(
             isOpen:false,
             onOpen:()=>set({isOpen:true}),
             onClose:()=>set({isOpen:false}),
+            count:0,
+            setCount:(count)=>set({count:count})
+        
         }),
         {
             name:"cart",

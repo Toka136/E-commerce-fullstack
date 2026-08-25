@@ -10,10 +10,10 @@ export default function SearchBar() {
     const handleChange=(e:React.ChangeEvent<HTMLInputElement>,text:string)=>{
         const params=new URLSearchParams(searchParams);
         params.set("searchText",text);
-        router.push(`dashboard/?${params.toString()}`);
+        router.push(`?${params.toString()}`);
     }
   return (
-    <section className="w-[70%]" >
+    <section className="w-full md:w-[60%] mx-auto mt-8" >
       <div className="relative w-full">
         <input
         onChange={(e)=>handleChange(e,e.target.value)}

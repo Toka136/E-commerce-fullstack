@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, Search, ShoppingBag } from "lucide-react";
+import { Heart, Menu, Search, ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/features/cart/store/cart-store";
 import { userNavbarProps } from "@/Types/HeaderTypes";
+import Link from "next/link";
+import { useWishlistStore } from "@/features/wishlist/store/wishlist-store";
+import { useGetWishlist } from "@/features/wishlist/hooks/useGetWishlist";
 
 
 
@@ -14,12 +17,13 @@ export default function Navbar({
   onSearch,
 }: userNavbarProps) {
   const [query, setQuery] = useState("");
-
+  const {data:wishlistItems}=useGetWishlist()
+  console.log("wishlistItems",wishlistItems)
+const {count}=useCartStore()
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     onSearch?.(query);
   }
-  const cartCount=2
   return (
     <header className="relative w-full border-b border-tertiary-300 bg-white px-8">
       {/* Signature accent line */}
@@ -73,16 +77,32 @@ export default function Navbar({
           <button
             type="button"
             onClick={onCartClick}
-            aria-label={`Cart, ${cartCount} item${cartCount}`}
+            aria-label={`Cart, ${count} item${count}`}
             className="relative rounded-full bg-transparent p-2.5 text-[#3F5FBD] transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300"
           >
             <ShoppingBag size={18} strokeWidth={2} />
-            {cartCount > 0 && (
+            {count > 0 && (
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[#9550FF] font-label text-[10px] font-bold leading-none text-white">
-                {cartCount > 9 ? "9+" : cartCount}
+                {count > 9 ? "9+" : count}
               </span>
             )}
           </button>
+          {/* =========== wishlist========= */}
+          {wishlistItems&&
+           <Link
+           prefetch={false}
+            href={"/wishlist"}
+            aria-label={`wishlist, ${wishlistItems.items.length} item${wishlistItems.items.length}`}
+            className="relative rounded-full bg-transparent p-2.5 text-[#3F5FBD] transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300"
+          >
+            <Heart size={18} strokeWidth={2} />
+            {wishlistItems.items.length > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[#9550FF] font-label text-[10px] font-bold leading-none text-white">
+                {wishlistItems.items.length > 9 ? "9+" : wishlistItems.items.length}
+              </span>
+            )}
+          </Link>
+          }
         </div>
       </nav>
     </header>

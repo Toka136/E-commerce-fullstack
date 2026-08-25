@@ -1,11 +1,13 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import {  Heart, Plus } from "lucide-react";
 import { Book } from "../types/books";
 import { formatPrice } from "../utils/utils";
 import BookCover from "@/UI/components/BookCover";
 import { CircularProgress } from "@mui/material";
 import { useAddToCartMutation } from "@/features/cart/hooks/useAddToCart";
+import Link from "next/link";
+import { useAddToWishlist } from "@/features/wishlist/hooks/useAddToWishlist";
 
 interface BookCardProps {
   book: Book;
@@ -20,19 +22,23 @@ export default function BookCard({ book, eyebrow }: BookCardProps) {
                quantity: 1
               });
   }
+ 
 
   return (
-    <div className="bg-white hover:-translate-y-0.5 rounded-2xl overflow-hidden shadow-sm flex flex-col h-full hover:shadow-md transition-shadow">
+    <div className="bg-white hover:-translate-y-0.5 relative rounded-2xl overflow-hidden shadow-sm flex flex-col h-full hover:shadow-md transition-shadow">
       {/* Upper Cover Container */}
+              <Link href={`/books/${book._id}`}>
+             
       <div className="relative aspect-4/5  w-full bg-[#679198] flex items-center justify-centeroverflow-hidden">
         <BookCover coverImage={book.coverImage} title={book.title} />
-
         {isOutOfStock && (
           <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 text-white text-xs font-semibold backdrop-blur-sm">
             Out of stock
           </span>
         )}
       </div>
+      </Link>
+
 
       {/* Content Container */}
       <div className="p-4 flex flex-col grow justify-between bg-white">

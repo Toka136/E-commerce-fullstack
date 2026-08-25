@@ -85,7 +85,7 @@ export default function Sidebar({
         </nav>
 
         {/* Footer / profile */}
-        <div className="border-t border-slate-200 bg-[#eff4ff] p-6">
+        <div className="border-t border-slate-200 bg-surface-container-low  p-6">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#b6c4ff]/30">
               {user!.image ? <img 
@@ -97,7 +97,7 @@ export default function Sidebar({
               <p className="truncate font-body text-sm font-bold text-[#0b1c30]">
                 {user!.name}
               </p>
-              <p className="truncate font-headline text-xs text-[#444652]">
+              <p className="truncate font-headline text-xs text-on-surface-variant">
                 {user!.role}
               </p>
             </div>

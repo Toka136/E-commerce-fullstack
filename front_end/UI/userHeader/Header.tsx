@@ -11,20 +11,19 @@ import {
   User,
   
   X,
-  type LucideIcon,
+  
   LayoutDashboard,
   BookOpen,
   Users,
   LucideSettings,
+  StoreIcon,
 } from "lucide-react";
 import { SidebarNavItem, SidebarUser } from '@/Types/HeaderTypes';
 import Sidebar from './Sidebar';
-import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/features/Auth/store/auth-store';
 import AdminNavbar from '../adminHeader/adminNavbar';
 import AdminSidebar from '../adminHeader/adminSidebar';
 import SideCart from '@/features/cart/components/cartDrawer';
-import { CartItem } from '@/features/cart/types/cart';
 import { useCartStore } from '@/features/cart/store/cart-store';
 const Header = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -37,15 +36,16 @@ const Header = () => {
       setActiveId(id);
     }
     const defaultNavItems: SidebarNavItem[] = [
-      { id: "/", label: "Explore", icon: Compass },
+      { id: "/dashboard", label: "Explore", icon: Compass },
+      { id: "/books", label: "Store", icon: StoreIcon },
       { id: "orders", label: "My Orders", icon: Receipt },
-      { id: "wishlist", label: "Wishlist", icon: Heart },
+      { id: "/wishlist", label: "wishlist", icon: Heart },
       { id: "reviews", label: "My Reviews", icon: MessageSquareText },
     ];
     
     const defaultAccountItems: SidebarNavItem[] = [
-      { id: "settings", label: "Account Settings", icon: Settings },
-      { id: "logout", label: "Logout", icon: LogOut, variant: "danger" },
+      { id: "profile", label: "profile", icon: Settings },
+      { id: useData._id?  "logout":"/login", label:useData._id?  "Logout":"Login", icon:useData._id?  LogOut:User, variant:useData._id?"danger":"default" },
     ];
  
     const defaultUser: SidebarUser = {

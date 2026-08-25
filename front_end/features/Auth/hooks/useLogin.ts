@@ -13,7 +13,7 @@ export const useLogin=()=>{
     const res=await Login(data)
     console.log("res",res)
     login();
-    setUserData(res.data.newUser.userName,res.data.newUser.image,res.data.newUser.role);
+    setUserData(res.data.newUser.userName,res.data.newUser.image,res.data.newUser.role,res.data.newUser._id);
      toast.success("User logged in Successfully")
             setTimeout(() => {
               if(res.data.newUser.role==="user")

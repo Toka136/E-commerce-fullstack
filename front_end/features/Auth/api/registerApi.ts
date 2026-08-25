@@ -1,3 +1,4 @@
+import axios from "axios";
 import { registerInputT } from "../types/registerType";
 
 export const Register=async(data:registerInputT)=>{
@@ -8,13 +9,11 @@ export const Register=async(data:registerInputT)=>{
     formData.append("password",data.password)
     data.image&&formData.append("image",data.image)
      console.log("dataregform",formData)
-    const res =await fetch("http://localhost:4000/api/auth/register",{
-        method:"POST",
+    const res =await axios.post("http://localhost:4000/api/auth/register",{
         body:formData,
         credentials:"include"
     })
-    const result = await res.json();
-    if(!res.ok)
-      throw new Error(result.message);
-    return result
+     
+   
+    return res.data;
 }

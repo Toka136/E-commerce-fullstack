@@ -1,12 +1,14 @@
 "use client";
 
-import { Drawer, IconButton, Divider, Button } from "@mui/material";
+import { Drawer, IconButton, Divider, Button, CircularProgress } from "@mui/material";
 import { X, Minus, Plus } from "lucide-react";
 import Image from "next/image";
 import { CartDrawerProps } from "../types/cart";
 import SideCartItem from "./sideCartItem";
 import { useCartStore } from "../store/cart-store";
 import { useGetCart } from "../hooks/useGetCart";
+import { useEffect } from "react";
+import Link from "next/link";
 
 
 
@@ -19,7 +21,14 @@ export default function SideCart({
 }: CartDrawerProps) {
   const {data,isPending,error}=useGetCart()
   const {isOpen,onClose,}=useCartStore()
+  const {setCount}=useCartStore()
+  useEffect(() => {
+     if(data)
+      setCount(data.data.items.length)
+  }, [data])
   return (
+    <>
+    {!isPending&&
     <Drawer
       anchor="right"
       open={isOpen}
@@ -39,6 +48,7 @@ export default function SideCart({
       </div>
 
       {/* Items */}
+      {/* {console.log("cart items",data?.data.items)} */}
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
         {data?.data.items.length === 0 ? (
           <p className="text-sm text-gray-500 text-center mt-8">Your cart is empty.</p>
@@ -74,7 +84,6 @@ export default function SideCart({
             <span>{(data?.data.subtotal??0+shippingEstimate)}$</span>
           </div>
         </div>
-
         <Button
           fullWidth
           variant="contained"
@@ -85,8 +94,17 @@ export default function SideCart({
         >
           Proceed to Checkout
         </Button>
+         <Link
+          href="/cart"
+          // onClick={onCheckout}
+          className="bg-[#3455B9] hover:bg-blue-700 normal-case py-3! rounded-lg text-sm font-semibold"
+        >
+          View Cart
+        </Link>
       </div>
-    </Drawer>
+    </Drawer>}
+    
+    </>
   );
 }
 

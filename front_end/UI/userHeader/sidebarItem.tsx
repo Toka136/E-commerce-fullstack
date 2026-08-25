@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export  function renderItem(item: SidebarNavItem, isFirstAccountItem: boolean, activeId: string, onNavigate?: () => void) {
     const Icon = item.icon;
-    const isActive = item.id === activeId;
+    const isActive = item.id.includes( activeId);
     const isDanger = item.variant === "danger";
     const {handleLogout}=useLogout()
 

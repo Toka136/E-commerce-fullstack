@@ -9,8 +9,7 @@ export default function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
-   const router = useRouter();
-  const role = useAuthStore((state) => state.userData?.userRole);
+
 
   // useEffect(() => {
   //   if (role === "admin") {

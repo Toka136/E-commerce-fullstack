@@ -13,6 +13,7 @@ export interface Book {
   };
   createdAt: string; 
 }
+
 export interface getBooksResponse{
     status: string;
     message: string,
@@ -25,8 +26,13 @@ export interface getBooksResponse{
     }
 
 }
+export type SortOption="price-asc"|"price-desc"|"newest"|"oldest"
 export interface gteBooksParams{
     pageSize?:number,
     currentPage?:number,
-    searchText?:string
+    searchText?:string,
+    category?:string,
+    minPrice?:number,
+    maxPrice?:number
+   sort?:SortOption
 }

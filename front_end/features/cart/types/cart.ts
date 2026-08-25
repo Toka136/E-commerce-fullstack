@@ -10,6 +10,8 @@ export interface cartStore{
   isOpen:boolean,
   onOpen:()=>void,
   onClose:()=>void,
+  count:number,
+  setCount:(count:number)=>void
  
 }
 export interface cartProduct {

@@ -1,0 +1,9 @@
+/* Add this to your globals.css — hides the scrollbar on the horizontally
+   scrolling category pills while keeping it scrollable. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
