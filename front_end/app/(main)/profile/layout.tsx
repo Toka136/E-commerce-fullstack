@@ -11,7 +11,7 @@ export default async function AccountLayout({
   return (
  
      <div className="min-h-screen bg-background px-4 py-10 sm:px-8">
-     <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
+     <div className="mx-auto grid w-full md:w-[80%] grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
              {/* ------------------------------------------------------------- */}
              {/* Left column                                                   */}
              {/* ------------------------------------------------------------- */}

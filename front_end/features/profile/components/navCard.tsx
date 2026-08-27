@@ -1,19 +1,21 @@
 import { ChevronRight, CreditCard, FileText, LogOut, MapPin, Settings } from "lucide-react";
+import Link from "next/link";
 
 const NAV_ITEMS = [
-  { label: "My Orders", icon: FileText },
-  { label: "Payment Methods", icon: CreditCard },
-  { label: "Shipping Addresses", icon: MapPin },
-  { label: "Account Settings", icon: Settings },
+  { label: "My Orders", icon: FileText , to:"addresses" },
+  { label: "Payment Methods", icon: CreditCard,to:"/profile/addresses" },
+  { label: "Shipping Addresses", icon: MapPin ,to:"profile/addresses"},
+  { label: "Account Settings", icon: Settings, to:"/profile" },
 ];
 export const NavCard=()=>{
     return (
         <div className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-3 shadow-sm">
             <nav className="flex flex-col gap-1">
-              {NAV_ITEMS.map(({ label, icon: Icon }) => (
-                <button
+              {NAV_ITEMS.map(({ label, icon: Icon ,to}) => (
+                <Link
+                href={to}
                   key={label}
-                  type="button"
+                  type="Link"
                   className="flex items-center justify-between rounded-xl px-3 py-3 text-sm font-medium text-on-surface-variant transition hover:bg-surface-container"
                 >
                   <span className="flex items-center gap-3">
@@ -21,7 +23,7 @@ export const NavCard=()=>{
                     {label}
                   </span>
                   <ChevronRight className="h-4 w-4 text-outline" />
-                </button>
+                </Link>
               ))}
 
               <hr className="my-2 border-outline-variant/40" />
