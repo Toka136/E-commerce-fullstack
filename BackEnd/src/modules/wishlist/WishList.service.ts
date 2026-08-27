@@ -71,6 +71,8 @@ export const moveToCartS = async (token: string, productId: string) => {
     if (product.stock <= 0) {
       throw new appError("Product Out Of Stock", 400, responseStatus.FAILED);
     }
+    console.log("product.price",product.price);
+    
     await addProductIntoCartW_S(
         userId,
         productId,
@@ -101,9 +103,9 @@ export const addProductIntoCartW_S = async (
   if (!cart) {
     return await insertCart(
       {
-        userId,
-        productId,
-        price
+        userId:userId,
+        productId:productId,
+        price:price
       },
       session
     );
@@ -115,11 +117,14 @@ export const addProductIntoCartW_S = async (
 
   if (item) {
     item.quantity++;
+    cart.subtotal += price;
   } else {
     cart.items.push({
       product: productId,
       quantity: 1,
+      priceAtPurchase: price,
     });
+    cart.subtotal += price;
   }
 
 if (session) {

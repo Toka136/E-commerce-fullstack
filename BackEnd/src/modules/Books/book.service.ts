@@ -8,7 +8,7 @@ import path from "path";
 import { getCategory } from "../categories/Category.repo";
 import { getBookReviews } from "../reviews/review.repo";
 export const addBook_S=async(body:addBookBodyI,file?:Express.Multer.File)=>{  
-    const {title,author,slug,price,description,stock}=body
+    const {title,author,slug,price,description,stock,pages}=body
     const bookCategory=await getCategory(slug)
     if(!bookCategory){
         throw new appError("Category Not Found",400,responseStatus.FAILED)
@@ -24,7 +24,8 @@ export const addBook_S=async(body:addBookBodyI,file?:Express.Multer.File)=>{
         price,
         description,
         stock,
-        coverImage:""
+        coverImage:"",
+        pages
     }
 
     if(file){
@@ -58,7 +59,8 @@ export const editBook_S=async(body:editBookI,file?:Express.Multer.File)=>{
         price:body.price?body.price:book.price,
         description:body.description?body.description:book.description,
         stock:body.stock?body.stock:book.stock,
-        coverImage:book.coverImage
+        coverImage:book.coverImage,
+        pages:body.pages?body.pages:book.pages
     }
     
     if(file){
@@ -116,22 +118,26 @@ export const getBooks_S=async(query:queryI)=>{
     }
     
     let sort={}
-    switch(query.sort){
-        case "price-asc":
-            sort={price:1}
-            break;
-        case "price-desc":
-            sort={price:-1}
-            break;
-        case "newest":
-            sort={createdAt:-1}
-            break;
-        case "oldest":
-            sort={createdAt:1}
-            break;
-        default:
-            sort={createdAt:-1}   
-    }
+    switch (query.sort) {
+  case "price-asc":
+    sort = { price: 1, _id: 1 };
+    break;
+
+  case "price-desc":
+    sort = { price: -1, _id: -1 };
+    break;
+
+  case "newest":
+    sort = { createdAt: -1, _id: -1 };
+    break;
+
+  case "oldest":
+    sort = { createdAt: 1, _id: 1 };
+    break;
+
+  default:
+    sort = { createdAt: -1, _id: -1 };
+}
     query.pageSize=pageSize
     const resultData=await findBooks(query,skip,filter ,sort)
     const totalCount=await getBooksCount(filter)
@@ -142,5 +148,9 @@ export const getBooks_S=async(query:queryI)=>{
        totalPage:Math.ceil(totalCount/(query.pageSize?query.pageSize:10)),
        totalCount
     }
+    console.log("sort",sort)
+    console.log("filter",filter)
+    console.log("pageSize",pageSize)
+    console.log("currentPage",currentPage)
     return result
 }

@@ -34,6 +34,11 @@ const bookSchema=new mongoose.Schema({
         type:Date,
         default:Date.now
     },
+    pages:{
+        type:Number,
+        required:true
+    },
+    
     rate:{
         average:{
             type:Number,

@@ -13,6 +13,7 @@ export const getCartByUserId=async(userId:string)=>{
         })
 }
 export const insertCart=async(cart:insertCartI,session?:ClientSession)=>{
+  console.log("cart",cart)
     const newCart=new CartModal({userId:cart.userId,items:[{product:cart.productId,quantity:1,priceAtPurchase:cart.price}],subtotal:cart.price},{session})
     // mongoose SaveOptions.session expects ClientSession | null (not undefined)
     return await newCart.save({session: session ?? null})
