@@ -10,6 +10,7 @@ import { formatPrice } from "@/features/userDashboard/utils/format";
 import { CartItemRow } from "./cartItem";
 import { useAddToCartMutation } from "../hooks/useAddToCart";
 import { useRemoveFromCartMutation } from "../hooks/useRemoveFromCart";
+import Link from "next/link";
 
 export default function CartPage() {
   const {data,isPending,error}=useGetCart()
@@ -23,6 +24,7 @@ export default function CartPage() {
     addToCartMutation({productId:id,quantity:quantity})
   }
   console.log("cart data",data)
+
   return (
     <>
     {isPending&&<div className="flex min-h-screen flex-col bg-[#F7F7FB]">
@@ -98,15 +100,15 @@ export default function CartPage() {
 
             <div className="flex items-center justify-between">
               <span className="text-[15px] font-medium text-gray-900">Total</span>
-              <span className="text-[22px] font-bold text-indigo-600">{formatPrice(data.data.subtotal)}</span>
+              <span className="text-[22px] font-bold text-primary">{formatPrice(data.data.subtotal)}</span>
             </div>
 
-            <button className="mt-5 cursor-pointer flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3.5 text-[15px] font-semibold text-white transition hover:bg-indigo-700">
+            <Link href={"/checkout"}  className="mt-5 cursor-pointer flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-[15px] font-semibold text-white transition hover:bg-indigo-700">
               Proceed to Checkout
               <ArrowRight className="h-4 w-4" />
-            </button>
+            </Link >
 
-            <button className="mt-3 cursor-pointer w-full text-center text-[14px] font-semibold text-indigo-600 hover:text-indigo-700">
+            <button className="mt-3 cursor-pointer w-full text-center text-[14px] font-semibold text-primary hover:text-indigo-700">
               Continue Shopping
             </button>
           </section>

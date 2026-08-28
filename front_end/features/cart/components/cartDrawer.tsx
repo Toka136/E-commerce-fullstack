@@ -90,17 +90,24 @@ export default function SideCart({
           disableElevation
           onClick={onCheckout}
           disabled={data?.data.items.length === 0}
-          className="bg-[#3455B9] hover:bg-blue-700 normal-case py-3! rounded-lg text-sm font-semibold"
+          className="bg-primary hover:bg-blue-700 normal-case py-3! rounded-lg text-sm font-semibold"
         >
           Proceed to Checkout
         </Button>
-         <Link
-          href="/cart"
-          // onClick={onCheckout}
-          className="bg-[#3455B9] hover:bg-blue-700 normal-case py-3! rounded-lg text-sm font-semibold"
+         <Button
+          fullWidth
+          variant="contained"
+          disableElevation
+          disabled={data?.data.items.length === 0}
+          className="bg-primary mt-8! hover:bg-blue-700 normal-case  rounded-lg text-sm font-semibold"
         >
+          <Link
+          className="flex items-center justify-center gap-2 w-full py-2"
+          href="/cart">
           View Cart
-        </Link>
+          </Link>
+        </Button>
+        
       </div>
     </Drawer>}
     

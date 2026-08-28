@@ -8,7 +8,6 @@ export interface AddressFormValues {
   country: string;
   postalCode: string;
   mobile: string;
-  isDefault: boolean;
 }
 
 export const addressValidationSchema = Yup.object({

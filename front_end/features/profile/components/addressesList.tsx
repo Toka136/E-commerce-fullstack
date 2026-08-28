@@ -34,6 +34,7 @@ export default function AddressList({ addresses }: { addresses: Address[] }) {
   }
   const handleSetDefault=async(addressId:string)=>{
     try{
+      console.log("addressId default",addressId);
         await setAsDefault(addressId)
     }
      catch(err){

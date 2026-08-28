@@ -91,26 +91,7 @@ export default function AddressFormFields({
         helperText={formik.touched.mobile && formik.errors.mobile}
         fullWidth
       />
-     {/* {formType === "add" &&} */}
-      <FormControlLabel
-        control={
-          <Switch
-            name="isDefault"
-            checked={formik.values.isDefault}
-            onChange={formik.handleChange}
-            sx={{
-              "& .MuiSwitch-switchBase.Mui-checked": {
-                color: "var(--color-primary)",
-              },
-              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: "var(--color-primary)",
-              },
-            }}
-          />
-        }
-        label="Set as default address"
-        sx={{ color: "var(--color-on-surface-variant)" }}
-      />
+      
     </>
   );
 }

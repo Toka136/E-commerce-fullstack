@@ -3,6 +3,7 @@ export interface Address {
   userId: string;
   title: string;
   addressLine1: string;
+  addressLine2: string;
   city: string;
   state: string;
   country: string;
@@ -26,7 +27,6 @@ export interface CreateAddressParams {
   country: string;
   postalCode: string;
   mobile: string;
-  isDefault: boolean;
 }
 
 export interface editAddressParams

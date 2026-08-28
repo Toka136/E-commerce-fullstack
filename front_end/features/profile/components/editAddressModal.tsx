@@ -69,7 +69,6 @@ export default function EditAddressModal({
       country: address.country,
       postalCode: address.postalCode,
       mobile: address.mobile,
-      isDefault: address.isDefault,
     },
     validationSchema: addressValidationSchema,
     onSubmit: handleEditAddress,

@@ -32,7 +32,6 @@ const initialValues: AddressFormValues = {
   country: "",
   postalCode: "",
   mobile: "",
-  isDefault: false,
 };
 
 export default function AddAddressModal({
