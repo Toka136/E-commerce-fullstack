@@ -1,18 +1,18 @@
 import { toast } from "react-toastify";
-import {  EditBook } from "../api/booksApi";
-import {  editBookT } from "../types/Books";
+import { addBookT, editBookT } from "../types/Books";
+import { useMutation } from "@tanstack/react-query";
+import { AddBook } from "../api/addBook";
+import { useRouter } from "next/navigation";
+import { EditBook } from "../api/editBook";
 
-export const UseEditBook=async(data:editBookT)=>{
-    try{
-        console.log("data edit",data)
-        const res=await EditBook(data)
-        toast.success("Book Edited Successfully")
-    return res
-    }catch(err){
-        console.log("err",err)
-        const error=err as {message:string}
-        toast.error(error.message)
-    }
-    
+export const UseEditBook=()=>{
+    const router=useRouter()
+    return useMutation({
+        mutationFn:(data:editBookT)=>EditBook(data),
+        onSuccess:()=>{
+            toast.success("Book added successfully")
+            router.refresh()
+        }
+    })
     
 }

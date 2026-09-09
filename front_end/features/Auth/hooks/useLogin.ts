@@ -19,7 +19,7 @@ export const useLogin=()=>{
               if(res.data.newUser.role==="user")
               router.push("/dashboard")
               else
-                router.push("/admin")
+                router.push("/admin/dashboard")
     
             }, 2000);
   }catch(err){

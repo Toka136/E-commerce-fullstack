@@ -1,8 +1,10 @@
+import { Category } from "@/features/categories/types/categories";
+
 export interface Book {
   _id: string;
   title: string;
   author: string;
-  genre: string;
+ category:Category
   price: number;
   description: string;
   coverImage: string;

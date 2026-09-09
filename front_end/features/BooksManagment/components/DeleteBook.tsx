@@ -14,23 +14,31 @@ import {
 import { Delete, X } from "lucide-react";
 import { DeleteModalPropsT } from "../types/Books";
 import { UseDeleteBook } from "../hooks/useDeleteBook";
+import { AxiosError } from "axios";
 
 
 
-export default function DeleteBookModal({open,fetchBooks,onClose,id,title = "Delete Item",itemName = "this item",loading = false,
+export default function DeleteBookModal({open,onClose,id,title = "Delete Item",itemName = "this item",loading = false,
 }:  DeleteModalPropsT) {
-    const handleDelete = async () => {
-      try {
-        const res = await UseDeleteBook(id);
-        if(res){
-         await fetchBooks();
-        onClose();
+   
+    const {mutateAsync:deleteBook,isPending}=UseDeleteBook()
+    const handleDelete=async()=>{
+      try{
+        await deleteBook(id)
+        onClose()
+      }catch(err){
+        const error=err as AxiosError
+        if (err instanceof AxiosError) {
+        console.log("STATUS:", err.response?.status);
+        console.log("DATA:", err.response?.data);
+        console.log("MESSAGE:", err.response?.data?.message);
+        if(err.response?.data?.message){
+          alert(err.response?.data?.message)
         }
-       
-      } catch (error) {
-        console.error(error);
+      }
       }
     }
+
   return (
     <Dialog 
       open={open} 

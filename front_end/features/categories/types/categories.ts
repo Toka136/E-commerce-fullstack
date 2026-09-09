@@ -9,3 +9,7 @@ export interface GetCategoriesResponse{
     status:string,
     message:string
 }
+export interface AddCategoryReq{
+   name:string,
+   description?:string
+}

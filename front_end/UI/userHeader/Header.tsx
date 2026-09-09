@@ -55,10 +55,10 @@ const Header = () => {
     };
       const adminDefaultNavItems: SidebarNavItem[] = [
       { id: "/", label: "Dashboard", icon: LayoutDashboard },
-      { id: "/inventory", label: "Inventory", icon: BookOpen },
+      { id: "/admin/inventory", label: "Inventory", icon: BookOpen },
       { id: "orders", label: "My Orders", icon: Receipt },
       { id: "customers", label: "Customers", icon: Users },
-      { id: "seetings", label: "Settings", icon: LucideSettings },
+      { id: "/admin/categories", label: "Categories", icon: Compass },
       { id: "adminLogout", label: "Logout", icon: LogOut, variant: "danger" }
     ];
    const onSearch=(query:string)=>{

@@ -1,30 +1,40 @@
 import { useFormik } from "formik";
 import { addBookSchema } from "../schema/addBookSchema";
 import { addBookT } from "../types/Books";
-import { AddBook } from "../api/booksApi";
 import { UseAddBook } from "../hooks/useAddBook";
 import { UploadCloud, X } from "lucide-react";
 import { useRef, useState } from "react";
+import { Category } from "@/features/categories/types/categories";
 
-export const AddBookForm = ({handleClose}:{handleClose:()=>void}) => {
+export const AddBookForm = ({handleClose,categories}:{handleClose:()=>void,categories:Category[]}) => {
     const [isDragging,setIsDragging]=useState(false)
+    const {mutateAsync:AddBook,isPending}=UseAddBook()
     const [imagePreview,setImagePreview]=useState<string|null>(null)
     const imageRef=useRef<HTMLInputElement>(null)
+    const handleAddBook=async(data:addBookT)=>{
+      try{
+        await AddBook(data)
+        handleClose()
+      }catch(error){
+        console.log(error)
+      }
+    }
     const bookFormik=useFormik<addBookT>(
         {
             initialValues: {
               title: '',
               author: '',
-              genre: '',
+              slug: '',
               description: '',
               coverImage: null,
               price: 0,
-              stock: 0
+              stock: 0,
+              pages: 0
             },
-            onSubmit:()=>{
-              UseAddBook(bookFormik.values)
-              handleClose()
-            },
+          onSubmit: (values) => {
+            console.log("SUBMIT VALUES:", values);
+            handleAddBook(values);
+          },
             validationSchema: addBookSchema
           }
     )
@@ -60,10 +70,11 @@ export const AddBookForm = ({handleClose}:{handleClose:()=>void}) => {
       }
 
     }
+
     return <div>
             <form onSubmit={bookFormik.handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-[#444652]">
+            <label className="text-sm font-semibold text-on-surface-variant">
               Book Title
             </label>
             <input
@@ -72,14 +83,14 @@ export const AddBookForm = ({handleClose}:{handleClose:()=>void}) => {
               onChange={bookFormik.handleChange}
               value={bookFormik.values.title}
               placeholder="e.g. The Great Adventure"
-              className="w-full px-4 py-3 rounded-xl border-none bg-[#eff4ff] focus:ring-2 focus:ring-[#3455b9] transition-all"
+              className="w-full px-4 py-3 rounded-xl border-none bg-surface-container-low focus:ring-2 focus:ring-primary transition-all"
             />
           </div>
           {bookFormik.errors.title && bookFormik.touched.title && <p className="text-red-500">{bookFormik.errors.title}</p>}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-[#444652]">
+              <label className="text-sm font-semibold text-on-surface-variant">
                 Author
               </label>
               <input
@@ -88,29 +99,44 @@ export const AddBookForm = ({handleClose}:{handleClose:()=>void}) => {
                 onChange={bookFormik.handleChange}
                 value={bookFormik.values.author}
                 placeholder="Full name"
-                className="w-full px-4 py-3 rounded-xl border-none bg-[#eff4ff] focus:ring-2 focus:ring-[#3455b9] transition-all"
+                className="w-full px-4 py-3 rounded-xl border-none bg-surface-container-low focus:ring-2 focus:ring-primary transition-all"
               />
             </div>
             {bookFormik.errors.author && bookFormik.touched.author && <p className="text-red-500">{bookFormik.errors.author}</p>}
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-[#444652]">
-                Genre
+              <label className="text-sm font-semibold text-on-surface-variant">
+                Category
               </label>
-             <input
-                type="text"
-                name="genre"
-                onChange={bookFormik.handleChange}
-                value={bookFormik.values.genre}
-                placeholder="e.g. Fiction"
-                />
+
+              <div>
+                <select
+                  name="slug"
+                  onChange={bookFormik.handleChange}
+                  onBlur={bookFormik.handleBlur}
+                  value={bookFormik.values.slug}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                >
+                  <option value="">Select a category</option>
+
+                  {categories.map((category: Category) => (
+                    <option key={category._id} value={category.slug}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+
+                {bookFormik.errors.slug && bookFormik.touched.slug && (
+                  <p className="text-red-500">{bookFormik.errors.slug}</p>
+                )}
+              </div>
             </div>
-            {bookFormik.errors.genre && bookFormik.touched.genre && <p className="text-red-500">{bookFormik.errors.genre}</p>}
+            {bookFormik.errors.slug && bookFormik.touched.slug && <p className="text-red-500">{bookFormik.errors.slug}</p>}
           </div>
 
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-[#444652]">
+              <label className="text-sm font-semibold text-on-surface-variant">
                 Retail Price ($)
               </label>
               <input
@@ -119,12 +145,12 @@ export const AddBookForm = ({handleClose}:{handleClose:()=>void}) => {
                 onChange={bookFormik.handleChange}
                 value={bookFormik.values.price}
                 step="0.01"
-                className="w-full px-4 py-3 rounded-xl border-none bg-[#eff4ff] focus:ring-2 focus:ring-[#3455b9] transition-all"
+                className="w-full px-4 py-3 rounded-xl border-none bg-surface-container-low focus:ring-2 focus:ring-primary transition-all"
               />
             </div>
             {bookFormik.errors.price && bookFormik.touched.price && <p className="text-red-500">{bookFormik.errors.price}</p>}
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-[#444652]">
+              <label className="text-sm font-semibold text-on-surface-variant">
                 Opening Stock
               </label>
               <input
@@ -133,14 +159,32 @@ export const AddBookForm = ({handleClose}:{handleClose:()=>void}) => {
                 onChange={bookFormik.handleChange}
                 value={bookFormik.values.stock}
                 step="1"
-                className="w-full px-4 py-3 rounded-xl border-none bg-[#eff4ff] focus:ring-2 focus:ring-[#3455b9] transition-all"
+                className="w-full px-4 py-3 rounded-xl border-none bg-surface-container-low focus:ring-2 focus:ring-primary transition-all"
               />
             </div>
             {bookFormik.errors.stock && bookFormik.touched.stock && <p className="text-red-500">{bookFormik.errors.stock}</p>}
           </div>
+          {/* pages */}
+          <div className="grid grid-cols-2 gap-4">
+        
+            <div className="space-y-1">
+              <label className="text-sm font-semibold text-on-surface-variant">
+                Pages Number
+              </label>
+              <input
+                type="number"
+                name="pages"
+                onChange={bookFormik.handleChange}
+                value={bookFormik.values.pages}
+                step="1"
+                className="w-full px-4 py-3 rounded-xl border-none bg-surface-container-low focus:ring-2 focus:ring-primary transition-all"
+              />
+            </div>
+            {bookFormik.errors.pages && bookFormik.touched.pages && <p className="text-red-500">{bookFormik.errors.pages}</p>}
+          </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-[#444652]">
+            <label className="text-sm font-semibold text-on-surface-variant">
               Book Description
             </label>
             <textarea
@@ -150,13 +194,13 @@ export const AddBookForm = ({handleClose}:{handleClose:()=>void}) => {
               value={bookFormik.values.description}
               
               placeholder="Brief summary of the book..."
-              className="w-full px-4 py-3 rounded-xl border-none bg-[#eff4ff] focus:ring-2 focus:ring-[#3455b9] transition-all"
+              className="w-full px-4 py-3 rounded-xl border-none bg-surface-container-low focus:ring-2 focus:ring-primary transition-all"
             />
           </div>
           {bookFormik.errors.description && bookFormik.touched.description && <p className="text-red-500">{bookFormik.errors.description}</p>}
-  <div>
+            <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Profile Picture
+              Book Cover Image
             </label>
             
             <input 
@@ -208,14 +252,14 @@ export const AddBookForm = ({handleClose}:{handleClose:()=>void}) => {
             )}
            
           </div>
-             <footer className="p-6 border-t border-[#c4c5d5]/20 flex gap-4">
+             <footer className="p-6 border-t border-outline-variant/20  flex gap-4">
           <button
             onClick={handleCancel}
-            className="flex-1 px-6 py-3 rounded-xl font-semibold text-[#444652] hover:bg-[#dce9ff] transition-colors"
+            className="flex-1 px-6 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-hightransition-colors"
           >
             Cancel
           </button>
-          <button className="flex-1 px-6 py-3 rounded-xl font-semibold bg-[#3455b9] text-white shadow-md hover:shadow-lg active:scale-95 transition-all">
+          <button   type="submit" className="flex-1 px-6 py-3 rounded-xl font-semibold bg-primary text-white shadow-md hover:shadow-lg active:scale-95 transition-all">
             Save Book
           </button>
         </footer>
