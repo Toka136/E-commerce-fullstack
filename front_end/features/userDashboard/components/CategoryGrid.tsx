@@ -1,4 +1,4 @@
-import type { Category } from "@/lib/types";
+import { Category } from "@/features/categories/types/categories";
 import CategoryCard from "./CategoryCard";
 
 interface CategoryGridProps {

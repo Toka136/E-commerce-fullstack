@@ -1,3 +1,4 @@
+import { Category } from "@/features/categories/types/categories";
 import {
   BookOpen,
   FlaskConical,
@@ -8,7 +9,6 @@ import {
   UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
-import type { Category } from "@/lib/types";
 
 const ICONS_BY_KEYWORD: Array<{ match: RegExp; icon: LucideIcon }> = [
   { match: /software|program|code|dev|tech/i, icon: Code2 },

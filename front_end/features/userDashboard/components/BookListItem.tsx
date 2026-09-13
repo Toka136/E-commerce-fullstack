@@ -40,8 +40,8 @@ export default function BookListItem({ book, badge }: BookListItemProps) {
         
         <p className="text-xs text-[#64748B] font-medium line-clamp-1 mt-0.5">
           {book.author}
-          {book.genre && (
-            <span className="text-[#64748B]"> • {book.genre}</span>
+          {book.category.name && (
+            <span className="text-[#64748B]"> • {book.category.name}</span>
           )}
         </p>
 

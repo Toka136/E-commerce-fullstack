@@ -56,7 +56,7 @@ const Header = () => {
       const adminDefaultNavItems: SidebarNavItem[] = [
       { id: "/", label: "Dashboard", icon: LayoutDashboard },
       { id: "/admin/inventory", label: "Inventory", icon: BookOpen },
-      { id: "orders", label: "My Orders", icon: Receipt },
+      { id: "/admin/orders", label: " Orders", icon: Receipt },
       { id: "customers", label: "Customers", icon: Users },
       { id: "/admin/categories", label: "Categories", icon: Compass },
       { id: "adminLogout", label: "Logout", icon: LogOut, variant: "danger" }
