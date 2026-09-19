@@ -2,8 +2,10 @@ import { useMutation } from "@tanstack/react-query"
 import { AxiosError } from "axios"
 import { toast } from "react-toastify"
 import { deleteReviewA } from "../api/deleteReview"
+import { useRouter } from "next/navigation"
 
 export const useDeleteReview=()=>{
+       const router=useRouter()
     return useMutation({
         mutationFn:(reviewId:string)=>deleteReviewA(reviewId),
         onError:(err)=>{
@@ -14,6 +16,9 @@ export const useDeleteReview=()=>{
                 toast.error(err.response?.data?.message)
                 
             }
+        },
+        onSuccess:()=>{
+            router.refresh()
         }
     })
 }

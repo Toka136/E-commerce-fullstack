@@ -32,45 +32,21 @@ const {count}=useCartStore()
       <nav className="flex items-center gap-3 px-8 py-3 sm:gap-4 sm:px-6 flex-wrap">
         {/* Left: menu + logo */}
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onMenuClick}
-            aria-label="Open menu"
-            className="rounded-lg p-2 text-[#3F5FBD] transition-colors hover:bg-tertiary-200 hover:text-primary-600 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300"
-          >
-            <Menu size={20} strokeWidth={2} />
-          </button>
+  <button
+  type="button"
+  onClick={onMenuClick}
+  aria-label="Open menu"
+  className="rounded-lg p-2 text-[#3F5FBD] transition-colors hover:bg-tertiary-200 hover:text-primary-600 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 lg:hidden"
+>
+  <Menu size={20} strokeWidth={2} />
+</button>
 
           <span className="select-none whitespace-nowrap font-headline text-lg font-bold text-[#3F5FBD]">
             LibroDiscovery
           </span>
         </div>
 
-        {/* Center: search */}
-        <form
-          onSubmit={handleSubmit}
-          role="search"
-          className="mx-auto md:w-full w-[50%] md:max-w-md max-w-lg flex-1"
-        >
-          <label htmlFor="catalog-search" className="sr-only">
-            Search by title, author
-          </label>
-          <div className="relative">
-            <Search
-              size={18}
-              strokeWidth={2}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-            />
-            <input
-              id="catalog-search"
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by title, author, or ISBN..."
-              className="w-full rounded-full bg-[#EFF4FF] py-2.5 pl-10 pr-4 font-body text-sm text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3F5FBD]"
-            />
-          </div>
-        </form>
+      
 
         {/* Right: cart */}
         <div className="flex items-center">

@@ -3,8 +3,10 @@ import {  editReviewAProps } from "../types/review"
 import { AxiosError } from "axios"
 import { toast } from "react-toastify"
 import { editReviewA } from "../api/editReview"
+import { useRouter } from "next/navigation"
 
 export const useEditReview=()=>{
+    const router=useRouter()
     return useMutation({
         mutationFn:(data:editReviewAProps)=>editReviewA(data),
         onError:(err)=>{
@@ -15,6 +17,9 @@ export const useEditReview=()=>{
                 toast.error(err.response?.data?.message)
                 
             }
+        },
+        onSuccess:()=>{
+            router.refresh()
         }
     })
 }

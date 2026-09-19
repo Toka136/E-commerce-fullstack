@@ -5,31 +5,31 @@ export const api = axios.create({
   baseURL: `${BaseUrl}`,
   withCredentials: true,
 });
-// api.interceptors.response.use(
-//   (response) => response,
-//   async (error) => {
-//     const originalRequest = error.config;
-//      console.log("error",error);
-//     if (error.response.status === 401 && !originalRequest._retry) {
-//       console.log("refresh");
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+     console.log("error",error);
+    if (error.response.status === 401 && !originalRequest._retry) {
+      console.log("refresh");
      
-//       originalRequest._retry = true;
-//       try{
-//       const res = await axios.post("http://localhost:4000/api/auth/refreshToken", {
+      originalRequest._retry = true;
+      try{
+      const res = await axios.post("http://localhost:4000/api/auth/refreshToken", {
         
-//       },{
-//         withCredentials: true,
-//       });
-//      console.log("refresh",res.data);
-//       return api(originalRequest);
-//     }
-//     catch(refreshError){
-//        useAuthStore.getState().logout();
-//         // window.location.href = "/login";
-//        return Promise.reject(refreshError);
+      },{
+        withCredentials: true,
+      });
+     console.log("refresh",res.data);
+      return api(originalRequest);
+    }
+    catch(refreshError){
+       useAuthStore.getState().logout();
+        // window.location.href = "/login";
+       return Promise.reject(refreshError);
       
-//     }
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+    }
+    }
+    return Promise.reject(error);
+  }
+);

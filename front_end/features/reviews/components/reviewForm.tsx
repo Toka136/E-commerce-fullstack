@@ -18,10 +18,10 @@ export default function ReviewForm({ bookId , addReview, isPending, isError, isS
   const [hoverRating, setHoverRating] = useState(0)
   const [review, setreview] = useState("")
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (rating <= 0 ) return
 
-    addReview(
+    await addReview(
       {
         bookId,
         rating,
@@ -29,6 +29,8 @@ export default function ReviewForm({ bookId , addReview, isPending, isError, isS
       },
      
     )
+    setRating(0)
+    setreview("")
   }
 
   const isValid = rating > 0 

@@ -2,7 +2,6 @@ import { ChevronRight, CreditCard, FileText, LogOut, MapPin, Settings } from "lu
 import Link from "next/link";
 
 const NAV_ITEMS = [
-  { label: "My Orders", icon: FileText , to:"profile/orders" },
   { label: "Payment Methods", icon: CreditCard,to:"/profile/addresses" },
   { label: "Shipping Addresses", icon: MapPin ,to:"profile/addresses"},
   { label: "Account Settings", icon: Settings, to:"/profile" },

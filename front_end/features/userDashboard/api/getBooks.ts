@@ -1,8 +1,10 @@
 import { api } from "@/axios/api"
 import { getBooksResponse, gteBooksParams } from "../types/books"
+import { AxiosError } from "axios"
 
 export const getBooksA=async({pageSize,currentPage,searchText,category,minPrice,maxPrice,sort}:gteBooksParams):Promise<getBooksResponse>=>{
-    console.log("category",category)
+  try{
+      console.log("category",category)
     const res=await api.get("books/getBooks/",{
         params:{
             pageSize:pageSize??2,
@@ -16,5 +18,14 @@ export const getBooksA=async({pageSize,currentPage,searchText,category,minPrice,
     
     })
     return res.data
+  }catch(err){
+    const error=err as AxiosError
+    if (err instanceof AxiosError) {
+    console.log("STATUS:", err.response?.status);
+    console.log("DATA:", err.response?.data);
+    console.log("MESSAGE:", err.response?.data);
+    }
+    throw error
+  }
 
 }

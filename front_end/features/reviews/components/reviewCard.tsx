@@ -14,7 +14,6 @@ import {
 
 import { EditReviewForm } from "./editReviewForm";
 import { DeleteReviewDialog } from "./deleteReviewDialog";
-import { useEditReview } from "../hooks/useEditReview";
 import { addReviewAProps, editReviewAProps } from "../types/review";
 
 interface ReviewCardProps {
