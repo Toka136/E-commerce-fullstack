@@ -8,7 +8,7 @@ export const addressPermision=async(req:Request,res:Response,next:NextFunction)=
     if(!userId){
         return next(new appError("You are not logged in",401,responseStatus.FAILED))
     }
-    const addressId=req.body.addressId
+    const addressId=Array.isArray(req.params.addressId)?req.params.addressId[0]:req.params.addressId
     if(!addressId){
         return next(new appError("Address Id is required",400,responseStatus.FAILED))
     }

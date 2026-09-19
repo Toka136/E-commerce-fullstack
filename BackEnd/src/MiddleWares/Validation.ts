@@ -3,7 +3,7 @@ import appError from "../utils/errorClass";
 import { responseStatus } from "../utils/responseStatus";
 export const validationSchema=(schema:any)=>{
     return (req:Request,res:Response,next:NextFunction)=>{
-        console.log("req.body",req.body)
+        console.log("req.body validation",req.body)
         const result=schema.safeParse(req.body)
         if(result.success){
             req.body=result.data

@@ -21,7 +21,7 @@ const orderSchema=new mongoose.Schema({
     paymentMethod:{
         type:String,
         required:true,
-        enum:["cash","online"]
+        enum:["cod","online"]
     },
     paymentStatus:{
         type:String,
@@ -42,12 +42,34 @@ const orderSchema=new mongoose.Schema({
         default:Date.now()
     },
     shippingAddress: {
-        type: String,
-        required: true,
-      },
-      phoneNumber: {
-        type: String,
-        required: true,
+         
+        addressLine1:{
+            type:String,
+            required:true
+        },
+        addressLine2:{
+            type:String
+        },
+        city:{
+            type:String,
+            required:true
+        },
+        state:{
+            type:String,
+            required:true
+        },
+        country:{
+            type:String,
+            required:true
+        },
+       postalCode:{
+        type:String,
+        required:true
+    },
+        mobile:{
+            type:String,
+            required:true
+        },
       }
 
 })

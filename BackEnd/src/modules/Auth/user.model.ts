@@ -27,13 +27,6 @@ const UserSchema=new mongoose.Schema(
             type:String,
             default:""
         } ,
-        accessToken:{
-            type:String,
-            default:""
-        },
-        refreshToken:{
-            type:String,
-            default:""
-        }
+       lastActiveAt: { type: Date, default: Date.now },
     })
 export default mongoose.model("User",UserSchema)

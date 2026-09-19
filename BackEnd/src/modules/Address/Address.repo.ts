@@ -27,3 +27,6 @@ export const setAddressDefault=async(addressId:string)=>{
 export const setAddressUnDefault=async(addressId:string)=>{
     return await AddressModal.findByIdAndUpdate(addressId,{isDefault:false},{new:true})
 }
+export const thereisDefault=async(userId:string)=>{
+    return await AddressModal.findOne({userId,isDefault:true})
+}

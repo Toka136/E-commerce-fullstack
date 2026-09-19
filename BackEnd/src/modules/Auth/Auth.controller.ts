@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { authResponse, UserData } from "./Auth.types";
 import { S_login, S_refreshToken, S_register } from "./Auth.service";
+import appError from "../../utils/errorClass";
+import { responseStatus } from "../../utils/responseStatus";
 export const C_register=async(req:Request,res:Response,next:NextFunction)=>{
     console.log("in function")
     console.log("req.body",req.body)
@@ -88,3 +90,19 @@ export const C_login=async(req:Request,res:Response,next:NextFunction)=>{
                 next(err)
             }
         }
+export const C_authMe=async(req:Request,res:Response,next:NextFunction)=>{
+
+    try{
+        if(!req.user)
+        {
+            throw new appError("You are not logged in",401,responseStatus.FAILED)
+        }
+        res.status(200).json({
+            status:"success",
+            message:"User Found Successfully",
+            data:req.user
+        })
+    }catch(err){
+        next(err)
+    }
+}

@@ -5,8 +5,8 @@ export interface address{
     addressLine2?:string,
     state:string,
     country:string,
-    postalCode:number,
-    mobile:number,
+    postalCode:string,
+    mobile:string,
     isDefault?:boolean
 }
 export interface addAddressParams
@@ -23,8 +23,8 @@ export interface updateAddressParams
     addressLine2?:string,
     state?:string,
     country?:string,
-    postalCode?:number,
-    mobile?:number,
+    postalCode?:string,
+    mobile?:string,
     updatedAt:Date,
     
 }

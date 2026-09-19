@@ -7,14 +7,19 @@ import fs from "fs"
 import path from "path";
 import { getCategory } from "../categories/Category.repo";
 import { getBookReviews } from "../reviews/review.repo";
+import redis from "../../config/redis";
+import invalidateCache from "../../utils/invalidateCache";
 export const addBook_S=async(body:addBookBodyI,file?:Express.Multer.File)=>{  
     const {title,author,slug,price,description,stock,pages}=body
+    console.log("body",body)
     const bookCategory=await getCategory(slug)
     if(!bookCategory){
+        console.log("no category found")
         throw new appError("Category Not Found",400,responseStatus.FAILED)
     }
     const oldBook=await findBookByName(title)
     if(oldBook){
+        console.log("book already exists")
         throw new appError("Book Already Exists",400,responseStatus.FAILED)
     }
        const newwBook:insertBookI={
@@ -29,9 +34,12 @@ export const addBook_S=async(body:addBookBodyI,file?:Express.Multer.File)=>{
     }
 
     if(file){
+        console.log("file image",file)
         newwBook.coverImage=file.filename
     }
     const result=await insertBook(newwBook)
+    await invalidateCache("books:list:")
+    console.log("result",result)
     return result
     
 
@@ -69,6 +77,8 @@ export const editBook_S=async(body:editBookI,file?:Express.Multer.File)=>{
         newBook.coverImage=file.filename
     }
     const result=await updateBook(newBook,body._id)
+    await invalidateCache("books:list:")
+    await invalidateCache(`book:${body._id}`)
     return result
 }
 export const deleteBook_S=async(id:string)=>{
@@ -78,14 +88,29 @@ export const deleteBook_S=async(id:string)=>{
     }
     const imagePath = path.join(__dirname, '../../Uploads', book.coverImage);
     if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath)
-    await deleteBook(id)
+         await deleteBook(id)
+        await invalidateCache("books:list:")
+        await invalidateCache(`book:${id}`)
+   
 }
 export const getBook_S=async(id:string)=>{
+    const cachKey=`book:${id}`
+    const cachedBook=await redis.get(cachKey)
+    if(cachedBook){
+        return (cachedBook);
+    }
     const book=await findBookById(id)
     if(!book){
         throw new appError("Book Not Found",400,responseStatus.FAILED)
     }
     const bookReviews=await getBookReviews(id)
+    await redis.set(
+    cachKey,
+    JSON.stringify({ book, bookReviews }),
+    {
+        ex: 300
+    }
+);
     return {
         book,
         bookReviews
@@ -139,6 +164,23 @@ export const getBooks_S=async(query:queryI)=>{
     sort = { createdAt: -1, _id: -1 };
 }
     query.pageSize=pageSize
+   const cacheKey =
+        `books:list:${currentPage}:${pageSize}:` +
+        `${query.searchText || ""}:` +
+        `${query.category || ""}:` +
+        `${query.minPrice || ""}:` +
+        `${query.maxPrice || ""}:` +
+        `${query.sort || "newest"}`;
+
+    // Check Redis
+   const cached = await redis.get(cacheKey);
+
+console.log("REDIS CACHE:", cached);
+console.log("REDIS CACHE TYPE:", typeof cached);
+
+if (cached) {
+    return (cached);
+}
     const resultData=await findBooks(query,skip,filter ,sort)
     const totalCount=await getBooksCount(filter)
     const result={
@@ -148,6 +190,9 @@ export const getBooks_S=async(query:queryI)=>{
        totalPage:Math.ceil(totalCount/(query.pageSize?query.pageSize:10)),
        totalCount
     }
+    await redis.set(cacheKey,JSON.stringify(result),{
+        ex:60
+    })
     console.log("sort",sort)
     console.log("filter",filter)
     console.log("pageSize",pageSize)

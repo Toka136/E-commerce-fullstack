@@ -3,6 +3,8 @@ import Wrapper from "../../MiddleWares/Wrapper"
 import { addBook_C, deleteBook_C, getBook_C, getBooks_C, updateBook_C } from "./book.controller"
 import { imageUpload } from "../../utils/multerCode"
 import { adminPermision } from "../../MiddleWares/adminPermision"
+import { validationSchema } from "../../MiddleWares/Validation"
+import { addBookSchema } from "./book.validation"
 const router=express.Router()
 router.route("/addBook").post(adminPermision,imageUpload.single("coverImage"),Wrapper(addBook_C))
 router.route("/updateBook").patch(adminPermision,imageUpload.single("coverImage"),Wrapper(updateBook_C))

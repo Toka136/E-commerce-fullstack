@@ -27,7 +27,7 @@ export interface editBookI{
     coverImage?:string,
     stock?:number,
     _id:string,
-    pages:number
+    pages?:number
 }
 export interface queryI{
      pageSize?: number;

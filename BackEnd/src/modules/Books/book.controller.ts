@@ -5,6 +5,7 @@ import { responseStatus } from "../../utils/responseStatus"
 
 export const addBook_C=async(req:Request,res:Response,next:NextFunction)=>{
     console.log("req.file",req.file)
+    console.log("req.body",req.body)
     try{
        const result=await addBook_S(req.body,req.file)
        console.log("result add book",result)

@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from "express"
 import appError from "../../utils/errorClass"
 import { responseStatus } from "../../utils/responseStatus"
-import { changeOrderStatusS, createOrderS, getOrdersS } from "./order.service"
+import { changeOrderStatusS, createOrderS, getOrderS, getOrdersS } from "./order.service"
 
 export const createOrderC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
-   const token=req.cookies.accessToken
-   if(!token){
+   const id=req.user?.id.toString()
+   if(!id){
     throw new appError("You are not logged in",401,responseStatus.FAILED)
    }
-   const order=await createOrderS(token,req.body.phone,req.body.address)
+   const order=await createOrderS(id,req.body.address,req.body.paymentMethod)
    res.status(200).json({
     status:"success",
     message:"Order Created Successfully",
@@ -20,11 +20,37 @@ export const createOrderC=async(req:Request,res:Response,next:NextFunction)=>{
 }
 export const getOrdersC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
-        const accessToken=req.cookies.accessToken
-        if(!accessToken){
+        console.log("requser admin",req.user)
+        console.log("req.cookies admin",req.cookies)
+        const id=req.user?.id.toString()
+        if(!id){
             throw new appError("You are not logged in",401,responseStatus.FAILED)
         }
-        const orders=await getOrdersS(accessToken)
+        if(!req.user){
+            throw new appError("You are not logged in",401,responseStatus.FAILED)
+        }
+        const orders=await getOrdersS(id,req.user?.role)
+        res.status(200).json({
+            status:"success",
+            message:"Orders Found Successfully",
+            data:orders
+        })
+    }catch(err){
+        next(err)
+    }
+}
+export const getOrderC=async(req:Request,res:Response,next:NextFunction)=>{
+    try{
+       
+        if(!req.user){
+            throw new appError("You are not logged in",401,responseStatus.FAILED)
+        }
+        const id=Array.isArray(req.params.id)?req.params.id[0]:req.params.id
+        if(!id){
+            throw new appError("id is required",400,responseStatus.FAILED)
+        }
+         const userId=req.user?.id.toString()
+        const orders=await getOrderS(id,userId,req.user?.role)
         res.status(200).json({
             status:"success",
             message:"Orders Found Successfully",

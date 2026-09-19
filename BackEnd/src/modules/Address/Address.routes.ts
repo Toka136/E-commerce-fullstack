@@ -9,9 +9,9 @@ import { set } from "mongoose"
 
 const router=express.Router()
 router.route("/addAddress").post(validationSchema(addSchema),Wrapper(addAddressC))
-router.route("/getAddresses").get(Wrapper(getAddressesC))
-router.route("/getAddress").get(Wrapper(getAddressC))
-router.route("/updateAddress").patch(authenticationMiddleware,addressPermision,validationSchema(updateSchema),Wrapper(updateAddressC))
-router.route("/deleteAddress").delete(authenticationMiddleware,addressPermision,Wrapper(deleteAddressC))
-router.route("/setDefault").patch(authenticationMiddleware,addressPermision,Wrapper(setAddressDefaultC))
+router.route("/getAddresses").get(authenticationMiddleware,Wrapper(getAddressesC))
+router.route("/getAddress").get(authenticationMiddleware,Wrapper(getAddressC))
+router.route("/updateAddress/:addressId").patch(authenticationMiddleware,addressPermision,validationSchema(updateSchema),Wrapper(updateAddressC))
+router.route("/deleteAddress/:addressId").delete(authenticationMiddleware,addressPermision,Wrapper(deleteAddressC))
+router.route("/setDefault/:addressId").patch(authenticationMiddleware,addressPermision,Wrapper(setAddressDefaultC))
 export default router

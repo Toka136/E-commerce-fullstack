@@ -1,4 +1,6 @@
+import redis from "../../config/redis"
 import appError from "../../utils/errorClass"
+import invalidateCache from "../../utils/invalidateCache"
 import { responseStatus } from "../../utils/responseStatus"
 import { GetUserInfo } from "../../utils/userInfo"
 import { addRate, deleteRate, editRate } from "../Books/book.repo"
@@ -13,7 +15,9 @@ export const addReviewS=async(accessToken:string,review:reviewI)=>{
     }
     review.userId=userId.id.toString()
     await addRate(review.bookId,review.rating)
-    return await addReview(review)
+    await addReview(review)
+    await invalidateCache(`book:${review.bookId}`)
+    return review
 }
 
 export const editReviewS=async(review:editReviewI)=>{
@@ -34,7 +38,11 @@ export const editReviewS=async(review:editReviewI)=>{
         await editRate(existingReview.bookId.toString(),review.rating,existingReview.rating)
     }
      
-    return await editReview(reviewData)
+    await editReview(reviewData)
+     await invalidateCache(`book:${existingReview.bookId}`)
+     const test = await redis.get(`book:${existingReview.bookId}`);
+console.log("CACHE AFTER INVALIDATION:", test);
+    return review
 }
 export const deleteReviewS=async(reviewId:string)=>{
     const existingReview=await getReviewById(reviewId)
@@ -43,5 +51,7 @@ export const deleteReviewS=async(reviewId:string)=>{
         throw new appError("Review Not Found",400,responseStatus.FAILED)
     }
     await deleteRate(existingReview.bookId.toString(),existingReview.rating)
-    return await deleteReview(reviewId.toString())
+     await deleteReview(reviewId.toString())
+     await invalidateCache(`book:${existingReview.bookId}`)
+    return existingReview
 }

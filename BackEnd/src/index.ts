@@ -10,6 +10,7 @@ import wishlistRoutes from "./modules/wishlist/WishList.routes"
 import categoryRoutes from "./modules/categories/Category.routes"
 import addressRoutes from "./modules/Address/Address.routes"
 import profileRoutes from "./modules/profile/profile.routes"
+import adminDashboard from './modules/admin/admin.route'
 import { responseStatus } from "./utils/responseStatus"
 import appError from "./utils/errorClass"
 import cookieParser from 'cookie-parser'
@@ -18,9 +19,7 @@ import path from "path"
 const app = express()
 app.use(cookieParser())
 dotenv.config()
-// console.log("env",process.env);
-// console.log("url",process.env.MONGO_URL);
-// console.log(process.env.PORT);
+
 app.use(cors(
     {
         origin:"http://localhost:3000",
@@ -29,9 +28,7 @@ app.use(cors(
 ))
 app.use(express.json())
 mongoose.connect(process.env.MONGO_URL as string).then(()=>{
-    console.log("Connected to DB")
 }).catch((err)=>{
-    console.log(err)
 })
 app.use("/api/auth",authRoutes)
 app.use("/api/books",bookRoutes)
@@ -42,6 +39,7 @@ app.use("/api/review",reviewRoutes)
 app.use("/api/wishlist",wishlistRoutes)
 app.use("/api/address",addressRoutes)
 app.use("/api/profile",profileRoutes)
+app.use("/api/adminDashboard",adminDashboard)
 app.use("/api/Uploads/", express.static(path.join(__dirname, "Uploads")));
 app.use((req, res) => {
   

@@ -5,9 +5,18 @@ export const findBookByName=async(title:string)=>{
     return await Book.findOne({title})
 }
 export const insertBook=async(book:insertBookI)=>{
-    const newBook=new Book(book)
-     await newBook.save()
-     return newBook
+     try{
+          const newBook=new Book(book)
+
+      const res=await newBook.save()
+      console.log("res save",res)
+           return newBook
+
+     }
+     catch(err){
+         console.log("err",err)
+     }
+    //  console.log("res save book",res)
 }
 export const findBookById=async(id:string,session?:ClientSession)=>{
     return await Book.findById(id,null).populate({path:"category",select:{__v:0,description:0}}).session(session??null)

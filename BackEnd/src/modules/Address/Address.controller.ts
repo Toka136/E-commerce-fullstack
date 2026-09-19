@@ -24,11 +24,8 @@ export const addAddressC=async(req:Request,res:Response,next:NextFunction)=>{
 
 export const getAddressesC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
-        const token=req.cookies.accessToken
-        if(!token){
-            throw new appError("You are not logged in",401,responseStatus.FAILED)
-        }
-        const address=await getAddressesS(token)
+        
+        const address=await getAddressesS(req.user?.id.toString()!)
         res.status(200).json({
             status:"success",
             message:"Address Found Successfully",
@@ -48,7 +45,7 @@ export const getAddressC=async(req:Request,res:Response,next:NextFunction)=>{
         if(!addressId){
             throw new appError("Address Id is required",400,responseStatus.FAILED)
         }
-        const address=await getAddressS(token,addressId)
+        const address=await getAddressS(req.user?.id.toString()!,addressId)
         res.status(200).json({
             status:"success",
             message:"Address Found Successfully",
@@ -62,6 +59,7 @@ export const updateAddressC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
         
         const address=req.body
+        address._id=Array.isArray(req.params.addressId)?req.params.addressId[0]:req.params.addressId
         console.log("address",address)
         const newAddress=await updateAddressS(address)
         res.status(200).json({
@@ -75,7 +73,8 @@ export const updateAddressC=async(req:Request,res:Response,next:NextFunction)=>{
 export const deleteAddressC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
         
-        const addressId=req.body.addressId
+        const addressId=Array.isArray(req.params.addressId)?req.params.addressId[0]:req.params.addressId
+        console.log("addressId",addressId)
         if(!addressId){
             throw new appError("Address Id is required",400,responseStatus.FAILED)
         }
@@ -94,7 +93,7 @@ export const setAddressDefaultC=async(req:Request,res:Response,next:NextFunction
         if(!userId){
             throw new appError("You are not logged in",401,responseStatus.FAILED)
         }
-        const addressId=req.body.addressId
+        const addressId=Array.isArray(req.params.addressId)?req.params.addressId[0]:req.params.addressId
         if(!addressId){
             throw new appError("Address Id is required",400,responseStatus.FAILED)
         }

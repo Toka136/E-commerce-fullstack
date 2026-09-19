@@ -6,8 +6,7 @@ import { userInfo } from "../Types/middleWareType"
 
 export const authenticationMiddleware=async (req:Request,res:Response,next:NextFunction)=>{
    const token=req.cookies.accessToken
-   console.log("req.bodyMiddleware",req.body)
-   console.log("token",req.cookies)
+   console.log("token",req)
     if(!token){
             throw new appError("You are not logged in",401,responseStatus.FAILED)
         }
