@@ -53,7 +53,6 @@ export const createOrderS=async(id:string,address:shippingAddress,paymentMethod:
     await session.commitTransaction();
     return res
     }catch(err){
-        console.log(err)
         await session.abortTransaction()
         if(err instanceof appError){
             throw err
@@ -66,18 +65,14 @@ export const createOrderS=async(id:string,address:shippingAddress,paymentMethod:
 }
 export const checkQuantity=async(books:bookI[],bookId:string,quantity:number,id:string)=>{
     const book=books.find((book)=>book._id!.toString()===bookId)
-    console.log("book")
     if(!book){
-        console.log("bookId");
-// console.log(typeof bookId);
+     
          await removeProductFromCart(id,bookId)
         throw new appError("Book Not Found",400,responseStatus.FAILED)
     }
     if(book.stock<quantity){
-        // console.log("book.stock",book.stock,"quantity",quantity);
         throw new appError("not enough stock",400,responseStatus.FAILED)
     }
-    console.log("book.stock",book.stock,"quantity",quantity);
     return book
 }
 export const getOrdersS=async(id:string,role:string)=>{
@@ -108,7 +103,6 @@ export const changeOrderStatusS=async(id:string,status:string)=>{
 export const getOrderS=async(id:string,userId:string,role:string)=>{
    
     if(role==="admin"){
-        console.log("admin");
         return await findOrderById(id)
     }
     const order= await findOrderById(id)

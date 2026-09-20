@@ -9,90 +9,195 @@ import { getCategory } from "../categories/Category.repo";
 import { getBookReviews } from "../reviews/review.repo";
 import redis from "../../config/redis";
 import invalidateCache from "../../utils/invalidateCache";
-export const addBook_S=async(body:addBookBodyI,file?:Express.Multer.File)=>{  
-    const {title,author,slug,price,description,stock,pages}=body
-    console.log("body",body)
-    const bookCategory=await getCategory(slug)
-    if(!bookCategory){
-        console.log("no category found")
-        throw new appError("Category Not Found",400,responseStatus.FAILED)
-    }
-    const oldBook=await findBookByName(title)
-    if(oldBook){
-        console.log("book already exists")
-        throw new appError("Book Already Exists",400,responseStatus.FAILED)
-    }
-       const newwBook:insertBookI={
-        title,
-        author,
-        category:bookCategory._id,
-        price,
-        description,
-        stock,
-        coverImage:"",
-        pages
+import cloudinary from "../../config/cloudinaryconfig";
+import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
+export const addBook_S = async (
+  body: addBookBodyI,
+  file?: Express.Multer.File
+) => {
+  const {
+    title,
+    author,
+    slug,
+    price,
+    description,
+    stock,
+    pages,
+  } = body;
+
+  const bookCategory = await getCategory(slug);
+
+  if (!bookCategory) {
+    throw new appError(
+      "Category Not Found",
+      400,
+      responseStatus.FAILED
+    );
+  }
+
+  const oldBook = await findBookByName(title);
+
+  if (oldBook) {
+    throw new appError(
+      "Book Already Exists",
+      400,
+      responseStatus.FAILED
+    );
+  }
+
+  const newBook: insertBookI = {
+    title,
+    author,
+    category: bookCategory._id,
+    price,
+    description,
+    stock,
+    coverImage: "",
+    pages,
+    imagePublicId: "",
+  };
+
+  let uploadedImage;
+
+  try {
+    if (file) {
+      uploadedImage = await uploadToCloudinary(
+        file.buffer,
+        "books"
+      );
+
+      newBook.coverImage = uploadedImage.secure_url;
+      newBook.imagePublicId = uploadedImage.public_id;
     }
 
-    if(file){
-        console.log("file image",file)
-        newwBook.coverImage=file.filename
-    }
-    const result=await insertBook(newwBook)
-    await invalidateCache("books:list:")
-    console.log("result",result)
-    return result
-    
+    const result = await insertBook(newBook);
 
-}
-export const editBook_S=async(body:editBookI,file?:Express.Multer.File)=>{
-    console.log("body of edited book",body)
-    const book=await findBookById(body._id)
-    if(!book)
-    {
-        throw new appError("Book Not Found",400,responseStatus.FAILED)
+    await invalidateCache("books:list:");
+
+    return result;
+  } catch (error) {
+    if (uploadedImage?.public_id) {
+      await cloudinary.uploader.destroy(
+        uploadedImage.public_id
+      );
     }
-    let bookCategory=book.category
-    if(body.slug){
-        const category=await getCategory(body.slug)
-    if(!category){
-        throw new appError("Category Not Found",400,responseStatus.FAILED)
+
+    throw error;
+  }
+};
+export const editBook_S = async (
+  body: editBookI,
+  file?: Express.Multer.File
+) => {
+  const book = await findBookById(body._id);
+
+  if (!book) {
+    throw new appError(
+      "Book Not Found",
+      400,
+      responseStatus.FAILED
+    );
+  }
+
+  let bookCategory = book.category;
+
+  if (body.slug) {
+    const category = await getCategory(body.slug);
+
+    if (!category) {
+      throw new appError(
+        "Category Not Found",
+        400,
+        responseStatus.FAILED
+      );
     }
-        bookCategory=category._id
-        
+
+    bookCategory = category._id;
+  }
+
+  const newBook: insertBookI = {
+    title: book.title,
+    author: body.author ?? book.author,
+    category: bookCategory,
+    price: body.price ?? book.price,
+    description: body.description ?? book.description,
+    stock: body.stock ?? book.stock,
+    coverImage: book.coverImage,
+    pages: body.pages ?? book.pages,
+    imagePublicId: book.imagePublicId ?? "",
+  };
+
+  let uploadedImage;
+
+  try {
+    if (file) {
+      // Upload the new image first
+      uploadedImage = await uploadToCloudinary(
+        file.buffer,
+        "books"
+      );
+
+      newBook.coverImage = uploadedImage.secure_url;
+      newBook.imagePublicId = uploadedImage.public_id;
     }
-    const newBook:insertBookI={
-        title:book.title,
-        author:body.author?body.author:book.author,
-        category:bookCategory,
-        price:body.price?body.price:book.price,
-        description:body.description?body.description:book.description,
-        stock:body.stock?body.stock:book.stock,
-        coverImage:book.coverImage,
-        pages:body.pages?body.pages:book.pages
+
+    // Update DB
+    const result = await updateBook(
+      newBook,
+      body._id
+    );
+
+    // DB update succeeded → delete old Cloudinary image
+    if (
+      file &&
+      book.imagePublicId
+    ) {
+      await cloudinary.uploader.destroy(
+        book.imagePublicId
+      );
     }
-    
-    if(file){
-        const oldImagePath = path.join(__dirname, '../../Uploads', book.coverImage);
-        if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath)
-        newBook.coverImage=file.filename
-    }
-    const result=await updateBook(newBook,body._id)
-    await invalidateCache("books:list:")
-    await invalidateCache(`book:${body._id}`)
-    return result
-}
-export const deleteBook_S=async(id:string)=>{
-    const book=await findBookById(id)
-    if(!book){
-        throw new appError("Book Not Found",400,responseStatus.FAILED)
-    }
-    const imagePath = path.join(__dirname, '../../Uploads', book.coverImage);
-    if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath)
-         await deleteBook(id)
-        await invalidateCache("books:list:")
-        await invalidateCache(`book:${id}`)
+
+    await invalidateCache("books:list:");
+    await invalidateCache(`book:${body._id}`);
+
+    return result;
+
+  } catch (error) {
+
    
-}
+    if (uploadedImage?.public_id) {
+      await cloudinary.uploader.destroy(
+        uploadedImage.public_id
+      );
+    }
+
+    throw error;
+  }
+};
+export const deleteBook_S = async (id: string) => {
+  const book = await findBookById(id);
+
+  if (!book) {
+    throw new appError(
+      "Book Not Found",
+      400,
+      responseStatus.FAILED
+    );
+  }
+
+  // Delete book from database first
+  await deleteBook(id);
+
+  // Delete image from Cloudinary
+  if (book.imagePublicId) {
+    await cloudinary.uploader.destroy(
+      book.imagePublicId
+    );
+  }
+
+  await invalidateCache("books:list:");
+  await invalidateCache(`book:${id}`);
+};
 export const getBook_S=async(id:string)=>{
     const cachKey=`book:${id}`
     const cachedBook=await redis.get(cachKey)
@@ -175,8 +280,7 @@ export const getBooks_S=async(query:queryI)=>{
     // Check Redis
    const cached = await redis.get(cacheKey);
 
-console.log("REDIS CACHE:", cached);
-console.log("REDIS CACHE TYPE:", typeof cached);
+
 
 if (cached) {
     return (cached);
@@ -193,9 +297,6 @@ if (cached) {
     await redis.set(cacheKey,JSON.stringify(result),{
         ex:60
     })
-    console.log("sort",sort)
-    console.log("filter",filter)
-    console.log("pageSize",pageSize)
-    console.log("currentPage",currentPage)
+  
     return result
 }

@@ -20,8 +20,7 @@ export const createOrderC=async(req:Request,res:Response,next:NextFunction)=>{
 }
 export const getOrdersC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
-        console.log("requser admin",req.user)
-        console.log("req.cookies admin",req.cookies)
+     
         const id=req.user?.id.toString()
         if(!id){
             throw new appError("You are not logged in",401,responseStatus.FAILED)
@@ -61,9 +60,7 @@ export const getOrderC=async(req:Request,res:Response,next:NextFunction)=>{
     }
 }
 export const changeOrderStatusC=async(req:Request,res:Response,next:NextFunction)=>{
-    console.log("req.params",req.params)
     try{
-        console.log("req.params",req.params)
         const orderId=Array.isArray(req.params.id)?req.params.id[0]:req.params.id
         const status=req.body.status
         if(!orderId||!status){

@@ -6,10 +6,8 @@ import { CusomtJwtPayload } from "../modules/Auth/Auth.types";
 export const adminPermision= async(req:Request,res:Response,Next:NextFunction)=>{
     try{
           const accessToken= req.cookies.accessToken;
-    console.log("accessToken permission",accessToken)
     const userInfo=jwt.verify(accessToken,process.env.JWT_SECRET_KEY as string) as CusomtJwtPayload;
 
-    console.log("userInfo",userInfo)
     if(userInfo){
         if(userInfo.role!=="admin"){
              Next( new appError("You are not admin",403,responseStatus.FAILED))
@@ -21,7 +19,6 @@ export const adminPermision= async(req:Request,res:Response,Next:NextFunction)=>
     }
 
     }catch(err){
-        console.log(err)
         const error =err as Error
         Next(new appError(error.message,401,responseStatus.FAILED))
     }

@@ -17,7 +17,6 @@ export const addAddressS=async(address:address,token:string)=>{
         address.isDefault=false
     }
     const userId=userInfo.id.toString()
-    console.log("addressSS",address)
     const newAddress=await addAddress({address,userId})
     return newAddress
     

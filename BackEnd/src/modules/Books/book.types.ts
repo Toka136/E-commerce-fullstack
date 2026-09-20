@@ -8,14 +8,16 @@ export interface bookI{
     coverImage:string,
     stock:number,
     _id?:ObjectId,
-    pages:number
+    pages:number,
+    imagePublicId?:string
 }
 export interface addBookBodyI extends bookI{
     slug:string,
     
 }
 export interface insertBookI extends bookI{
-    category:ObjectId
+    category:ObjectId,
+
     
 }
 export interface editBookI{

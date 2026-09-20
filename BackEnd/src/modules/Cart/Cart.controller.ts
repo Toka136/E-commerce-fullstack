@@ -5,7 +5,6 @@ import { responseStatus } from "../../utils/responseStatus"
 export const addProductInCartC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
         const accessToken=req.cookies.accessToken
-        console.log("accessToken cart",accessToken)
         if(!accessToken){
             throw new appError("You are not logged in",401,responseStatus.FAILED)
         }
@@ -22,7 +21,6 @@ export const addProductInCartC=async(req:Request,res:Response,next:NextFunction)
 export const getCartC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
         const accessToken=req.cookies.accessToken
-        console.log("accessToken cart",accessToken)
         if(!accessToken){
             throw new appError("You are not logged in",401,responseStatus.FAILED)
         }

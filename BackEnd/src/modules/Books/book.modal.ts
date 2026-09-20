@@ -49,7 +49,11 @@ const bookSchema=new mongoose.Schema({
             default:0
         }
       
-    }
+    },
+    imagePublicId: {
+        type: String,
+        default: "",
+      },
     
 })
 export default mongoose.model("Book",bookSchema)

@@ -27,6 +27,9 @@ const UserSchema=new mongoose.Schema(
             type:String,
             default:""
         } ,
+        imagePublicId: {
+  type: String,
+},
        lastActiveAt: { type: Date, default: Date.now },
     })
 export default mongoose.model("User",UserSchema)

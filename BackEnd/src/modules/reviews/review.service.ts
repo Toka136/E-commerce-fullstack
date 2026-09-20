@@ -21,7 +21,6 @@ export const addReviewS=async(accessToken:string,review:reviewI)=>{
 }
 
 export const editReviewS=async(review:editReviewI)=>{
-    console.log("review",review);
     const existingReview=await getReviewById(review.reviewId)
     if(!existingReview){
         throw new appError("Review Not Found",400,responseStatus.FAILED)
@@ -32,16 +31,13 @@ export const editReviewS=async(review:editReviewI)=>{
         // ensure review is a string (fall back to existing review or empty string)
         review: (typeof review.review === 'string') ? review.review : (existingReview.review ?? '')
     }
-    console.log("review.rating",review.rating)
     if(review.rating!==undefined&&review.rating>=0){
-        console.log("rating",review.rating)
         await editRate(existingReview.bookId.toString(),review.rating,existingReview.rating)
     }
      
     await editReview(reviewData)
      await invalidateCache(`book:${existingReview.bookId}`)
      const test = await redis.get(`book:${existingReview.bookId}`);
-console.log("CACHE AFTER INVALIDATION:", test);
     return review
 }
 export const deleteReviewS=async(reviewId:string)=>{

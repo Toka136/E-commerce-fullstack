@@ -4,11 +4,10 @@ import { S_login, S_refreshToken, S_register } from "./Auth.service";
 import appError from "../../utils/errorClass";
 import { responseStatus } from "../../utils/responseStatus";
 export const C_register=async(req:Request,res:Response,next:NextFunction)=>{
-    console.log("in function")
-    console.log("req.body",req.body)
+  
     try{
 
-    const user:authResponse=await S_register(req.body,req.file)
+    const user=await S_register(req.body,req.file)
     res.cookie("accessToken",user.accessToken,{
          httpOnly: true,
         secure: false, 
@@ -31,9 +30,8 @@ export const C_register=async(req:Request,res:Response,next:NextFunction)=>{
     }
 }
 export const C_login=async(req:Request,res:Response,next:NextFunction)=>{
-    console.log("req.body login",req.body)
     try{
-        const user:authResponse=await S_login(req.body)
+        const user=await S_login(req.body)
         res.cookie("accessToken",user.accessToken,{
             httpOnly: true,
             secure: false, 
@@ -69,7 +67,7 @@ export const C_login=async(req:Request,res:Response,next:NextFunction)=>{
     }
     export const C_refreshToken=async(req:Request,res:Response,next:NextFunction)=>{
         try{
-            const user:authResponse=await S_refreshToken(req.cookies.refreshToken)
+            const user=await S_refreshToken(req.cookies.refreshToken)
             res.cookie("accessToken",user.accessToken,{
                 httpOnly: true,
                 secure: false, 

@@ -7,6 +7,7 @@ export const registerSchema = z.object({
     userName: z.string().min(2),
     email: z.email(),
     password: z.string().min(8),
+    phoneNumber: z.string().min(11).max(11),
     role: z.enum(["admin", "user"]).optional(),
    
 })

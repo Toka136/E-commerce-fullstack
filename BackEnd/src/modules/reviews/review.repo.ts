@@ -20,6 +20,5 @@ export const editReview=async (reviewData:editReviewI)=>{
     }})
 }
 export const deleteReview=async(id:string)=>{
-    console.log("id final",id)
     return await reviewModal.deleteOne({_id:id})
 }

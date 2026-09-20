@@ -2,7 +2,6 @@ import AddressModal from "./Address.modal"
 import { addAddressParams, updateAddressParams } from "./Address.types"
 
 export const addAddress=async(address:addAddressParams)=>{
-    console.log("address repo",address)
     const newAddress=new  AddressModal({...address.address,userId:address.userId}) 
     return await newAddress.save()
 }

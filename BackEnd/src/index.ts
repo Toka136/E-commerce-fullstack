@@ -1,6 +1,6 @@
+import "dotenv/config";
 import express, { Request, Response, NextFunction } from "express"
 import mongoose from "mongoose"
-import dotenv from "dotenv"
 import authRoutes from "./modules/Auth/Auth.routes"
 import bookRoutes from "./modules/Books/book.routes"
 import cartRoutes from "./modules/Cart/Cart.routes"
@@ -18,7 +18,6 @@ import cors from 'cors'
 import path from "path"
 const app = express()
 app.use(cookieParser())
-dotenv.config()
 
 app.use(cors(
     {

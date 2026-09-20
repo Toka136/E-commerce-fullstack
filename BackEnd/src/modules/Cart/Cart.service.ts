@@ -9,13 +9,11 @@ import { findBookById, findOnlyBookById } from "../Books/book.repo";
 export const addProductInCart_S=async({productId,token,quantity}:cartI)=>{
     const userInfo=await GetUserInfo(token)
     const userId=new ObjectId(userInfo.id).toString()
-    console.log("userId in cart",userId)
         const product = await findOnlyBookById(productId)
  if (!product) {
             throw new appError("Product Not Found", 404, responseStatus.FAILED);
         }
     const cart=await findCartByUserId(userId)
-    console.log("quantity",quantity)
     if(!cart)
     {
         

@@ -5,7 +5,6 @@ import { CusomtJwtPayload } from "../modules/Auth/Auth.types"
 export const GetUserInfo=(token:string)=>{
     try{
     const userInfo=jwt.verify(token,process.env.JWT_SECRET_KEY as string) as CusomtJwtPayload
-    console.log("userInfo",userInfo)
    
     return userInfo
     }catch(err){

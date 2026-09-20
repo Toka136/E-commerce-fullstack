@@ -10,7 +10,6 @@ export const addAddressC=async(req:Request,res:Response,next:NextFunction)=>{
             throw new appError("You are not logged in",401,responseStatus.FAILED)
         }
         const address=req.body
-        console.log("address",address)
         const newAddress=await addAddressS(address,token)
         res.status(200).json({
             status:"success",
@@ -60,7 +59,6 @@ export const updateAddressC=async(req:Request,res:Response,next:NextFunction)=>{
         
         const address=req.body
         address._id=Array.isArray(req.params.addressId)?req.params.addressId[0]:req.params.addressId
-        console.log("address",address)
         const newAddress=await updateAddressS(address)
         res.status(200).json({
             status:"success",
@@ -74,7 +72,6 @@ export const deleteAddressC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
         
         const addressId=Array.isArray(req.params.addressId)?req.params.addressId[0]:req.params.addressId
-        console.log("addressId",addressId)
         if(!addressId){
             throw new appError("Address Id is required",400,responseStatus.FAILED)
         }
