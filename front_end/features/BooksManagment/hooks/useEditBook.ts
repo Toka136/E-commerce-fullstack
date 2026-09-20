@@ -10,7 +10,7 @@ export const UseEditBook=()=>{
     return useMutation({
         mutationFn:(data:editBookT)=>EditBook(data),
         onSuccess:()=>{
-            toast.success("Book added successfully")
+            toast.success("Book updated successfully")
             router.refresh()
         }
     })

@@ -64,7 +64,7 @@ export const BooksTable = ({ result, categories }: booksTableParamsT) => {
                         className="object-contain object-center" 
                         priority
                         unoptimized
-                        src={`http://localhost:4000/api/Uploads/${bookItem.coverImage}`}
+                        src={`${bookItem.coverImage}`}
                       />
                     </div>
                     <div>

@@ -113,7 +113,7 @@ export default function AdminSidebar({
                   sizes="40px"
                   priority
                   unoptimized
-                  src={`http://localhost:4000/api/Uploads/${user.image}`}
+                  src={`${user.image}`}
                   alt="avatar"
                 />
               ) : (

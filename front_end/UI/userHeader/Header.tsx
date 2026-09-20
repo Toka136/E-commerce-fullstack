@@ -23,13 +23,14 @@ import AdminNavbar from "../adminHeader/adminNavbar";
 import AdminSidebar from "../adminHeader/adminSidebar";
 import SideCart from "@/features/cart/components/cartDrawer";
 import { useCartStore } from "@/features/cart/store/cart-store";
+import { useGetProfile } from "@/features/profile/hooks/useGetProfile";
 
 const Header = ({menuOpen, setMenuOpen}:{menuOpen:boolean, setMenuOpen:(value:boolean)=>void}) => {
   
   const [activeId, setActiveId] = useState("explore");
 
   const { onOpen } = useCartStore();
-  const useData = useAuthStore((state) => state.userData);
+  const { data: useData, isLoading } = useGetProfile();
 
   const onNavigate = (id: string) => {
     setMenuOpen(false);
@@ -51,17 +52,17 @@ const Header = ({menuOpen, setMenuOpen}:{menuOpen:boolean, setMenuOpen:(value:bo
       icon: Settings,
     },
     {
-      id: useData._id ? "logout" : "/login",
-      label: useData._id ? "Logout" : "Login",
-      icon: useData._id ? LogOut : User,
-      variant: useData._id ? "danger" : "default",
+      id: useData?.data._id ? "logout" : "/login",
+      label: useData?.data._id ? "Logout" : "Login",
+      icon: useData?.data._id ? LogOut : User,
+      variant: useData?.data._id ? "danger" : "default",
     },
   ];
 
   const defaultUser: SidebarUser = {
-    name: useData.userName,
+    name: useData?.data.userName??"",
     role: "Reader",
-    image: useData.userAvatar,
+    image: useData?.data.image,
   };
 
   const adminDefaultNavItems: SidebarNavItem[] = [
@@ -100,11 +101,10 @@ const Header = ({menuOpen, setMenuOpen}:{menuOpen:boolean, setMenuOpen:(value:bo
 
 
 
-  const isAdmin = useData.userRole === "admin";
+  const isAdmin = useData?.data.role === "admin";
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* 1. Navbar فوق خالص بعرض الشاشة الكامل */}
     
 
       {/* 2. الـ Sidebar والـ Cart تحت الـ Navbar */}

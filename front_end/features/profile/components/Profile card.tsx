@@ -8,7 +8,7 @@ function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 export const ProfileCard=({user}:{user:userProfile})=>{    
-      const avatarUrl = user.image ? `http://localhost:4000/api/Uploads/${user.image}` : undefined;
+      const avatarUrl = user.image || undefined;
         const displayName = capitalize(user.userName);
 
     return (

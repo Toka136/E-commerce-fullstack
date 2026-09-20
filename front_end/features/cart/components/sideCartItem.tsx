@@ -24,7 +24,7 @@ export default function SideCartItem({item}:sideCartItemProps){
           <div key={item.id} className="flex gap-3">
               <div className="relative w-14 h-20 shrink-0 rounded-md overflow-hidden bg-gray-100">
                 <Image
-                  src={`http://localhost:4000/api/Uploads/${item.coverImage}`}
+                  src={`${item.coverImage}`}
                   alt={item.title}
                   fill
                   unoptimized

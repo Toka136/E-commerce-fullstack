@@ -13,8 +13,9 @@ export default function RecentlyAdded({ books, totalCount }: RecentlyAddedProps)
   if (books.length === 0) return null;
 
   const sorted = [...books].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+);
+  console.log("sorted",sorted)
 
   return (
     <section className="mt-12 w-[90%] mx-auto">

@@ -38,7 +38,6 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Overlay - الشاشات الصغيرة فقط */}
       <div
         aria-hidden="true"
         onClick={onClose}
@@ -64,7 +63,6 @@ export default function Sidebar({
           lg:sticky lg:top-[65px] lg:z-auto lg:flex lg:h-[calc(100vh-65px)] lg:w-[30%] lg:min-w-[260px] lg:max-w-[360px] lg:translate-x-0 lg:shadow-none
         `}
       >
-        {/* Header (للشاشات الصغيرة فقط لإغلاق الـ Sidebar) */}
         <div className="flex items-center justify-between border-b border-slate-200 p-4 lg:hidden">
           <span className="select-none font-headline text-lg font-bold text-[#3455b9]">
             Menu
@@ -97,7 +95,7 @@ export default function Sidebar({
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#b6c4ff]/30">
               {user?.image ? (
                 <img
-                  src={`http://localhost:4000/api/Uploads/${user.image}`}
+                  src={`${user.image}`}
                   alt="avatar"
                 />
               ) : (

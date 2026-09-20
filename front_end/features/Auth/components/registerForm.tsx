@@ -20,6 +20,7 @@ export const RegisterForm = () => {
           userName: '',
           email: '',
           password: '',
+          phoneNumber: '',
           image: null,
         }, 
         validationSchema: registerSchema,
@@ -145,6 +146,30 @@ export const RegisterForm = () => {
             </div>
             {registerFormik.errors.userName && registerFormik.touched.userName && (
               <span className="text-red-500 text-xs mt-1 block">{registerFormik.errors.userName}</span>
+            )}
+          </div>
+           {/* phoneNumber Field */}
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              Phone Number
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-gray-300" aria-hidden="true" />
+              </div>
+              <input
+                type="text"
+                name="phoneNumber"
+                id="phone"
+                onChange={registerFormik.handleChange}
+                onBlur={registerFormik.handleBlur}
+                value={registerFormik.values.phoneNumber}
+                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-300 bg-gray-50/30 text-sm"
+                placeholder="+1 (123) 456-7890"
+              />
+            </div>
+            {registerFormik.errors.phoneNumber && registerFormik.touched.phoneNumber && (
+              <span className="text-red-500 text-xs mt-1 block">{registerFormik.errors.phoneNumber}</span>
             )}
           </div>
 

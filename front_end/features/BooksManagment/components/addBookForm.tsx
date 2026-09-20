@@ -14,6 +14,7 @@ export const AddBookForm = ({handleClose,categories}:{handleClose:()=>void,categ
     const handleAddBook=async(data:addBookT)=>{
       try{
         await AddBook(data)
+        bookFormik.resetForm()
         handleClose()
       }catch(error){
         console.log(error)

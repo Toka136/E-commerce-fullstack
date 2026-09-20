@@ -13,7 +13,7 @@ export default function BookRow({ item }: { item: CartItem }) {
       {item.product.coverImage  ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={`http://localhost:4000/api/Uploads/${item.product.coverImage}`}
+          src={`${item.product.coverImage}`}
           alt={item.product.title}
           onError={() => setImgError(true)}
           className="h-14 w-11 shrink-0 rounded-md object-cover"

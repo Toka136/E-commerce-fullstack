@@ -38,7 +38,7 @@ export default function EditProfileModal({
   onSuccess,
 }: EditProfileModalProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const existingAvatarUrl = useMemo(() => (user.image ? `http://localhost:4000/api/Uploads/${user.image}` : undefined), [user.image]);
+  const existingAvatarUrl = useMemo(() => (user.image ? `${user.image}` : undefined), [user.image]);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(existingAvatarUrl);
   const { mutateAsync: updateProfile, isPending } = useUpdateProfile();
 

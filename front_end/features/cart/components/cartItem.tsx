@@ -25,7 +25,7 @@ export const CartItemRow=({item,onRemove,onAdd,deletPending,addPending}:props)=>
   )}
               <div className="relative h-24 w-[72px] flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
                 <Image
-                  src={`http://localhost:4000/api/Uploads/${item.product.coverImage}`}
+                  src={`${item.product.coverImage}`}
                   alt={`Cover of ${item.product.title}`}
                   fill
                   sizes="72px"

@@ -231,9 +231,9 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
 </div>
 <div>
   {/* Reviews */}
-        {bookReviews.length > 0 && (
-          <div className="flex justify-between items-start flex-col mt-8 md:flex-row w-[90%] mx-auto">
-            <div className="mt-8 md:w-[40%] w-full">
+        
+          <div className="flex justify-between items-start flex-col mt-8 md:flex-row w-[90%] mx-auto">             
+               <div className="mt-8 md:w-[40%] w-full">
                <>
               <div className="flex items-center gap-0.5 mb-4">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -260,6 +260,8 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
 
             </>
           </div>
+           {bookReviews.length > 0 &&
+          (
           <section className="mt-8 md:w-[50%] w-full">
             <h2 className="text-[17px] font-bold text-gray-900">Reader Reviews</h2>
             <div className="mt-3 space-y-3">
@@ -267,10 +269,10 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
                 <ReviewCard key={review._id} review={review} access={userData._id===review.userId._id} onEdit={onEditReview} isEditing={editReviewPending} onDelete={onDeleteReview} isDeleting={deleteReviewPending}/>
               ))}
             </div>
-          </section>
+          </section>)}
           
           </div>
-        )}
+        
 </div>
       
     </div>

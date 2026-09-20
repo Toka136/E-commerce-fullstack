@@ -32,7 +32,7 @@ export const WishlistItemCard=({item,stock,isAdded}:props)=>{
                 <Link href={`/books/${item.productId._id}`}>
 
                 <Image
-                  src={`http://localhost:4000/api/Uploads/${item.productId.coverImage}`}
+                  src={`${item.productId.coverImage}`}
                   alt={`Cover of ${item.productId.title}`}
                   fill
                   sizes="80px"

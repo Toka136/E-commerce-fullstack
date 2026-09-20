@@ -18,6 +18,7 @@ export const EditBookForm = ({handleClose,book,categories}:{handleClose:()=>void
     const handleEditBook=async(data:editBookT)=>{
       try{
         await editBook(data)
+        bookFormik.resetForm()
         handleClose()
       }catch(error){
         console.log(error)
@@ -58,6 +59,16 @@ export const EditBookForm = ({handleClose,book,categories}:{handleClose:()=>void
             reader.readAsDataURL(file)
 
         }
+    }
+    const onRemoveImage=()=>{
+     
+    setImagePreview(null);
+    bookFormik.setFieldValue("coverImage", undefined);
+
+    if (imageRef.current) {
+      imageRef.current.value = "";
+    }
+  
     }
     const handleDragOver=(e:React.DragEvent)=>{
       e.preventDefault();
@@ -244,12 +255,13 @@ export const EditBookForm = ({handleClose,book,categories}:{handleClose:()=>void
             ) : (
               <div className="relative flex items-center justify-center w-24 h-24 mx-auto group">
                 <img 
-                  src={`http://localhost:4000/api/Uploads/${imagePreview}`} 
+                  src={`${imagePreview}`} 
                   alt="Preview" 
                   className="w-full h-full object-cover rounded-full ring-2 ring-gray-100"
                 />
                 <button
                   type="button"
+                  onClick={onRemoveImage}
                 
                   className="absolute -top-1 -right-1 bg-red-500 text-white p-1 rounded-full shadow-md opacity-90 hover:opacity-100 transition-opacity"
                 >

@@ -34,7 +34,7 @@ export default function BookCover({ coverImage, title, className = "" }: BookCov
     // configuring a remote pattern for every possible upload host.
     // eslint-disable-next-line @next/next/no-img-element
     <img
-     src={`http://localhost:4000/api/Uploads/${coverImage}`}
+     src={`${coverImage}`}
       alt={title}
       loading="lazy"
       onError={() => setErrored(true)}
