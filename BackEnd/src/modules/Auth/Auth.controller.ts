@@ -8,18 +8,7 @@ export const C_register=async(req:Request,res:Response,next:NextFunction)=>{
     try{
 
     const user=await S_register(req.body,req.file)
-    res.cookie("accessToken",user.accessToken,{
-         httpOnly: true,
-        secure: false, 
-        sameSite: "strict",
-        maxAge: 1 * 24 * 60 * 60 * 1000 
-    })
-    res.cookie("refreshToken",user.refreshToken,{
-        httpOnly: true,
-        secure: false, 
-        sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000
-    })
+  
     res.status(201).json({
         status:"success",
         message:"User Created Successfully",

@@ -7,6 +7,7 @@ import { loginBody, UserData } from "./Auth.types"
 import bcrypt from "bcrypt"
 import { uploadToCloudinary } from "../../utils/uploadToCloudinary"
 import cloudinary from "../../config/cloudinaryconfig"
+import { createEmailVerificationS, SendVerificationEmailS } from "../emailVerification/emailVerification.service"
 
 
 export const S_register = async (
@@ -40,31 +41,9 @@ export const S_register = async (
       user.imagePublicId = uploadedImage.public_id;
     }
 
-    const newUser = await R_register(user);
+   
 
-    const accessToken = TokenCreation(
-      {
-        id: newUser._id,
-        email: newUser.email,
-        role: newUser.role,
-      },
-      "60m"
-    );
-
-    const refreshToken = TokenCreation(
-      {
-        id: newUser._id,
-        email: newUser.email,
-        role: newUser.role,
-      },
-      "7d"
-    );
-
-    return {
-      newUser,
-      accessToken,
-      refreshToken,
-    };
+  
 
   } catch (error) {
 
@@ -76,11 +55,26 @@ export const S_register = async (
 
     throw error;
   }
+   const newUser = await R_register(user);
+  const rawToken= await createEmailVerificationS(newUser._id.toString())
+  const verificationUrl =
+  `${process.env.FRONTEND_URL}verify-email?token=${rawToken}`;
+  const emailTemp=`<p>Please click the link below to verify your email address:</p>
+  <a href="${verificationUrl}">${verificationUrl}</a>`
+  await SendVerificationEmailS(user.email,"Verify Your Email",emailTemp)
+
+    return {
+      newUser,
+    
+    };
 };
 export const S_login=async(user:loginBody)=>{
     const existUser=await findUser(user.email)
     if(!existUser){
         throw new appError("Invalid Credentials",400,responseStatus.FAILED)
+    }
+    if(existUser.verified===false){
+        throw new appError("Email Not Verified",400,responseStatus.FAILED)
     }
     const checkPass=await bcrypt.compare(user.password,existUser.password)
     if(!checkPass){

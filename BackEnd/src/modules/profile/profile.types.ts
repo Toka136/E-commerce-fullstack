@@ -3,5 +3,6 @@ export interface updateProfileI{
     email?:string
     phoneNumber?:string
     image?:string,
-    imagePublicId?:string
+    imagePublicId?:string,
+    
 }

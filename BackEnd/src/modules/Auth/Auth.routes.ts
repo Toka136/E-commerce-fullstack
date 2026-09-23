@@ -5,11 +5,13 @@ import { validationSchema } from "../../MiddleWares/Validation"
 import { registerSchema } from "./Auth.validation"
 import { imageUpload } from "../../utils/multerCode"
 import { authenticationMiddleware } from "../../MiddleWares/authenticationMiddleware"
+import { veifyEmailC } from "../emailVerification/emailVerification.controller"
 const router=express.Router()
 router.route("/register").post(imageUpload.single("image"),validationSchema(registerSchema),Wrapper(C_register))
 router.route("/login").post(Wrapper(C_login))
 router.route("/logout").post(Wrapper(C_logout))
 router.route("/refreshToken").post(Wrapper(C_refreshToken))
 router.route("/authMe").get(authenticationMiddleware,Wrapper(C_authMe))
+router.route("/verify").post(Wrapper(veifyEmailC))
 
 export default router

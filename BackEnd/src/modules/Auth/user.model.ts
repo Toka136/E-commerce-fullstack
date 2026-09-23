@@ -28,8 +28,12 @@ const UserSchema=new mongoose.Schema(
             default:""
         } ,
         imagePublicId: {
-  type: String,
-},
+        type: String,
+        },
+        verified: {
+        type: Boolean,
+        default: false,
+        },
        lastActiveAt: { type: Date, default: Date.now },
     })
 export default mongoose.model("User",UserSchema)
