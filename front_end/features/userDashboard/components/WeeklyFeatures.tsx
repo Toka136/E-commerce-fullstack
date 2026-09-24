@@ -8,6 +8,7 @@ import { Book } from "../types/books";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
+import Link from "next/link";
 
 interface WeeklyFeaturesProps {
   books: Book[];
@@ -26,12 +27,13 @@ export default function WeeklyFeatures({ books }: WeeklyFeaturesProps) {
             Handpicked stories for your collection.
           </p>
         </div>
-        <button
+        <Link
+          href="/books"
           type="button"
           className="text-primary font-label-md hover:underline flex items-center gap-2 shrink-0"
         >
-          See all <ArrowRight className="w-[18px] h-[18px]" />
-        </button>
+          See all <ArrowRight className="w-4.5 h-4.5" />
+        </Link>
       </div>
 
       <div className="overflow-hidden grid grid-cols-2 md:grid-cols-4 gap-6 pb-12 ">

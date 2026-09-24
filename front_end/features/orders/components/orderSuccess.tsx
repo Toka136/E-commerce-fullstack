@@ -10,7 +10,7 @@ interface OrderSuccessProps {
 export default function OrderSuccess({
   orderId,
   continueShoppingHref = "/books",
-  trackOrderHref = "/profile/orders",
+  trackOrderHref = "/orders",
 }: OrderSuccessProps) {
   return (
     <div className="flex flex-col items-center gap-4 rounded-2xl bg-surface-container-low px-6 py-10 text-center">

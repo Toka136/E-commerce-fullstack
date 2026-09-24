@@ -229,15 +229,15 @@ export default function ShippingDetailsForm({
           {/* Phone Number */}
           <div>
             <label
-              htmlFor="phoneNumber"
+              htmlFor="mobile"
               className={labelClass}
             >
               Phone Number
             </label>
 
             <input
-              id="phoneNumber"
-              name="phoneNumber"
+              id="mobile"
+              name="mobile"
               type="tel"
               placeholder="+20 100 000 0000"
               value={formik.values.mobile}

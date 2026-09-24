@@ -3,7 +3,7 @@ import { addBookSchema } from "../schema/addBookSchema";
 import { addBookT, editBookT } from "../types/Books";
 import {  GetSingleBook } from "../api/booksApi";
 import { UseAddBook } from "../hooks/useAddBook";
-import { UploadCloud, X } from "lucide-react";
+import { Loader, UploadCloud, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { UseEditBook } from "../hooks/useEditBook";
 import { Category } from "@/features/categories/types/categories";
@@ -278,8 +278,8 @@ export const EditBookForm = ({handleClose,book,categories}:{handleClose:()=>void
           >
             Cancel
           </button>
-          <button className="flex-1 px-6 py-3 rounded-xl font-semibold bg-primary text-white shadow-md hover:shadow-lg active:scale-95 transition-all">
-            Save Book
+          <button className="flex-1 px-6 py-3 rounded-xl font-semibold bg-primary text-white shadow-md hover:shadow-lg active:scale-95 transition-all justify-center items-center">
+            {editPending ?<Loader /> : "Update Book"}
           </button>
         </footer>
         </form>

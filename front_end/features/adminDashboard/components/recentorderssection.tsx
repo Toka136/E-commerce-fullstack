@@ -19,7 +19,7 @@ export default function RecentOrdersSection({ orders }: { orders: Order[] }) {
                 </div>
                 <Link
                     href="/admin/orders"
-                    className="flex flex-shrink-0 items-center gap-1 text-sm font-medium text-primary hover:opacity-80"
+                    className="flex fshrink-0 items-center gap-1 text-sm font-medium text-primary hover:opacity-80"
                 >
                     View All
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -30,7 +30,7 @@ export default function RecentOrdersSection({ orders }: { orders: Order[] }) {
                 <p className="mt-6 text-sm text-on-surface-variant">No orders yet.</p>
             ) : (
                 <div className="mt-4 overflow-x-auto">
-                    <table className="w-full min-w-[560px] text-left">
+                    <table className="w-full min-w-140 text-left">
                         <thead>
                             <tr className="border-b border-outline-variant/20 text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
                                 <th className="py-2 pr-4">Order ID</th>
@@ -50,7 +50,7 @@ export default function RecentOrdersSection({ orders }: { orders: Order[] }) {
                                             {getOrderNumber(order._id)}
                                         </Link>
                                     </td>
-                                    <td className="max-w-[220px] truncate py-3 pr-4 text-sm text-on-surface-variant">
+                                    <td className="max-w-55 truncate py-3 pr-4 text-sm text-on-surface-variant">
                                         {order.items.map((item) => item.titleAtPurchase).join(", ")}
                                     </td>
                                     <td className="py-3 pr-4">

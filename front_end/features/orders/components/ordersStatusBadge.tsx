@@ -7,7 +7,7 @@ export default function OrderStatusBadge({ status }: { status: OrderStatus }) {
 
   return (
     <span
-      className={`flex hrink-0 items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${config.className}`}
+      className={`flex shrink-0 items-center gap-1 rounded-full px-4 py-1.5 w-fit text-xs font-medium ${config.className}`}
     >
       <Icon className="h-3 w-3" />
       {config.label}

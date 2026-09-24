@@ -2,7 +2,7 @@ import { useFormik } from "formik";
 import { addBookSchema } from "../schema/addBookSchema";
 import { addBookT } from "../types/Books";
 import { UseAddBook } from "../hooks/useAddBook";
-import { UploadCloud, X } from "lucide-react";
+import { Loader, UploadCloud, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { Category } from "@/features/categories/types/categories";
 
@@ -72,8 +72,12 @@ export const AddBookForm = ({handleClose,categories}:{handleClose:()=>void,categ
 
     }
 
-    return <div>
-            <form onSubmit={bookFormik.handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+    return  <div className="flex h-full min-h-0 flex-col">
+            <form
+  id="add-book-form"
+  onSubmit={bookFormik.handleSubmit}
+  className="flex-1 min-h-0 overflow-y-auto p-6 space-y-6"
+>
           <div className="space-y-1">
             <label className="text-sm font-semibold text-on-surface-variant">
               Book Title
@@ -253,18 +257,27 @@ export const AddBookForm = ({handleClose,categories}:{handleClose:()=>void,categ
             )}
            
           </div>
-             <footer className="p-6 border-t border-outline-variant/20  flex gap-4">
-          <button
-            onClick={handleCancel}
-            className="flex-1 px-6 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-hightransition-colors"
-          >
-            Cancel
-          </button>
-          <button   type="submit" className="flex-1 px-6 py-3 rounded-xl font-semibold bg-primary text-white shadow-md hover:shadow-lg active:scale-95 transition-all">
-            Save Book
-          </button>
-        </footer>
+          {bookFormik.errors.coverImage && bookFormik.touched.coverImage && <p className="text-red-500">{bookFormik.errors.coverImage}</p>}
+            
         </form>
+         <footer className="shrink-0 border-t border-outline-variant/20 bg-[#f8f9ff] p-6 flex gap-4">
+      <button
+        type="button"
+        onClick={handleCancel}
+        className="flex-1 px-6 py-3 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors"
+      >
+        Cancel
+      </button>
+
+     <button
+  type="submit"
+  form="add-book-form"
+  className="flex-1 justify-center items-center  flex  px-6 py-3 rounded-xl font-semibold bg-primary text-white shadow-md hover:shadow-lg active:scale-95 transition-all"
+>
+ {isPending ? <Loader/> : "Add Book"}
+</button>
+    </footer>
+        
 
      
     </div>;

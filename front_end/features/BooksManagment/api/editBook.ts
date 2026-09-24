@@ -15,6 +15,6 @@ export const EditBook=async(data:editBookT)=>{
     data.stock&&formData.append("stock",data.stock.toString())
     console.log("dataregform",formData)
     const res=await api.patch("books/updateBook",formData)
-  
+   console.log("res edit",res)
     return res.data
 }

@@ -23,7 +23,6 @@ export default function Sidebar({
 
     document.addEventListener("keydown", handleKeyDown);
     
-    // قفل الـ Scroll في الموبايل فقط
     const isMobile = window.innerWidth < 1024;
     const previousOverflow = document.body.style.overflow;
     if (isMobile) {
@@ -59,19 +58,18 @@ export default function Sidebar({
           transition-transform duration-300 ease-in-out
           ${open ? "translate-x-0" : "-translate-x-full"}
 
-          /* Desktop: 30% ثابت تحت الـ Navbar */
-          lg:sticky lg:top-[65px] lg:z-auto lg:flex lg:h-[calc(100vh-65px)] lg:w-[30%] lg:min-w-[260px] lg:max-w-[360px] lg:translate-x-0 lg:shadow-none
+          lg:sticky lg:top-16.25 lg:z-auto lg:flex lg:h-[calc(100vh-65px)] lg:w-[30%] lg:min-w-[260px] lg:max-w-[360px] lg:translate-x-0 lg:shadow-none
         `}
       >
         <div className="flex items-center justify-between border-b border-slate-200 p-4 lg:hidden">
-          <span className="select-none font-headline text-lg font-bold text-[#3455b9]">
+          <span className="select-none font-headline text-lg font-bold text-primary">
             Menu
           </span>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close menu"
-            className="rounded-full p-2 text-[#444652] hover:bg-[#e5eeff]"
+            className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container"
           >
             <X size={22} />
           </button>

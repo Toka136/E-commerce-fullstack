@@ -63,7 +63,6 @@ export default function AdminSidebar({
           transition-transform duration-300 ease-in-out
           ${open ? "translate-x-0" : "-translate-x-full"}
 
-          /* Desktop: ثابت 30% تحت ה-Navbar */
           lg:sticky lg:top-[65px]
           lg:z-auto
           lg:flex

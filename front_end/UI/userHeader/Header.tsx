@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import {
   Compass,
@@ -24,10 +24,11 @@ import AdminSidebar from "../adminHeader/adminSidebar";
 import SideCart from "@/features/cart/components/cartDrawer";
 import { useCartStore } from "@/features/cart/store/cart-store";
 import { useGetProfile } from "@/features/profile/hooks/useGetProfile";
+import { usePathname } from "next/navigation";
 
 const Header = ({menuOpen, setMenuOpen}:{menuOpen:boolean, setMenuOpen:(value:boolean)=>void}) => {
   
-  const [activeId, setActiveId] = useState("explore");
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const { onOpen } = useCartStore();
   const { data: useData, isLoading } = useGetProfile();
@@ -102,15 +103,21 @@ const Header = ({menuOpen, setMenuOpen}:{menuOpen:boolean, setMenuOpen:(value:bo
 
 
   const isAdmin = useData?.data.role === "admin";
-
+   const pathname = usePathname();
+ useEffect(() => {
+  console.log("isAdmin",isAdmin);
+ const pathnameWithoutBase = isAdmin?pathname.split("/")[2]:pathname.split("/")[1];
+ console.log(pathnameWithoutBase);
+  const currentActiveId = pathnameWithoutBase||activeId;
+  setActiveId(currentActiveId);
+ }, [pathname,isAdmin]);
   return (
     <div className="flex flex-col min-h-screen">
     
 
-      {/* 2. الـ Sidebar والـ Cart تحت الـ Navbar */}
       {isAdmin ? (
         <AdminSidebar
-          activeId={activeId}
+          activeId={activeId??""}
           onNavigate={onNavigate}
           open={menuOpen}
           onClose={() => setMenuOpen(false)}
@@ -119,7 +126,7 @@ const Header = ({menuOpen, setMenuOpen}:{menuOpen:boolean, setMenuOpen:(value:bo
         />
       ) : (
         <Sidebar
-          activeId={activeId}
+          activeId={activeId??""}
           onNavigate={onNavigate}
           open={menuOpen}
           onClose={() => setMenuOpen(false)}

@@ -11,7 +11,7 @@ export const UseAddBook=()=>{
         onSuccess:()=>{
             toast.success("Book added successfully")
             router.refresh()
-        }
+        },
     })
     
 }

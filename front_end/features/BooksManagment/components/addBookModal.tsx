@@ -16,11 +16,11 @@ export function AddBookModal({open,onClose,categories}: addBookModalT) {
           open ? "opacity-100" : "opacity-0"
         }`}
       />
-      <div
-        className={`absolute right-0 top-0 h-full w-full max-w-md bg-[#f8f9ff] shadow-2xl flex flex-col transform transition-transform duration-300 ease-out ${
-          open ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
+    <div
+  className={`fixed right-0 top-0 bottom-0 w-full max-w-md bg-[#f8f9ff] shadow-2xl flex flex-col overflow-hidden transform transition-transform duration-300 ease-out z-10 ${
+    open ? "translate-x-0" : "translate-x-full"
+  }`}
+>
         <header className="px-6 py-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
           <h3 className="text-lg font-bold text-primary">Add New Book</h3>
           <button

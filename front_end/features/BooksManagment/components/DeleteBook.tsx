@@ -11,13 +11,10 @@ import {
   IconButton,
   Box,
 } from "@mui/material";
-import { Delete, X } from "lucide-react";
+import { Delete, Loader, X } from "lucide-react";
 import { DeleteModalPropsT } from "../types/Books";
 import { UseDeleteBook } from "../hooks/useDeleteBook";
 import { AxiosError } from "axios";
-
-
-
 export default function DeleteBookModal({open,onClose,id,title = "Delete Item",itemName = "this item",loading = false,
 }:  DeleteModalPropsT) {
    
@@ -105,7 +102,7 @@ export default function DeleteBookModal({open,onClose,id,title = "Delete Item",i
           fullWidth
           sx={{ ml: 1 }}
         >
-          Delete
+          {isPending ? <Loader/>: "Delete"}
         </Button>
       </DialogActions>
     </Dialog>

@@ -5,11 +5,10 @@ import { EditBookForm } from "./editBookFrom";
 export function EditBookModal({ open, onClose, book, categories }: editBookModalT) {
   console.log("book edit", book);
 
-  if (!open) return null; // لتجنب مشاكل الرندر عندما تكون المغلقة غير نشطة
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
-      {/* الـ Overlay / Backdrop */}
       <div
         onClick={onClose}
         className={`fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm transition-opacity duration-300 ${
@@ -17,7 +16,6 @@ export function EditBookModal({ open, onClose, book, categories }: editBookModal
         }`}
       />
 
-      {/* النافذة الجانبية / Sidebar Modal */}
       <div
         className={`fixed right-0 top-0 bottom-0 w-full max-w-md bg-[#f8f9ff] shadow-2xl flex flex-col transform transition-transform duration-300 ease-out z-10 ${
           open ? "translate-x-0" : "translate-x-full"

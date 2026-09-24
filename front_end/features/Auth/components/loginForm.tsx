@@ -5,6 +5,7 @@ import { loginSchema } from '../schema/loginSchema';
 import { useLogin } from '../hooks/useLogin';
 import { useFormik } from 'formik';
 import { useState } from 'react';
+import Link from 'next/link';
 export const LoginForm=()=>{
     const [showPassword, setShowPassword] = useState(false);
     const {handleLogin}=useLogin()
@@ -48,9 +49,9 @@ export const LoginForm=()=>{
                 Password
               </label>
               <div className="text-sm">
-                <a href="#" className="font-medium text-blue-500 hover:text-blue-600 text-xs">
-                  Forgot password?
-                </a>
+            <Link href="/forgot-password" className="text-sm font-medium text-[#3b59c4] hover:underline">
+               Forgot password?
+            </Link>
               </div>
             </div>
             <div className="relative rounded-md shadow-sm">

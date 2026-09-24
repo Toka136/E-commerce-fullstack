@@ -22,10 +22,10 @@ export  function renderItem(item: SidebarNavItem, isFirstAccountItem: boolean, a
           aria-current={isActive ? "page" : undefined}
           className={`flex cursor-pointer items-center gap-4 rounded-xl p-4 font-body text-sm transition-colors ${
             isDanger
-              ? "text-[#ba1a1a] hover:bg-[#ffdad6]"
+              ? "text-error hover:bg-error-container"
               : isActive
-                ? "bg-[#b6c4ff]/20 font-bold text-[#3455b9]"
-                : "text-[#444652] hover:bg-[#e5eeff]"
+                ? "bg-[#b6c4ff]/20 font-bold text-primary"
+                : "text-on-surface-variant hover:bg-surface-container"
           }`}
         >
           <Icon size={20} strokeWidth={2} />

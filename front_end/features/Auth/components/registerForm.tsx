@@ -1,6 +1,6 @@
 'use client'
 
-import { Mail, Lock, Unlock, User, UploadCloud, X } from 'lucide-react';
+import { Mail, Lock, Unlock, User, UploadCloud, X, Loader, Link } from 'lucide-react';
 import { useFormik } from 'formik';
 import { useState, useRef } from 'react';
 import { useRegister } from '../hooks/useRegister';
@@ -13,7 +13,7 @@ export const RegisterForm = () => {
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     
-    const { handleRegister } = useRegister();
+    const { handleRegister, isPending,isSuccess } = useRegister();
 
     const registerFormik = useFormik<registerInputT>({
         initialValues: {
@@ -24,7 +24,9 @@ export const RegisterForm = () => {
           image: null,
         }, 
         validationSchema: registerSchema,
-        onSubmit: handleRegister
+        onSubmit: (values) => {
+          handleRegister(values);
+        }
     });
 
     // Handle image file selection/processing
@@ -65,6 +67,20 @@ export const RegisterForm = () => {
     };
 
     return (
+      <>
+      {isSuccess && (
+  <div
+    role="status"
+    className="flex items-start gap-3 rounded-xl border border-[#3b59c4]/30 bg-[#3b59c4]/10 p-4"
+  >
+    <Mail className="h-5 w-5 text-[#3b59c4] mt-0.5 shrink-0" aria-hidden="true" />
+    <p className="text-sm font-medium text-primary">
+      We've sent a verification email! Please check your inbox to complete your registration
+    </p>
+    <Link href="/login" className="text-sm font-medium text-primary">Log In</Link>
+  </div>
+     )}
+     {!isSuccess && (
         <form className="space-y-5 mt-10" onSubmit={registerFormik.handleSubmit}>
           
           {/* Image Drag & Drop / Select Zone */}
@@ -236,9 +252,10 @@ export const RegisterForm = () => {
               type="submit"
               className="w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-[#3b59c4] hover:bg-[#2f49aa] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
             >
-              Create Account
+              {isPending?<Loader/>:"Create Account"}
             </button>
           </div>
-        </form>
+        </form>)}
+        </>
     );
 };
