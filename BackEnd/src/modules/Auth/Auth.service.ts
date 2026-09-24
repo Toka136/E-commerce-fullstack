@@ -7,7 +7,8 @@ import { loginBody, UserData } from "./Auth.types"
 import bcrypt from "bcrypt"
 import { uploadToCloudinary } from "../../utils/uploadToCloudinary"
 import cloudinary from "../../config/cloudinaryconfig"
-import { createEmailVerificationS, SendVerificationEmailS } from "../emailVerification/emailVerification.service"
+import { createEmailVerificationS } from "../emailVerification/emailVerification.service"
+import { SendEmailS } from "../../utils/sendEmail"
 
 
 export const S_register = async (
@@ -61,7 +62,7 @@ export const S_register = async (
   `${process.env.FRONTEND_URL}verify-email?token=${rawToken}`;
   const emailTemp=`<p>Please click the link below to verify your email address:</p>
   <a href="${verificationUrl}">${verificationUrl}</a>`
-  await SendVerificationEmailS(user.email,"Verify Your Email",emailTemp)
+  await SendEmailS(user.email,"Verify Your Email",emailTemp)
 
     return {
       newUser,

@@ -11,6 +11,7 @@ import categoryRoutes from "./modules/categories/Category.routes"
 import addressRoutes from "./modules/Address/Address.routes"
 import profileRoutes from "./modules/profile/profile.routes"
 import adminDashboard from './modules/admin/admin.route'
+import resetPassword from "./modules/resetPassword/resetPassword.routes"
 import { responseStatus } from "./utils/responseStatus"
 import appError from "./utils/errorClass"
 import cookieParser from 'cookie-parser'
@@ -39,6 +40,7 @@ app.use("/api/wishlist",wishlistRoutes)
 app.use("/api/address",addressRoutes)
 app.use("/api/profile",profileRoutes)
 app.use("/api/adminDashboard",adminDashboard)
+app.use("/api/password",resetPassword)
 app.use("/api/Uploads/", express.static(path.join(__dirname, "Uploads")));
 app.use((req, res) => {
   
@@ -48,6 +50,7 @@ app.use((req, res) => {
   });
 });
 app.use((err:appError,req:Request,res:Response,next:NextFunction)=>{
+    console.log(err)
     res.status(err.statusCode||500).json({
         status:err.statusText||responseStatus.FAILED,
         statusCode:err.statusCode||500,

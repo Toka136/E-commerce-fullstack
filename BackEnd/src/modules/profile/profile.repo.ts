@@ -10,3 +10,9 @@ export const updateUserProfile=async(userId:string,updateData:updateProfileI)=>{
 export const verifyUser=async(userId:string)=>{
     return await userModel.findByIdAndUpdate(userId,{verified:true},{new:true})
 }
+export const updatePassword=async(userId:string,password:string)=>{
+    return await userModel.findByIdAndUpdate(userId,{password},{new:true})
+}
+export const findUser=async(email:string)=>{
+    return await userModel.findOne({email})
+}

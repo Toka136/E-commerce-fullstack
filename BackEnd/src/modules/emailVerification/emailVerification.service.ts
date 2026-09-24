@@ -1,6 +1,5 @@
 import crypto from "crypto";
 import { createEmailVerification, findVerificationToken } from "./emailVerification.repo";
-import transporter from "../../config/email"
 import { verifyUser } from "../profile/profile.repo";
 import appError from "../../utils/errorClass";
 import { responseStatus } from "../../utils/responseStatus";
@@ -12,19 +11,7 @@ export const createEmailVerificationS=async(userId:string)=>{
     return verificationToken
 }
 
-export const SendVerificationEmailS=async(email:string,subject:string,html:string)=>{
-    try {
-        await transporter.sendMail({
-            from:process.env.EMAIL,
-            to:email,
-            subject:subject,
-            html:html
-        })
-        console.log("Email sent")
-    } catch (error) {
-        console.log(error)
-    }
-}
+
 export const verifyEmailS = async (rawToken: string) => {
 
   const tokenHash = crypto
