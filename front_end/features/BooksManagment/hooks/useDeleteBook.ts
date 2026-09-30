@@ -1,15 +1,15 @@
 import { toast } from "react-toastify"
-import { DeleteBook } from "../api/booksApi"
+import { useMutation } from "@tanstack/react-query";
+import { DeleteBook } from "../api/deleteBook";
+import { useRouter } from "next/navigation";
 
-export const UseDeleteBook=async(id:string)=>{
-    try{
-        const res=await DeleteBook(id)
-        toast.success("Book Deleted Successfully")
-        return res
-
-    }catch(err){
-        console.log("err",err)
-        const error=err as {message:string}
-        toast.error(error.message)
-    }
+export const UseDeleteBook=()=>{
+    const router=useRouter()
+    return useMutation({
+        mutationFn:(id:string)=>DeleteBook(id),
+        onSuccess:()=>{
+            toast.success("Book deleted successfully")
+            router.refresh()
+        }
+    })
 }

@@ -13,10 +13,13 @@ export const useLogin=()=>{
     const res=await Login(data)
     console.log("res",res)
     login();
-    setUserData(res.data.newUser.userName,res.data.newUser.image,res.data.newUser.role);
+    setUserData(res.data.newUser.userName,res.data.newUser.image,res.data.newUser.role,res.data.newUser._id);
      toast.success("User logged in Successfully")
             setTimeout(() => {
-                router.push("/dashboard")
+              if(res.data.newUser.role==="user")
+              router.push("/dashboard")
+              else
+                router.push("/admin/dashboard")
     
             }, 2000);
   }catch(err){

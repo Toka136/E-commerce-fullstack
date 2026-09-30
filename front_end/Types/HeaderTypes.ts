@@ -50,3 +50,11 @@ export interface adminNavbarProps {
   /** Called when the search form is submitted, with the current query. */
   onSearch?: (query: string) => void;
 }
+export interface userNavbarProps {
+
+  onMenuClick?: () => void;
+  /** Called when the cart button is clicked. */
+  onCartClick?: () => void;
+  /** Called when the search form is submitted, with the current query. */
+  onSearch?: (query: string) => void;
+}

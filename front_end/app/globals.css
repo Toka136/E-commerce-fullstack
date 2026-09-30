@@ -1,3 +1,126 @@
 @import "tailwindcss";
-body {font-family: Arial, Helvetica, sans-serif;
+body{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0
+}
+@theme {
+  /* =======================
+     Colors
+  ======================= */
+
+  --color-secondary-fixed-dim: #c9beff;
+  --color-secondary-fixed: #e6deff;
+  --color-on-error-container: #93000a;
+  --color-on-primary-fixed-variant: #183ea2;
+  --color-primary-fixed-dim: #b6c4ff;
+  --color-surface-bright: #f8f9ff;
+  --color-tertiary-fixed: #dee2ed;
+  --color-on-secondary-fixed: #1b0062;
+  --color-outline: #747684;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-tertiary-fixed-variant: #424750;
+  --color-on-primary-fixed: #00164f;
+  --color-tertiary-container: #70757e;
+  --color-primary-fixed: #dce1ff;
+  --color-surface: #f8f9ff;
+  --color-surface-container-low: #eff4ff;
+  --color-surface-container-highest: #d3e4fe;
+  --color-secondary-container: #9581ff;
+  --color-surface-variant: #d3e4fe;
+  --color-inverse-primary: #b6c4ff;
+  --color-on-tertiary-fixed: #171c23;
+  --color-outline-variant: #c4c5d5;
+  --color-on-secondary-container: #2c008f;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #fdfcff;
+  --color-error: #ba1a1a;
+  --color-on-surface-variant: #444652;
+  --color-on-secondary-fixed-variant: #472dac;
+  --color-surface-dim: #cbdbf5;
+  --color-on-secondary: #ffffff;
+  --color-tertiary-fixed-dim: #c2c6d1;
+  --color-secondary: #6049c6;
+  --color-surface-container-lowest: #ffffff;
+  --color-background: #f8f9ff;
+  --color-primary-container: #506ed3;
+  --color-inverse-surface: #213145;
+  --color-primary: #3455b9;
+  --color-surface-tint: #3757bb;
+  --color-on-surface: #0b1c30;
+  --color-on-primary: #ffffff;
+  --color-inverse-on-surface: #eaf1ff;
+  --color-on-background: #0b1c30;
+  --color-on-primary-container: #fffbff;
+  --color-surface-container: #e5eeff;
+  --color-surface-container-high: #dce9ff;
+  --color-tertiary: #575c65;
+
+  /* =======================
+     Radius
+  ======================= */
+
+  --radius: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* =======================
+     Fonts
+  ======================= */
+
+  --font-headline-lg: "Plus Jakarta Sans", sans-serif;
+  --font-headline-md: "Plus Jakarta Sans", sans-serif;
+  --font-headline-xl: "Plus Jakarta Sans", sans-serif;
+  --font-headline-lg-mobile: "Plus Jakarta Sans", sans-serif;
+  --font-label-sm: "Plus Jakarta Sans", sans-serif;
+  --font-label-md: "Plus Jakarta Sans", sans-serif;
+
+  --font-body-lg: "Inter", sans-serif;
+  --font-body-md: "Inter", sans-serif;
+  --font-body-sm: "Inter", sans-serif;
+
+  /* =======================
+     Typography
+  ======================= */
+
+  --text-headline-xl: 48px;
+  --text-headline-xl--line-height: 1.2;
+  --text-headline-xl--font-weight: 700;
+  --text-headline-xl--letter-spacing: -0.02em;
+
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 1.25;
+  --text-headline-lg--font-weight: 700;
+
+  --text-headline-lg-mobile: 24px;
+  --text-headline-lg-mobile--line-height: 1.3;
+  --text-headline-lg-mobile--font-weight: 700;
+
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 1.4;
+  --text-headline-md--font-weight: 600;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--font-weight: 400;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.6;
+  --text-body-md--font-weight: 400;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 1.5;
+  --text-body-sm--font-weight: 400;
+
+  --text-label-md: 14px;
+  --text-label-md--line-height: 1;
+  --text-label-md--font-weight: 600;
+  --text-label-md--letter-spacing: 0.01em;
+
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 1;
+  --text-label-sm--font-weight: 500;
 }

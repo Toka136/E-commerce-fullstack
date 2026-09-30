@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/Auth/store/auth-store";
+import { useAuthAdmin } from "@/features/BooksManagment/hooks/useAuthAdmin";
 
 export default function AdminLayout({
   children,
@@ -10,13 +11,11 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const role = useAuthStore((state) => state.userData?.userRole);
+  const {data:user,isLoading}=useAuthAdmin()
 
-  useEffect(() => {
-    if (role !== "admin") {
-      router.replace("/dashboard");
-    }
-  }, [role]);
-
-  return <>{children}</>;
+  return <>
+  {user?.data.role!=="admin" && !isLoading && router.push("/")}
+  {isLoading && <h1>Loading...</h1>}
+  {children}
+  </>;
 }

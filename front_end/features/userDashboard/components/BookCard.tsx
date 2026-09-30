@@ -1,42 +1,86 @@
-import { bookT } from "@/features/BooksManagment/types/Books"
-import { UseAddToCart } from "@/features/Cart/hooks/useAddToCart"
-import { Plus } from "lucide-react"
+"use client";
 
-export default function BookCard({book}:{book:bookT}){
-  const {useHandleAddToCart}=UseAddToCart()
-  const handleAddToCart = () => {
-    useHandleAddToCart(book)
-    
+import {  Heart, Plus } from "lucide-react";
+import { Book } from "../types/books";
+import { formatPrice } from "../utils/utils";
+import BookCover from "@/UI/components/BookCover";
+import { CircularProgress } from "@mui/material";
+import { useAddToCartMutation } from "@/features/cart/hooks/useAddToCart";
+import Link from "next/link";
+import { useAddToWishlist } from "@/features/wishlist/hooks/useAddToWishlist";
+
+interface BookCardProps {
+  book: Book;
+  eyebrow?: string;
+} 
+export default function BookCard({ book, eyebrow }: BookCardProps) {
+  const isOutOfStock = book.stock <= 0;
+  const { mutate: addToCartMutation, isPending } = useAddToCartMutation();
+  const onAdd = () => {
+     addToCartMutation({
+               productId: book._id,
+               quantity: 1
+              });
   }
-    return (
-        <div key={book._id} className="flex-none w-44 md:w-52 snap-start">
-                <div className="bg-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 cursor-pointer">
-                  <div className="aspect-[2/3] w-full bg-[#d3e4fe]">
-                    <img
-                      src={`http://localhost:4000/api/Uploads/${book.coverImage}`}
-                      alt={book.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-2.5">
-                    <p className="text-[11px] font-semibold text-[#6049c6] mb-1">
-                      {book.genre}
-                    </p>
-                    <h3 className="text-base font-semibold truncate">{book.title}</h3>
-                    <p className="text-sm text-[#444652] mb-2">{book.author}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-bold text-[#3455b9]">
-                        {book.price}
-                      </span>
-                      <button
-                        aria-label={`Add ${book.title} to cart`}
-                        className="w-8 h-8 rounded-full bg-[#b6c4ff]/20 text-[#3455b9] flex items-center justify-center hover:bg-[#3455b9] hover:text-white transition-all"
-                      >
-                        <Plus onClick={handleAddToCart} size={18} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-    )
+ 
+
+  return (
+    <div className="bg-white hover:-translate-y-0.5 relative rounded-2xl overflow-hidden shadow-sm flex flex-col h-full hover:shadow-md transition-shadow">
+      {/* Upper Cover Container */}
+              <Link href={`/books/${book._id}`}>
+             
+      <div className="relative aspect-4/5  w-full bg-[#679198] flex items-center justify-centeroverflow-hidden">
+        <BookCover coverImage={book.coverImage} title={book.title} />
+        {isOutOfStock && (
+          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 text-white text-xs font-semibold backdrop-blur-sm">
+            Out of stock
+          </span>
+        )}
+      </div>
+      </Link>
+
+
+      {/* Content Container */}
+      <div className="p-4 flex flex-col grow justify-between bg-white">
+        <div>
+          {/* Eyebrow Label */}
+          <p className="text-[11px] font-bold text-[#6C5CE7] uppercase tracking-wider mb-1">
+            {eyebrow ?? "Featured"}
+          </p>
+
+          {/* Book Title */}
+          <h3 className="text-base font-bold text-[#1E293B] line-clamp-1 leading-snug">
+            {book.title}
+          </h3>
+
+          {/* Author Name */}
+          <p className="text-xs text-[#64748B] font-medium line-clamp-1 mt-0.5">
+            {book.author}
+          </p>
+        </div>
+
+        {/* Footer: Price & Add Button */}
+        <div className="flex justify-between items-center mt-4 pt-1">
+          <span className="text-sm font-bold text-[#4F46E5]">
+            {formatPrice(book.price)}
+          </span>
+
+          <button
+            type="button"
+            disabled={isOutOfStock||isPending}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAdd();
+             
+            }}
+            aria-label={`Add ${book.title} to cart`}
+            className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#4F46E5] flex items-center justify-center hover:bg-[#4F46E5] hover:text-white transition-colors disabled:opacity-40 disabled:pointer-events-none"
+          >
+            {isPending?<CircularProgress color="primary" />:
+            <Plus className="w-4 h-4 stroke-[2.5]" />}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

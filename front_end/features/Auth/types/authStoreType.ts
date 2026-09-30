@@ -3,9 +3,10 @@ export type AuthStoreT={
     userData:{
         userName:string,
         userAvatar?:string,
-        userRole?:string
+        userRole?:string,
+        _id?:string
     }
     login:()=>void,
     logout:()=>void,
-    setUserData:(name:string,avatar?:string,role?:string)=>void,
+    setUserData:(name:string,avatar?:string,role?:string,_id?:string)=>void,
 }

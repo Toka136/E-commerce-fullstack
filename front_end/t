@@ -1,0 +1,22 @@
+[0;1;32m●[0m bluetooth.service - Bluetooth service
+     Loaded: loaded (]8;;file://tokaKaram/usr/lib/systemd/system/bluetooth.service/usr/lib/systemd/system/bluetooth.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;32mactive (running)[0m since Sat 2026-09-19 08:48:37 EEST; 13h ago
+       Docs: ]8;;man:bluetoothd(8)man:bluetoothd(8)]8;;
+   Main PID: 927 (bluetoothd)
+     Status: "[0;1;36mRunning[0m"
+      Tasks: 1 (limit: 7807)
+     Memory: 1.4M (peak: 4.2M swap: 280.0K swap peak: 284.0K)
+        CPU: 103ms
+     CGroup: /system.slice/bluetooth.service
+             └─[0;38;5;245m927 /usr/libexec/bluetooth/bluetoothd[0m
+
+Sep 19 21:02:41 tokaKaram bluetoothd[927]: Endpoint unregistered: sender=:1.90 path=/MediaEndpoint/A2DPSource/aptx_ll_0
+Sep 19 21:02:41 tokaKaram bluetoothd[927]: Endpoint unregistered: sender=:1.90 path=/MediaEndpoint/A2DPSource/aptx_ll_duplex_1
+Sep 19 21:02:41 tokaKaram bluetoothd[927]: Endpoint unregistered: sender=:1.90 path=/MediaEndpoint/A2DPSource/aptx_ll_duplex_0
+Sep 19 21:02:41 tokaKaram bluetoothd[927]: Endpoint unregistered: sender=:1.90 path=/MediaEndpoint/A2DPSource/faststream
+Sep 19 21:02:41 tokaKaram bluetoothd[927]: Endpoint unregistered: sender=:1.90 path=/MediaEndpoint/A2DPSource/faststream_duplex
+Sep 19 21:02:41 tokaKaram bluetoothd[927]: Endpoint unregistered: sender=:1.90 path=/MediaEndpoint/A2DPSink/opus_05
+Sep 19 21:02:41 tokaKaram bluetoothd[927]: Endpoint unregistered: sender=:1.90 path=/MediaEndpoint/A2DPSource/opus_05
+Sep 19 21:02:41 tokaKaram bluetoothd[927]: Endpoint unregistered: sender=:1.90 path=/MediaEndpoint/A2DPSink/opus_05_duplex
+Sep 19 21:02:41 tokaKaram bluetoothd[927]: Endpoint unregistered: sender=:1.90 path=/MediaEndpoint/A2DPSource/opus_05_duplex
+Sep 19 21:02:41 tokaKaram bluetoothd[927]: Battery Provider Manager destroyed

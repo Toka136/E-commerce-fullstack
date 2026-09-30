@@ -1,6 +1,6 @@
 'use client'
 
-import { Mail, Lock, Unlock, User, UploadCloud, X } from 'lucide-react';
+import { Mail, Lock, Unlock, User, UploadCloud, X, Loader, Link } from 'lucide-react';
 import { useFormik } from 'formik';
 import { useState, useRef } from 'react';
 import { useRegister } from '../hooks/useRegister';
@@ -13,17 +13,20 @@ export const RegisterForm = () => {
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     
-    const { handleRegister } = useRegister();
+    const { handleRegister, isPending,isSuccess } = useRegister();
 
     const registerFormik = useFormik<registerInputT>({
         initialValues: {
           userName: '',
           email: '',
           password: '',
+          phoneNumber: '',
           image: null,
         }, 
         validationSchema: registerSchema,
-        onSubmit: handleRegister
+        onSubmit: (values) => {
+          handleRegister(values);
+        }
     });
 
     // Handle image file selection/processing
@@ -64,6 +67,20 @@ export const RegisterForm = () => {
     };
 
     return (
+      <>
+      {isSuccess && (
+  <div
+    role="status"
+    className="flex items-start gap-3 rounded-xl border border-[#3b59c4]/30 bg-[#3b59c4]/10 p-4"
+  >
+    <Mail className="h-5 w-5 text-[#3b59c4] mt-0.5 shrink-0" aria-hidden="true" />
+    <p className="text-sm font-medium text-primary">
+      We've sent a verification email! Please check your inbox to complete your registration
+    </p>
+    <Link href="/login" className="text-sm font-medium text-primary">Log In</Link>
+  </div>
+     )}
+     {!isSuccess && (
         <form className="space-y-5 mt-10" onSubmit={registerFormik.handleSubmit}>
           
           {/* Image Drag & Drop / Select Zone */}
@@ -147,6 +164,30 @@ export const RegisterForm = () => {
               <span className="text-red-500 text-xs mt-1 block">{registerFormik.errors.userName}</span>
             )}
           </div>
+           {/* phoneNumber Field */}
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              Phone Number
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-gray-300" aria-hidden="true" />
+              </div>
+              <input
+                type="text"
+                name="phoneNumber"
+                id="phone"
+                onChange={registerFormik.handleChange}
+                onBlur={registerFormik.handleBlur}
+                value={registerFormik.values.phoneNumber}
+                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-300 bg-gray-50/30 text-sm"
+                placeholder="+1 (123) 456-7890"
+              />
+            </div>
+            {registerFormik.errors.phoneNumber && registerFormik.touched.phoneNumber && (
+              <span className="text-red-500 text-xs mt-1 block">{registerFormik.errors.phoneNumber}</span>
+            )}
+          </div>
 
           {/* Email Field */}
           <div>
@@ -211,9 +252,10 @@ export const RegisterForm = () => {
               type="submit"
               className="w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-[#3b59c4] hover:bg-[#2f49aa] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
             >
-              Create Account
+              {isPending?<Loader/>:"Create Account"}
             </button>
           </div>
-        </form>
+        </form>)}
+        </>
     );
 };

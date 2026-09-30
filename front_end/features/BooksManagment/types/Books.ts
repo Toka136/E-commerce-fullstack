@@ -1,11 +1,13 @@
+import { Category } from "@/features/categories/types/categories";
+import { Book, getBooksResponse } from "@/features/userDashboard/types/books";
 
 export type addBookModalT={
   open: boolean;
   onClose: () => void;
+  categories:Category[]
 }
 export type editBookModalT= addBookModalT & {
-  id:string,
-  fetchBooks:()=>void
+ book:editBookT
 }
 export type bookT={
     _id:string,
@@ -20,15 +22,31 @@ export type bookT={
 export type addBookT={
     title:string,
     author:string,
-    genre:string,
+    slug:string,
     price:number,
     description:string,
     coverImage?:File|null,
-    stock:number
+    stock:number,
+    pages:number
 }
-export type editBookT=addBookT&{
-    _id:string
-   
+
+   export interface editBookT {
+  title?: string;
+  author?: string;
+  slug?: string;
+  price?: number;
+  description?: string;
+  coverImage?: string;
+  stock?: number;
+  _id: string;
+  pages?: number;
+
+  category?: {
+    _id: string;
+    name: string;
+    slug: string;
+  };
+
 }
 export type bookResponseT={
     message:string,
@@ -60,13 +78,13 @@ export type bookParams={
 }
 export type booksTableParamsT=
     {
-        setEditId:(id:string)=>void,
-        setDeleteId:(id:string)=>void,
-        setIsDelteModalOpen:(open:boolean)=>void,
-        setIsEditModalOpen:(open:boolean)=>void,
-        result:bookResponseT,loading:boolean,
-        setPage:(page:number)=>void,
-        page:number
+        result:{
+        books:Book[],
+        totalCount:number,
+        pageSize:number,
+        currentPage:number,
+        totalPage:number},
+        categories:Category[],
     }
 export type  DeleteModalPropsT= {
   open: boolean;
@@ -74,6 +92,5 @@ export type  DeleteModalPropsT= {
   title?: string;
   itemName?: string;
   loading?: boolean;
-  fetchBooks:()=>void;
   id:string
 }
