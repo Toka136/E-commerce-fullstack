@@ -5,7 +5,6 @@ import appError from "../../utils/errorClass";
 import { responseStatus } from "../../utils/responseStatus";
 export const addCategoryC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
-        console.log("req.body",req.body)
        const category: categoryI = {
         name: req.body.name,
         description: req.body.description,
@@ -74,7 +73,6 @@ export const updateCategoryC=async(req:Request,res:Response,next:NextFunction)=>
         if(!slug){
             throw new appError("slug is required",400,responseStatus.FAILED)
         }
-                console.log("slug",slug)
 
         const result=await updateCategoryS(slug,description)
         res.status(200).json({

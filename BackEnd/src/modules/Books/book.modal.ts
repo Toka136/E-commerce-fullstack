@@ -34,6 +34,11 @@ const bookSchema=new mongoose.Schema({
         type:Date,
         default:Date.now
     },
+    pages:{
+        type:Number,
+        required:true
+    },
+    
     rate:{
         average:{
             type:Number,
@@ -44,7 +49,11 @@ const bookSchema=new mongoose.Schema({
             default:0
         }
       
-    }
+    },
+    imagePublicId: {
+        type: String,
+        default: "",
+      },
     
 })
 export default mongoose.model("Book",bookSchema)

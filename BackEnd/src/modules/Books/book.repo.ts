@@ -5,12 +5,22 @@ export const findBookByName=async(title:string)=>{
     return await Book.findOne({title})
 }
 export const insertBook=async(book:insertBookI)=>{
-    const newBook=new Book(book)
-     await newBook.save()
-     return newBook
+     try{
+          const newBook=new Book(book)
+
+      const res=await newBook.save()
+           return newBook
+
+     }
+     catch(err){
+     }
 }
 export const findBookById=async(id:string,session?:ClientSession)=>{
     return await Book.findById(id,null).populate({path:"category",select:{__v:0,description:0}}).session(session??null)
+}
+export const findOnlyBookById=async(id:string,session?:ClientSession)=>{
+  return await Book.findById(id,null).session(session??null)
+  
 }
 export const updateBook=async(book:bookI,id:string)=>{
      const newbook=await Book.findByIdAndUpdate(id,book,{new:true})
@@ -38,7 +48,6 @@ export const getBooksbyCategory=async(category:string)=>{
     return await Book.find({category})
 }
 export const addRate=async(bookId:string,rate:number)=>{
-    console.log("rate",rate);
     return await Book.findByIdAndUpdate(
   bookId,
   [
@@ -72,7 +81,6 @@ export const addRate=async(bookId:string,rate:number)=>{
 );
 }
 export const editRate=async(bookId:string,rate:number,oldRate:number)=>{
-    console.log("rate",rate);
     return await Book.findByIdAndUpdate(
   bookId,
   [

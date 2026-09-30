@@ -18,7 +18,7 @@ export const getWishListByUserId=async(userId:string,session?:ClientSession)=>{
 
     return await query.populate({
     path: "items.productId",
-    select: "title coverImage price",
+    select: "title coverImage price stock author",
     });
 }
 export const addEmptyWishList=async(userId:string)=>{

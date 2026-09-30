@@ -9,7 +9,6 @@ export const userPermission = (req:Request, res:Response, next:NextFunction) => 
     if(!accessToken){
         throw new appError("Please login to get access.",401,responseStatus.FAILED)
     }
-    console.log("accessToken userpermission",accessToken)
     const userInfo=jwt.verify(accessToken,process.env.JWT_SECRET_KEY as string) as CusomtJwtPayload;
 
     if(userInfo){
@@ -19,7 +18,6 @@ export const userPermission = (req:Request, res:Response, next:NextFunction) => 
         next()
        
     }}catch(err){
-        console.log(err)
         const error =err as Error
         next(new appError(error.message,401,responseStatus.FAILED))
     }

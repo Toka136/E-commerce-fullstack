@@ -33,7 +33,6 @@ export const editReviewC=async(req:Request,res:Response,next:NextFunction)=>{
 }
 export const deleteReviewC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
-       console.log("controll",req.body)
         const result=await deleteReviewS(req.body.reviewId)
         res.status(200).json({
             status:"success",

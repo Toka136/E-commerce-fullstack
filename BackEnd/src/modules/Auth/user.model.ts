@@ -10,6 +10,10 @@ const UserSchema=new mongoose.Schema(
             type:String,
             required:true
         },
+        phoneNumber:{
+            type:String,
+            required:true
+        },
         password:{
             type:String,
             required:true 
@@ -23,13 +27,13 @@ const UserSchema=new mongoose.Schema(
             type:String,
             default:""
         } ,
-        accessToken:{
-            type:String,
-            default:""
+        imagePublicId: {
+        type: String,
         },
-        refreshToken:{
-            type:String,
-            default:""
-        }
+        verified: {
+        type: Boolean,
+        default: false,
+        },
+       lastActiveAt: { type: Date, default: Date.now },
     })
 export default mongoose.model("User",UserSchema)

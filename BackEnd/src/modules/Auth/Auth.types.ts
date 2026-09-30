@@ -5,7 +5,8 @@ export interface UserData {
     email: string;
     password: string;
    role?: string;
-    image?: string
+    image?: string,
+    imagePublicId?:string
 }
 export interface loginBody {
     email: string;

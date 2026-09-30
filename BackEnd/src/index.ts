@@ -1,6 +1,6 @@
+import "dotenv/config";
 import express, { Request, Response, NextFunction } from "express"
 import mongoose from "mongoose"
-import dotenv from "dotenv"
 import authRoutes from "./modules/Auth/Auth.routes"
 import bookRoutes from "./modules/Books/book.routes"
 import cartRoutes from "./modules/Cart/Cart.routes"
@@ -8,6 +8,10 @@ import orderRoutes from "./modules/Orders/order.routes"
 import reviewRoutes from "./modules/reviews/review.routes"
 import wishlistRoutes from "./modules/wishlist/WishList.routes"
 import categoryRoutes from "./modules/categories/Category.routes"
+import addressRoutes from "./modules/Address/Address.routes"
+import profileRoutes from "./modules/profile/profile.routes"
+import adminDashboard from './modules/admin/admin.route'
+import resetPassword from "./modules/resetPassword/resetPassword.routes"
 import { responseStatus } from "./utils/responseStatus"
 import appError from "./utils/errorClass"
 import cookieParser from 'cookie-parser'
@@ -15,7 +19,7 @@ import cors from 'cors'
 import path from "path"
 const app = express()
 app.use(cookieParser())
-dotenv.config()
+
 app.use(cors(
     {
         origin:"http://localhost:3000",
@@ -24,9 +28,7 @@ app.use(cors(
 ))
 app.use(express.json())
 mongoose.connect(process.env.MONGO_URL as string).then(()=>{
-    console.log("Connected to DB")
 }).catch((err)=>{
-    console.log(err)
 })
 app.use("/api/auth",authRoutes)
 app.use("/api/books",bookRoutes)
@@ -35,7 +37,11 @@ app.use("/api/order",orderRoutes)
 app.use("/api/category",categoryRoutes)
 app.use("/api/review",reviewRoutes)
 app.use("/api/wishlist",wishlistRoutes)
-app.use("/api/Uploads", express.static(path.join(__dirname, "Uploads")));
+app.use("/api/address",addressRoutes)
+app.use("/api/profile",profileRoutes)
+app.use("/api/adminDashboard",adminDashboard)
+app.use("/api/password",resetPassword)
+app.use("/api/Uploads/", express.static(path.join(__dirname, "Uploads")));
 app.use((req, res) => {
   
   res.status(404).json({
@@ -44,6 +50,7 @@ app.use((req, res) => {
   });
 });
 app.use((err:appError,req:Request,res:Response,next:NextFunction)=>{
+    console.log(err)
     res.status(err.statusCode||500).json({
         status:err.statusText||responseStatus.FAILED,
         statusCode:err.statusCode||500,

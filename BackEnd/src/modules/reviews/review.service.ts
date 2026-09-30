@@ -1,4 +1,6 @@
+import redis from "../../config/redis"
 import appError from "../../utils/errorClass"
+import invalidateCache from "../../utils/invalidateCache"
 import { responseStatus } from "../../utils/responseStatus"
 import { GetUserInfo } from "../../utils/userInfo"
 import { addRate, deleteRate, editRate } from "../Books/book.repo"
@@ -13,11 +15,12 @@ export const addReviewS=async(accessToken:string,review:reviewI)=>{
     }
     review.userId=userId.id.toString()
     await addRate(review.bookId,review.rating)
-    return await addReview(review)
+    await addReview(review)
+    await invalidateCache(`book:${review.bookId}`)
+    return review
 }
 
 export const editReviewS=async(review:editReviewI)=>{
-    console.log("review",review);
     const existingReview=await getReviewById(review.reviewId)
     if(!existingReview){
         throw new appError("Review Not Found",400,responseStatus.FAILED)
@@ -28,13 +31,14 @@ export const editReviewS=async(review:editReviewI)=>{
         // ensure review is a string (fall back to existing review or empty string)
         review: (typeof review.review === 'string') ? review.review : (existingReview.review ?? '')
     }
-    console.log("review.rating",review.rating)
     if(review.rating!==undefined&&review.rating>=0){
-        console.log("rating",review.rating)
         await editRate(existingReview.bookId.toString(),review.rating,existingReview.rating)
     }
      
-    return await editReview(reviewData)
+    await editReview(reviewData)
+     await invalidateCache(`book:${existingReview.bookId}`)
+     const test = await redis.get(`book:${existingReview.bookId}`);
+    return review
 }
 export const deleteReviewS=async(reviewId:string)=>{
     const existingReview=await getReviewById(reviewId)
@@ -43,5 +47,7 @@ export const deleteReviewS=async(reviewId:string)=>{
         throw new appError("Review Not Found",400,responseStatus.FAILED)
     }
     await deleteRate(existingReview.bookId.toString(),existingReview.rating)
-    return await deleteReview(reviewId.toString())
+     await deleteReview(reviewId.toString())
+     await invalidateCache(`book:${existingReview.bookId}`)
+    return existingReview
 }

@@ -7,14 +7,17 @@ export interface bookI{
     description:string,
     coverImage:string,
     stock:number,
-    _id?:ObjectId
+    _id?:ObjectId,
+    pages:number,
+    imagePublicId?:string
 }
 export interface addBookBodyI extends bookI{
     slug:string,
     
 }
 export interface insertBookI extends bookI{
-    category:ObjectId
+    category:ObjectId,
+
     
 }
 export interface editBookI{
@@ -25,7 +28,8 @@ export interface editBookI{
     description?:string,
     coverImage?:string,
     stock?:number,
-    _id:string
+    _id:string,
+    pages?:number
 }
 export interface queryI{
      pageSize?: number;

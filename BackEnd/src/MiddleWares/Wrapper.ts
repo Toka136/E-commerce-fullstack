@@ -5,7 +5,6 @@ const Wrapper=(asyncFunction:AsyncFunction)=>{
         try{
             asyncFunction(req,res,next)
         }catch(err){
-            console.log(err)
             next(err)
         }
     }

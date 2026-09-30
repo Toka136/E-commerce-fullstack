@@ -4,7 +4,7 @@ import { addEmptyWishList, addProductW, addWishList, deleteProductW, getWishList
 import appError from "../../utils/errorClass"
 import { responseStatus } from "../../utils/responseStatus"
 import mongoose, { ClientSession } from "mongoose"
-import { findBookById } from "../Books/book.repo"
+import { findBookById, findOnlyBookById } from "../Books/book.repo"
 import { addProductInCart_S } from "../Cart/Cart.service"
 import { findCartByUserId, insertCart } from "../Cart/Cart.repo"
 
@@ -62,7 +62,7 @@ export const moveToCartS = async (token: string, productId: string) => {
       throw new appError("Product Not Found In Wishlist", 404, responseStatus.FAILED);
     }
 
-    const product = await findBookById(productId, session);
+    const product = await findOnlyBookById(productId, session);
 
     if (!product) {
       throw new appError("Product Not Found", 404, responseStatus.FAILED);
@@ -71,9 +71,11 @@ export const moveToCartS = async (token: string, productId: string) => {
     if (product.stock <= 0) {
       throw new appError("Product Out Of Stock", 400, responseStatus.FAILED);
     }
+    
     await addProductIntoCartW_S(
         userId,
         productId,
+        product.price,
         session,
     );
 
@@ -92,15 +94,17 @@ export const moveToCartS = async (token: string, productId: string) => {
 export const addProductIntoCartW_S = async (
   userId: string,
   productId: string,
-  session?: ClientSession
+  price: number,
+  session?: ClientSession,
+  
 ) => {
   const cart = await findCartByUserId(userId, session);
-
   if (!cart) {
     return await insertCart(
       {
-        userId,
-        productId,
+        userId:userId,
+        productId:productId,
+        price:price
       },
       session
     );
@@ -112,11 +116,14 @@ export const addProductIntoCartW_S = async (
 
   if (item) {
     item.quantity++;
+    cart.subtotal += price;
   } else {
     cart.items.push({
       product: productId,
       quantity: 1,
+      priceAtPurchase: price,
     });
+    cart.subtotal += price;
   }
 
 if (session) {
