@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ShoppingCart,
@@ -25,6 +25,8 @@ import { useAuthStore } from "@/features/Auth/store/auth-store";
 import { useEditReview } from "@/features/reviews/hooks/useEditReview";
 import { addReviewAProps, editReviewAProps } from "@/features/reviews/types/review";
 import { useDeleteReview } from "@/features/reviews/hooks/useDeleteReview";
+import { useGetProfile } from "@/features/profile/hooks/useGetProfile";
+import { AxiosError } from "axios";
 
 
 interface BookDetailProps {
@@ -34,21 +36,38 @@ interface BookDetailProps {
 
 export default function BookDetail({ book, bookReviews }: BookDetailProps) {
   const [quantity, setQuantity] = useState(1);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   console.log("bookReviews",bookReviews)
   const coverUrl = useMemo(() => getCoverImageUrl(book.coverImage), [book.coverImage]);
   const stock = stockLabel(book);
-  const {userData}=useAuthStore()
-  const { mutate: addReview, isPending: addReviewPending, isError: addReviewError, isSuccess: addReviewSuccess,} = useAddReview()
-   const {mutate:editReview,isPending:editReviewPending}=useEditReview()
-   const {mutate:deleteReview,isPending:deleteReviewPending}=useDeleteReview()
+  const {data:userData}=useGetProfile()
+  const { mutate: addReview, isPending: addReviewPending, isError: addReviewError, isSuccess: addReviewSuccess,error:addReviewErrorData } = useAddReview()
+   const {mutate:editReview,isPending:editReviewPending,error:editReviewError}=useEditReview()
+   const {mutate:deleteReview,isPending:deleteReviewPending,error:deleteReviewError}=useDeleteReview()
 
-
+  const editErrorMessage =
+  editReviewError instanceof AxiosError
+    ? editReviewError.response?.data?.message
+    : undefined;
+    const addErrorMessage =
+  addReviewErrorData instanceof AxiosError
+    ? addReviewErrorData.response?.data?.message
+    : undefined;
+    const deleteErrorMessage =
+  deleteReviewError instanceof AxiosError
+    ? deleteReviewError.response?.data?.message
+    : undefined;
+   useEffect(() => {
+  setErrorMessage(
+    addErrorMessage || editErrorMessage || deleteErrorMessage || null
+  );
+}, [addErrorMessage, editErrorMessage, deleteErrorMessage]);
   const decrement = () => setQuantity((q) => Math.max(1, q - 1));
   const increment = () => setQuantity((q) => Math.min(book.stock, q + 1));
   const { mutate: addToCartMutation } = useAddToCartMutation();
     const {mutate:addToWishlist,isPending:wishlistPending}=useAddToWishlist()
     const onWishlist=()=>{
-      addToWishlist(book._id)
+      addToWishlist(book.id)
       
       console.log("added to wishlist")
     }
@@ -61,7 +80,7 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
   
   const onAdd = () => {
      addToCartMutation({
-               productId: book._id,
+               productId: book.id,
                quantity: quantity
               });
   }
@@ -251,10 +270,11 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
                 {book.rate.average.toFixed(1)} ({book.rate.count} Reviews)
               </span>
               <ReviewForm
-                bookId={book._id}
+                bookId={book.id}
                 addReview={addReview}
                 isPending={addReviewPending}
                 isError={addReviewError}
+                errorMsg={errorMessage??""}
                 isSuccess={addReviewSuccess}
               />
 
@@ -266,7 +286,7 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
             <h2 className="text-[17px] font-bold text-gray-900">Reader Reviews</h2>
             <div className="mt-3 space-y-3">
               {bookReviews.map((review) => (
-                <ReviewCard key={review._id} review={review} access={userData._id===review.userId._id} onEdit={onEditReview} isEditing={editReviewPending} onDelete={onDeleteReview} isDeleting={deleteReviewPending}/>
+                <ReviewCard key={review.id} review={review} access={userData?.data.id===review.userId} onEdit={onEditReview} isEditing={editReviewPending} onDelete={onDeleteReview} isDeleting={deleteReviewPending}/>
               ))}
             </div>
           </section>)}

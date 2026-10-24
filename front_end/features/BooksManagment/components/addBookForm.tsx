@@ -124,7 +124,7 @@ export const AddBookForm = ({handleClose,categories}:{handleClose:()=>void,categ
                   <option value="">Select a category</option>
 
                   {categories.map((category: Category) => (
-                    <option key={category._id} value={category.slug}>
+                    <option key={category.id} value={category.slug}>
                       {category.name}
                     </option>
                   ))}

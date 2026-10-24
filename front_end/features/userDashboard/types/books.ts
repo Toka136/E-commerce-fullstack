@@ -1,7 +1,7 @@
 import { Category } from "@/features/categories/types/categories";
 
 export interface Book {
-  _id: string;
+  id: string;
   title: string;
   author: string;
  category:Category

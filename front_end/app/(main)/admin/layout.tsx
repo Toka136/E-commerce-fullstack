@@ -14,7 +14,7 @@ export default function AdminLayout({
   const {data:user,isLoading}=useAuthAdmin()
 
   return <>
-  {user?.data.role!=="admin" && !isLoading && router.push("/")}
+  {user?.data.role!=="ADMIN" && !isLoading && router.push("/")}
   {isLoading && <h1>Loading...</h1>}
   {children}
   </>;

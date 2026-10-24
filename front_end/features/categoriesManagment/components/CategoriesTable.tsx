@@ -40,7 +40,7 @@ export const CategoriesTable = ({ categories }: { categories: Category[] }) => {
                     <tbody className="divide-y divide-outline-variant/10">
                         {categories.map((category) => (
                             <tr
-                                key={category._id}
+                                key={category.id}
                                 className="hover:bg-surface-container-low/30 transition-colors group"
                             >
                                 <td className="px-6 py-4">
@@ -64,7 +64,7 @@ export const CategoriesTable = ({ categories }: { categories: Category[] }) => {
                                             <Pencil className="w-5 h-5" />
                                         </button>
                                         <button
-                                            onClick={() => handleDeleteClick(category._id)}
+                                            onClick={() => handleDeleteClick(category.id)}
                                             title="Delete"
                                             className="p-2 text-error hover:bg-error/10 rounded-lg transition-all"
                                         >

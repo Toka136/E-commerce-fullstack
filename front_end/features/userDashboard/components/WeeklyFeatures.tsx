@@ -38,7 +38,7 @@ export default function WeeklyFeatures({ books }: WeeklyFeaturesProps) {
 
       <div className="overflow-hidden grid grid-cols-2 md:grid-cols-4 gap-6 pb-12 ">
         {books.map((book) => (
-          <div key={book._id}>
+          <div key={book.id}>
             <BookCard book={book} />
             </div>
         ))}

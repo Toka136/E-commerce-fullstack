@@ -14,7 +14,7 @@ export const useAddReview=()=>{
                 console.log("STATUS:", err.response?.status);
                 console.log("DATA:", err.response?.data);
                 console.log("MESSAGE:", err.response?.data?.message);
-                toast.error(err.response?.data?.message)
+                // toast.error(err.response?.data?.message)
                 
             }
         },

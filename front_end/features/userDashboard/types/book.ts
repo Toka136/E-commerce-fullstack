@@ -10,7 +10,7 @@ export interface BookRate {
 }
 
 export interface BookDetails {
-  _id: string;
+  id: string;
   title: string;
   author: string;
   category: BookCategory;
@@ -24,14 +24,12 @@ export interface BookDetails {
 }
 
 export interface BookReview {
-  _id: string;
-  userId: {
-    _id: string;
-    userName: string;
-  };
+  id: string;
+  userId: string;
   rating: number;
   review: string;
   updatedAt: string;
+  user:{userName:string}
 }
 
 export interface GetBookData {

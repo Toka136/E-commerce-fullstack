@@ -102,7 +102,7 @@ const Header = ({menuOpen, setMenuOpen}:{menuOpen:boolean, setMenuOpen:(value:bo
 
 
 
-  const isAdmin = useData?.data.role === "admin";
+  const isAdmin = useData?.data.role === "ADMIN";
    const pathname = usePathname();
  useEffect(() => {
   console.log("isAdmin",isAdmin);

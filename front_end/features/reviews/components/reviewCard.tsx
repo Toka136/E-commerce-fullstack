@@ -42,7 +42,7 @@ export const ReviewCard = ({
 
     onEdit?.(
       {
-        reviewId: review._id,
+        reviewId: review.id,
         rating,
         review: reviewText,
       }
@@ -58,7 +58,7 @@ export const ReviewCard = ({
   };
 
   const handleDelete = () => {
-    onDelete?.(review._id);
+    onDelete?.(review.id);
     setDeleteDialogOpen(false);
   };
 
@@ -71,11 +71,11 @@ export const ReviewCard = ({
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[12px] font-semibold text-white">
-              {getInitials(review.userId?.userName ?? "?")}
+              {getInitials(review?.user.userName ?? "?")}
             </div>
 
             <p className="text-[14px] font-semibold text-gray-800">
-              {access ? "You" : review.userId?.userName ?? "Anonymous reader"}
+              {access ? "You" : review.user?.userName ?? "Anonymous reader"}
             </p>
           </div>
 

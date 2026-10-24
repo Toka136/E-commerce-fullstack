@@ -17,7 +17,7 @@ export default function MainLayout({
   
     const { onOpen } = useCartStore();
     const useData = useAuthStore((state) => state.userData);
-    const isAdmin = useData.userRole === "admin";
+    const isAdmin = useData.userRole === "ADMIN";
   
   return (
     <div>

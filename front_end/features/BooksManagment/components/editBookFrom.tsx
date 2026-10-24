@@ -28,7 +28,7 @@ export const EditBookForm = ({handleClose,book,categories}:{handleClose:()=>void
         {enableReinitialize: true,
 
             initialValues: {
-              _id:book?._id??"",
+              id:book?.id??"",
               title: book?.title??"",
               author: book?.author??"",
               slug: book?.category?.slug??"",
@@ -137,7 +137,7 @@ export const EditBookForm = ({handleClose,book,categories}:{handleClose:()=>void
                             <option value="">Select a category</option>
           
                             {categories.map((category: Category) => (
-                              <option key={category._id} value={category.slug}>
+                              <option key={category.id} value={category.slug}>
                                 {category.name}
                               </option>
                             ))}

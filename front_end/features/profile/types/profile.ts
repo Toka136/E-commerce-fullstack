@@ -8,7 +8,7 @@ export interface updateProfile extends userProfileBase {
   image?: File | null;
 }
 export interface userProfile extends userProfileBase {
-  _id: string;
+  id: string;
    role: string;
    image?: string;
  

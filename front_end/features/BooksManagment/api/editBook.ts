@@ -4,7 +4,7 @@ import { editBookT } from "../types/Books"
 export const EditBook=async(data:editBookT)=>{
     console.log("data from api",data)
     const formData=new FormData()
-    formData.append("_id",data._id),
+    formData.append("id",data.id),
     data.title&&formData.append("title",data.title)
     data.author&&formData.append("author",data.author)
     data.slug&&formData.append("slug",data.slug)

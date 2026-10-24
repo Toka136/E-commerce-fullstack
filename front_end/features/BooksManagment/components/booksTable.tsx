@@ -50,7 +50,7 @@ export const BooksTable = ({ result, categories }: booksTableParamsT) => {
           <tbody className="divide-y divide-outline-variant/10">
             {result.books && result.books.map((bookItem) => (
               <tr
-                key={bookItem._id}
+                key={bookItem.id}
                 className="hover:bg-surface-container-low/30 transition-colors group"
               >
                 <td className="px-6 py-4">
@@ -82,19 +82,19 @@ export const BooksTable = ({ result, categories }: booksTableParamsT) => {
                   <StockBadge stock={bookItem.stock} />
                 </td>
                 <td className="px-6 py-4 font-semibold text-[#0b1c30]">
-                  ${bookItem.price.toFixed(2)}
+                  ${Number(bookItem.price).toFixed(2)}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-1 opacity-100 transition-opacity">
                     <button
-                      onClick={() => handleEditClick(bookItem._id, bookItem)}
+                      onClick={() => handleEditClick(bookItem.id, bookItem)}
                       title="Edit"
                       className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-all"
                     >
                       <Pencil className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => handleDeleteClick(bookItem._id)}
+                      onClick={() => handleDeleteClick(bookItem.id)}
                       title="Delete"
                       className="p-2 text-error hover:bg-error/10 rounded-lg transition-all"
                     >

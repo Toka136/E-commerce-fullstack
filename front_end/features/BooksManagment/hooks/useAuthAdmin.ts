@@ -3,7 +3,7 @@ import { authAdmin } from "../api/authAdmin";
 
 export const useAuthAdmin = () => {
     return useQuery({
-        queryKey: ["auth", "admin"],
+        queryKey: ["auth", "ADMIN"],
         queryFn: authAdmin,
         retry: false,
         staleTime: 5 * 60 * 1000,

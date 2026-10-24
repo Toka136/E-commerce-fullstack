@@ -38,11 +38,11 @@ export type addBookT={
   description?: string;
   coverImage?: string;
   stock?: number;
-  _id: string;
+  id: string;
   pages?: number;
 
   category?: {
-    _id: string;
+    id: string;
     name: string;
     slug: string;
   };

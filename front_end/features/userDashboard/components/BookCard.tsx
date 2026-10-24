@@ -18,7 +18,7 @@ export default function BookCard({ book, eyebrow }: BookCardProps) {
   const { mutate: addToCartMutation, isPending } = useAddToCartMutation();
   const onAdd = () => {
      addToCartMutation({
-               productId: book._id,
+               productId: book.id,
                quantity: 1
               });
   }
@@ -27,7 +27,7 @@ export default function BookCard({ book, eyebrow }: BookCardProps) {
   return (
     <div className="bg-white hover:-translate-y-0.5 relative rounded-2xl overflow-hidden shadow-sm flex flex-col h-full hover:shadow-md transition-shadow">
       {/* Upper Cover Container */}
-              <Link href={`/books/${book._id}`}>
+              <Link href={`/books/${book.id}`}>
              
       <div className="relative aspect-4/5  w-full bg-[#679198] flex items-center justify-centeroverflow-hidden">
         <BookCover coverImage={book.coverImage} title={book.title} />
