@@ -12,7 +12,7 @@ export const userPermission = (req:Request, res:Response, next:NextFunction) => 
     const userInfo=jwt.verify(accessToken,process.env.JWT_SECRET_KEY as string) as CusomtJwtPayload;
 
     if(userInfo){
-        if(userInfo.role!=="user"){
+        if(userInfo.role!=="USER"){
              next( new appError("Please Login First",403,responseStatus.FAILED))
         }
         next()

@@ -11,6 +11,7 @@ import redis from "../../config/redis";
 import invalidateCache from "../../utils/invalidateCache";
 import cloudinary from "../../config/cloudinaryconfig";
 import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
+import { Prisma } from "../../generated/prisma/client";
 export const addBook_S = async (
   body: addBookBodyI,
   file?: Express.Multer.File
@@ -48,12 +49,12 @@ export const addBook_S = async (
   const newBook: insertBookI = {
     title,
     author,
-    category: bookCategory._id,
-    price,
+    categoryId: bookCategory.id,
+    price: Number(price),
     description,
-    stock,
+    stock: Number(stock),
     coverImage: "",
-    pages,
+    pages: Number(pages),
     imagePublicId: "",
   };
 
@@ -89,7 +90,7 @@ export const editBook_S = async (
   body: editBookI,
   file?: Express.Multer.File
 ) => {
-  const book = await findBookById(body._id);
+  const book = await findBookById(body.id);
 
   if (!book) {
     throw new appError(
@@ -99,7 +100,7 @@ export const editBook_S = async (
     );
   }
 
-  let bookCategory = book.category;
+  let bookCategory = book.categoryId;
 
   if (body.slug) {
     const category = await getCategory(body.slug);
@@ -112,18 +113,18 @@ export const editBook_S = async (
       );
     }
 
-    bookCategory = category._id;
+    bookCategory = category.id;
   }
 
   const newBook: insertBookI = {
     title: book.title,
     author: body.author ?? book.author,
-    category: bookCategory,
-    price: body.price ?? book.price,
+    categoryId: bookCategory,
+    price: Number(body.price) ?? book.price.toNumber(),
     description: body.description ?? book.description,
-    stock: body.stock ?? book.stock,
+    stock: Number(body.stock) ?? book.stock,
     coverImage: book.coverImage,
-    pages: body.pages ?? book.pages,
+    pages: Number(body.pages) ?? book.pages,
     imagePublicId: book.imagePublicId ?? "",
   };
 
@@ -144,7 +145,7 @@ export const editBook_S = async (
     // Update DB
     const result = await updateBook(
       newBook,
-      body._id
+      body.id
     );
 
     // DB update succeeded → delete old Cloudinary image
@@ -158,7 +159,7 @@ export const editBook_S = async (
     }
 
     await invalidateCache("books:list:");
-    await invalidateCache(`book:${body._id}`);
+    await invalidateCache(`book:${body.id}`);
 
     return result;
 
@@ -225,48 +226,49 @@ export const getBooks_S=async(query:queryI)=>{
  const pageSize=query.pageSize?parseInt(String(query.pageSize)):10
     const currentPage=query.currentPage?parseInt(String(query.currentPage)):1
     const skip=(pageSize*(currentPage-1))
-     const filter: any = {};
+     const filter: Prisma.BookWhereInput = {};
     if (query.searchText) {
         const searchText = query.searchText;
-        filter.$or = [{title:{$regex:searchText,$options:"i"}},{author:{$regex:searchText,$options:"i"}},{description:{$regex:searchText,$options:"i"}}]
+        filter.OR = [{title:{contains:searchText,mode:"insensitive"}},{author:{contains:searchText,mode:"insensitive"}},{description:{contains:searchText,mode:"insensitive"}}]
     }
     if(query.category){
         const category=await getCategory(query.category)
         if(!category){
             throw new appError("Category Not Found",400,responseStatus.FAILED)
         }
-        filter.category=category._id
+        filter.categoryId=category.id
     }
     if(query.minPrice||query.maxPrice){
         filter.price={}
         if(query.minPrice){
-        filter.price.$gte= Number(query.minPrice);
+        filter.price.gte= Number(query.minPrice);
     }
         if(query.maxPrice){
-        filter.price.$lte= Number(query.maxPrice);
+        filter.price.lte= Number(query.maxPrice);
     }
     }
     
-    let sort={}
-    switch (query.sort) {
+let sort: Prisma.BookOrderByWithRelationInput[] = [];
+
+switch (query.sort) {
   case "price-asc":
-    sort = { price: 1, _id: 1 };
+    sort = [{ price: "asc" }, { id: "asc" }];
     break;
 
   case "price-desc":
-    sort = { price: -1, _id: -1 };
+    sort = [{ price: "desc" }, { id: "desc" }];
     break;
 
   case "newest":
-    sort = { createdAt: -1, _id: -1 };
+    sort = [{ createdAt: "desc" }, { id: "desc" }];
     break;
 
   case "oldest":
-    sort = { createdAt: 1, _id: 1 };
+    sort = [{ createdAt: "asc" }, { id: "asc" }];
     break;
 
   default:
-    sort = { createdAt: -1, _id: -1 };
+    sort = [{ createdAt: "desc" }, { id: "desc" }];
 }
     query.pageSize=pageSize
    const cacheKey =

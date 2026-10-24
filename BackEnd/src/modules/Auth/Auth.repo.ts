@@ -1,12 +1,31 @@
+import { prisma } from "../../config/prisma";
 import { UserData } from "./Auth.types";
-import User from "./user.model";
-export const R_register=async(newUser:UserData)=>{
-    const user=new User(newUser)
-     await user.save()
-     return user
 
-}
+export const R_register = async (newUser: UserData) => {
+  return await prisma.user.create({
+    data: {
+      userName: newUser.userName,
+      email: newUser.email,
+      password: newUser.password,
+       ...(newUser.phoneNumber !== undefined && {
+        phoneNumber: newUser.phoneNumber,
+      }),
 
-export const findUser=async(email:string)=>{
-    return await User.findOne({email})
-}
+      ...(newUser.image !== undefined && {
+        image: newUser.image,
+      }),
+
+      ...(newUser.imagePublicId !== undefined && {
+        imagePublicId: newUser.imagePublicId,
+      }),
+      
+
+    },
+  });
+};
+
+export const findUser = async (email: string) => {
+  return await prisma.user.findUnique({
+    where: { email },
+  });
+};

@@ -39,7 +39,7 @@ export const S_register = async (
       );
 
       user.image = uploadedImage.secure_url;
-      user.imagePublicId = uploadedImage.public_id;
+      user.imagePublicId = uploadedImage.publicid;
     }
 
    
@@ -48,16 +48,16 @@ export const S_register = async (
 
   } catch (error) {
 
-    if (uploadedImage?.public_id) {
+    if (uploadedImage?.publicid) {
       await cloudinary.uploader.destroy(
-        uploadedImage.public_id
+        uploadedImage.publicid
       );
     }
 
     throw error;
   }
    const newUser = await R_register(user);
-  const rawToken= await createEmailVerificationS(newUser._id.toString())
+  const rawToken= await createEmailVerificationS(newUser.id)
   const verificationUrl =
   `${process.env.FRONTEND_URL}verify-email?token=${rawToken}`;
   const emailTemp=`<p>Please click the link below to verify your email address:</p>
@@ -81,8 +81,8 @@ export const S_login=async(user:loginBody)=>{
     if(!checkPass){
         throw new appError("Invalid Credentials",400,responseStatus.FAILED)
     }
-    const accessToken=TokenCreation({id:existUser._id,email:existUser.email,role:existUser.role},"60m")
-    const refreshToken=TokenCreation({id:existUser._id,email:existUser.email,role:existUser.role},"7d")
+    const accessToken=TokenCreation({id:existUser.id,email:existUser.email,role:existUser.role},"60m")
+    const refreshToken=TokenCreation({id:existUser.id,email:existUser.email,role:existUser.role},"7d")
     const returnedUser={newUser:existUser,accessToken,refreshToken}
 
     return returnedUser
@@ -99,8 +99,8 @@ export const S_refreshToken=async(token:string)=>{
       if(!user){
           throw new appError("User Not Found",400,responseStatus.FAILED)
       }
-      const accessToken=TokenCreation({id:user._id ,email:user.email,role:user.role},"60m")
-      const refreshToken=TokenCreation({id:user._id,email:user.email,role:user.role},"7d")
+      const accessToken=TokenCreation({id:user.id ,email:user.email,role:user.role},"60m")
+      const refreshToken=TokenCreation({id:user.id,email:user.email,role:user.role},"7d")
       const returnedUser={newUser:user,accessToken,refreshToken}
     return returnedUser
     

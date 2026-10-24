@@ -18,7 +18,7 @@ export const sendResetPasswordLinkS=async(email:string)=>{
   if(!user){
       throw new appError("User Not Found",400,responseStatus.FAILED)
   }
-  const token=await createResetPasswordToken(user._id.toString())
+  const token=await createResetPasswordToken(user.id)
    const verificationUrl =
   `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
  const emailTemp=`<p>Please click the link below to reset your password:</p>
@@ -57,5 +57,5 @@ export const resetPasswordS = async (rawToken: string,newPassword:string) => {
     verificationToken.userId.toString(),
     newPass
   );
-  await deletePasswordResetToken(verificationToken._id.toString());
+  await deletePasswordResetToken(verificationToken.id);
 };

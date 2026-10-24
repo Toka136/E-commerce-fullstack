@@ -7,13 +7,13 @@ import { addRate, deleteRate, editRate } from "../Books/book.repo"
 import { addReview, deleteReview, editReview, getBookReviews, getReview, getReviewById } from "./review.repo"
 import { editReviewI, reviewI } from "./review.types"
 
-export const addReviewS=async(accessToken:string,review:reviewI)=>{
-    const userId=await GetUserInfo(accessToken)
-    const existingReview=await getReview(userId.id.toString(),review.bookId)
+export const addReviewS=async(userId:string,review:reviewI)=>{
+    
+    const existingReview=await getReview(userId,review.bookId)
     if(existingReview){
         throw new appError("Review already exists",400,responseStatus.FAILED)
     }
-    review.userId=userId.id.toString()
+    review.userId=userId
     await addRate(review.bookId,review.rating)
     await addReview(review)
     await invalidateCache(`book:${review.bookId}`)
@@ -26,7 +26,7 @@ export const editReviewS=async(review:editReviewI)=>{
         throw new appError("Review Not Found",400,responseStatus.FAILED)
     }
     const reviewData={
-        reviewId:existingReview._id.toString(),
+        reviewId:existingReview.id.toString(),
         rating:(typeof review.rating === 'number') ? review.rating : existingReview.rating,
         // ensure review is a string (fall back to existing review or empty string)
         review: (typeof review.review === 'string') ? review.review : (existingReview.review ?? '')

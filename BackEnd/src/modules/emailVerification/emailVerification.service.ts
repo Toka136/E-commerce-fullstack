@@ -37,8 +37,8 @@ export const verifyEmailS = async (rawToken: string) => {
       responseStatus.FAILED
     );
   }
-
+ console.log("verificationToken.userId",verificationToken.userId)
   await verifyUser(
-    verificationToken.userId.toString()
+    verificationToken.userId
   );
 };

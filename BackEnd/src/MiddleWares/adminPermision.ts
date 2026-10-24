@@ -9,7 +9,7 @@ export const adminPermision= async(req:Request,res:Response,Next:NextFunction)=>
     const userInfo=jwt.verify(accessToken,process.env.JWT_SECRET_KEY as string) as CusomtJwtPayload;
 
     if(userInfo){
-        if(userInfo.role!=="admin"){
+        if(userInfo.role!=="ADMIN"){
              Next( new appError("You are not admin",403,responseStatus.FAILED))
         }
         Next()

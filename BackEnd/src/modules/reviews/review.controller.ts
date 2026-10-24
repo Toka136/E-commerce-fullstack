@@ -8,7 +8,7 @@ export const addReviewC=async(req:Request,res:Response,next:NextFunction)=>{
         if(!accessToken){
             throw new appError("You are not logged in",401,responseStatus.FAILED)
         }
-        const result=await addReviewS(accessToken,req.body)
+        const result=await addReviewS(req.user?.id.toString()??"",req.body)
         res.status(200).json({
             status:"success",
             message:"Review Added Successfully",

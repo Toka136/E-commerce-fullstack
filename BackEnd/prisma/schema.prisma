@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                String             @id @default(uuid())
+  userName          String
+  email             String             @unique
+  phoneNumber       String?
+  password          String
+  role              userRole           @default(USER)
+  image             String?            @default("")
+  imagePublicId     String?            @default("")
+  verified          Boolean            @default(false)
+  lastActiveAt      DateTime           @default(now())
+  emailVerification emailVerification?
+  resetPassword     resetPassword?
+  reviews           BookReview[]
+}
+
+model emailVerification {
+  userId    String   @unique
+  tokenHash String   @unique
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model resetPassword {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  tokenHash String   @unique
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  slug        String  @unique
+  Books       Book[]
+}
+
+model BookRate {
+  id      String @id @default(uuid())
+  average Float  @default(0)
+  count   Int    @default(0)
+  book    Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  bookId  String @unique
+}
+
+model BookReview {
+  id        String   @id @default(uuid())
+  userId    String
+  bookId    String
+  rating    Int
+  review    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@index([bookId])
+  @@index([userId])
+}
+
+model Book {
+  id            String       @id @default(uuid())
+  title         String       @unique
+  description   String
+  coverImage    String
+  imagePublicId String       @default("")
+  author        String
+  category      Category     @relation(fields: [categoryId], references: [id])
+  categoryId    String
+  price         Decimal      @db.Decimal(10, 2)
+  stock         Int
+  pages         Int
+  createdAt     DateTime     @default(now())
+  rate          BookRate?
+  reviews       BookReview[]
+}
+
+enum userRole {
+  ADMIN
+  USER
+}

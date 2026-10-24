@@ -4,6 +4,7 @@ import { categoryI } from "./Category.types"
 import { responseStatus } from "../../utils/responseStatus";
 import appError from "../../utils/errorClass";
 import { getBooksbyCategory } from "../Books/book.repo";
+// import { getBooksbyCategory } from "../Books/book.repo";
 
 export const addCategoryS=async(category:categoryI)=>{
     const slug=slugify(category.name, {

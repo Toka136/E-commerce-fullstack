@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "phoneNumber" DROP NOT NULL,
+ALTER COLUMN "image" DROP NOT NULL,
+ALTER COLUMN "imagePublicId" DROP NOT NULL;

@@ -18,6 +18,14 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import path from "path"
 const app = express()
+app.get("/test", (req, res) => {
+  console.log("TEST ROUTE HIT");
+  res.send("Server is working!");
+});
+app.use((req, res, next) => {
+  console.log(req.method, req.originalUrl);
+  next();
+});
 app.use(cookieParser())
 
 app.use(cors(
@@ -30,6 +38,7 @@ app.use(express.json())
 mongoose.connect(process.env.MONGO_URL as string).then(()=>{
 }).catch((err)=>{
 })
+
 app.use("/api/auth",authRoutes)
 app.use("/api/books",bookRoutes)
 app.use("/api/cart",cartRoutes)

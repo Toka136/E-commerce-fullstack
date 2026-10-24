@@ -18,16 +18,16 @@ export const addProductInCart_S=async({productId,token,quantity}:cartI)=>{
     {
         
        
-        const newCart=await insertCart({userId:userId,productId:productId,quantity:quantity??1,price:product.price})
+        const newCart=await insertCart({userId:userId,productId:productId,quantity:quantity??1,price:product.price.toNumber()})
         return newCart
     }
 
     if(cart.items.find((item)=>item.product.toString()===productId))
     {
-        await updateQuantity({userId:userId,productId:productId,quantity:quantity??1,price:product.price},product.stock)
+        await updateQuantity({userId:userId,productId:productId,quantity:quantity??1,price:product.price.toNumber()},product.stock)
         return cart
     }
-   await addProductToCart({userId:userId,productId:productId,quantity:quantity??1,price:product.price})
+   await addProductToCart({userId:userId,productId:productId,quantity:quantity??1,price:product.price.toNumber()})
     return cart
     
 }

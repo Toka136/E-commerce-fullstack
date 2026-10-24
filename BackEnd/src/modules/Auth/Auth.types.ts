@@ -4,9 +4,10 @@ export interface UserData {
     userName: string;
     email: string;
     password: string;
-   role?: string;
+    role?: string;
     image?: string,
     imagePublicId?:string
+    phoneNumber?:string
 }
 export interface loginBody {
     email: string;
@@ -20,6 +21,6 @@ export interface authResponse {
 
 export interface CusomtJwtPayload extends JwtPayload {
   email: string;
-  id: ObjectId;
+  id: string;
   role:string;
 }

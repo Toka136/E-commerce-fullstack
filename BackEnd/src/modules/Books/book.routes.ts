@@ -10,6 +10,8 @@ router.route("/addBook").post(adminPermision,imageUpload.single("coverImage"),Wr
 router.route("/updateBook").patch(adminPermision,imageUpload.single("coverImage"),Wrapper(updateBook_C))
 router.route("/deleteBook/:id").delete(adminPermision,Wrapper(deleteBook_C))
 router.route("/getBook/:id").get(Wrapper(getBook_C))
-router.route("/getBooks/").get(Wrapper(getBooks_C))
-
+router.route("/getBooks").get((req, res, next) => {
+  console.log("GET BOOKS ROUTE HIT");
+  next();
+}, Wrapper(getBooks_C));
 export default router

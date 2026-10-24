@@ -3,11 +3,11 @@ import { ObjectId } from "mongodb"
 export interface bookI{
     title:string,
     author:string,
-    price:number,
+    price:number ,
     description:string,
     coverImage:string,
     stock:number,
-    _id?:ObjectId,
+    id?:string,
     pages:number,
     imagePublicId?:string
 }
@@ -16,7 +16,7 @@ export interface addBookBodyI extends bookI{
     
 }
 export interface insertBookI extends bookI{
-    category:ObjectId,
+     categoryId: string;
 
     
 }
@@ -28,7 +28,7 @@ export interface editBookI{
     description?:string,
     coverImage?:string,
     stock?:number,
-    _id:string,
+    id:string,
     pages?:number
 }
 export interface queryI{
