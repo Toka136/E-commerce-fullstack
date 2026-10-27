@@ -26,6 +26,7 @@ model User {
   emailVerification emailVerification?
   resetPassword     resetPassword?
   reviews           BookReview[]
+  wishList          wishList?
 }
 
 model emailVerification {
@@ -91,6 +92,14 @@ model Book {
   createdAt     DateTime     @default(now())
   rate          BookRate?
   reviews       BookReview[]
+  wishList      wishList[]
+}
+
+model wishList {
+  id     String @id @default(uuid())
+  userId String @unique
+  items  Book[]
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum userRole {

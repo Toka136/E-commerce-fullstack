@@ -1,4 +1,5 @@
 import {prisma} from "../../config/prisma"
+import { Prisma } from "../../generated/prisma/client";
 import { bookI, editBookI, insertBookI, queryI } from "./book.types"
 export const findBookByName=async(title:string)=>{
     return await prisma.book.findUnique({where:{title}})
@@ -15,11 +16,11 @@ export const findBookById=async(id:string)=>{
     include:{category:{omit:{description:true}},rate:{select:{average:true,count:true}}}})
  
 }
-export const findOnlyBookById=async(id:string)=>{
-  return await prisma.book.findUnique({where:{id}})
+export const findOnlyBookById=async(id:string,tx:Prisma.TransactionClient=prisma)=>{
+  return await tx.book.findUnique({where:{id}})
   
 }
-export const updateBook=async(book:bookI,id:string)=>{
+export const updateBook=async(book:insertBookI,id:string)=>{
   return await prisma.book.update({where:{id},data:book})
     
 }

@@ -7,7 +7,7 @@ import { loginBody, UserData } from "./Auth.types"
 import bcrypt from "bcrypt"
 import { uploadToCloudinary } from "../../utils/uploadToCloudinary"
 import cloudinary from "../../config/cloudinaryconfig"
-import { createEmailVerificationS } from "../emailVerification/emailVerification.service"
+import { createEmailVerificationS } from "../EmailVerification/emailVerification.service"
 import { SendEmailS } from "../../utils/sendEmail"
 
 

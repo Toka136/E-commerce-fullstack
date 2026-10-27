@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken"
 import appError from "../utils/errorClass"
 import { responseStatus } from "../utils/responseStatus"
 import { CusomtJwtPayload } from "../modules/Auth/Auth.types"
-import { getReviewById } from "../modules/reviews/review.repo"
+import { getReviewById } from "../modules/Reviews/review.repo"
 import { ObjectId } from "mongodb"
 export const deleteReviewPermision=async(req:Request,res:Response,next:NextFunction)=>{
     try{

@@ -35,7 +35,7 @@ export const deleteCategoryS=async(id:string)=>{
         throw new appError("Category Has Products",400,responseStatus.FAILED)
     }
     else{
-        await deleteCategory(id)
+         await deleteCategory(id)
     }
 }
 export const updateCategoryS=async(slug:string,description:string)=>{

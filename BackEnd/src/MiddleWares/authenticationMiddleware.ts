@@ -10,6 +10,7 @@ export const authenticationMiddleware=async (req:Request,res:Response,next:NextF
             throw new appError("You are not logged in",401,responseStatus.FAILED)
         }
         const user=await GetUserInfo(token)
+        console.log("user",user)
         req.user=user as userInfo
         next()
 }

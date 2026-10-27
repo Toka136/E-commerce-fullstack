@@ -2,7 +2,7 @@ import appError from "../../utils/errorClass";
 import { responseStatus } from "../../utils/responseStatus";
 import { SendEmailS } from "../../utils/sendEmail";
 import { findUser } from "../Auth/Auth.repo";
-import { updatePassword } from "../profile/profile.repo";
+import { updatePassword } from "../Profile/profile.repo";
 import { createResetPassword, deletePasswordResetToken, findVerificationToken } from "./resetPasswoed.repo"
 import crypto from "crypto";
 import bcrypt from "bcrypt"

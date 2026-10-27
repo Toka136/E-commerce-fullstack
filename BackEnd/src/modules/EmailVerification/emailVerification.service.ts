@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { createEmailVerification, findVerificationToken } from "./emailVerification.repo";
-import { verifyUser } from "../profile/profile.repo";
+import { verifyUser } from "../Profile/profile.repo";
 import appError from "../../utils/errorClass";
 import { responseStatus } from "../../utils/responseStatus";
 
