@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import {
   SlidersHorizontal,
@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { WishlistItem } from "../types/wishlist";
 import { formatPrice, getCoverImageUrl } from "@/features/userDashboard/utils/format";
-import { stockStatus } from "../utils/wiahlistFormates";
+import { stockStatus } from "../utils/wishlistFormates";
 import { WishlistItemCard } from "./wishlistItem";
 
 type SortOption = "recent" | "price-low" | "price-high";
@@ -30,8 +30,8 @@ export default function WishlistPage({ items}: WishlistPageProps) {
 
   const sortedItems = useMemo(() => {
     const copy = [...items];
-    if (sort === "price-low") copy.sort((a, b) => a.productId.price - b.productId.price);
-    if (sort === "price-high") copy.sort((a, b) => b.productId.price - a.productId.price);
+    if (sort === "price-low") copy.sort((a, b) => a.price - b.price);
+    if (sort === "price-high") copy.sort((a, b) => b.price - a.price);
     return copy;
   }, [items, sort]);
 
@@ -39,7 +39,9 @@ export default function WishlistPage({ items}: WishlistPageProps) {
   //   setLocalItems((prev) => prev.filter((item) => item._id !== itemId));
   //   await onRemove?.(itemId);
   // };
-
+   useEffect(() => {
+     setAddedIds(new Set(items.map((item) => item.id)));
+   }, [items]);
 
   return (
     <div className="min-h-screen bg-[#F7F7FB] px-4 pb-10 pt-6">
@@ -103,13 +105,13 @@ export default function WishlistPage({ items}: WishlistPageProps) {
       {/* Item cards */}
       <div className="mt-5 space-y-4">
         {sortedItems.map((item) => {
-          const product = item.productId;
-          const stock = stockStatus(product);
-          const isAdded = addedIds.has(product._id);
+         
+          const stock = stockStatus(item);
+          const isAdded = addedIds.has(item.id);
 
           return (
            <WishlistItemCard
-              key={item._id}
+              key={item.id}
               item={item}
               stock={stock}
               isAdded={isAdded}

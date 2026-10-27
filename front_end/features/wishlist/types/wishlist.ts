@@ -1,5 +1,5 @@
 export interface WishlistProduct {
-  _id: string;
+  id: string;
   title: string;
   author: string;
   price: number;
@@ -8,12 +8,16 @@ export interface WishlistProduct {
 }
 
 export interface WishlistItem {
-  _id: string;
-  productId: WishlistProduct;
+   id: string;
+  title: string;
+  author: string;
+  price: number;
+  coverImage: string;
+  stock: number;
 }
 
 export interface Wishlist {
-  _id: string;
+  id: string;
   userId: string;
   items: WishlistItem[];
   createdAt: string;

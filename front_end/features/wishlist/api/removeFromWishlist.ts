@@ -1,9 +1,9 @@
 import { api } from "@/axios/api"
-export const deleteFromWishlist=async(productId:string)=>
+export const deleteFromWishlist=async(bookId:string)=>
 {
-    const res=await api.delete("/wishlist/deleteProduct",{
+    const res=await api.delete("/wishlist/deleteBook",{
         data:{
-      productId:productId  
+      bookId:bookId  
         }
     })
     return res.data

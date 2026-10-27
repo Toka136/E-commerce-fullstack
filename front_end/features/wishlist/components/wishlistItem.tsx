@@ -1,7 +1,7 @@
 import { CheckCircle2, ShoppingCart, X } from "lucide-react";
 import { WishlistItem } from "../types/wishlist";
 import Image from "next/image";
-import { StockTone } from "../utils/wiahlistFormates";
+import { StockTone } from "../utils/wishlistFormates";
 import { formatPrice } from "@/features/userDashboard/utils/format";
 import {  StockBadgeW } from "./stockBadgeW";
 import { useMoveToCart } from "../hooks/useMoveToCart";
@@ -18,22 +18,22 @@ export const WishlistItemCard=({item,stock,isAdded}:props)=>{
     const {mutate:moveToCart,isPending}=useMoveToCart()
     const {mutate:deleteFromWishlist,isPending:deletePending}=useDeleteFromWishlist()
     const handleMoveToCart=()=>{
-      moveToCart(item.productId._id)
+      moveToCart(item.id)
     }
     const handleDelete=()=>{
-      deleteFromWishlist(item.productId._id)
+      deleteFromWishlist(item.id)
     }
      return (
             <div
-              key={item._id}
+              key={item.id}
               className="flex gap-3 rounded-2xl bg-white p-3 shadow-sm shadow-gray-200/60"
             >
               <div className="relative h-28 w-20 shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                <Link href={`/books/${item.productId._id}`}>
+                <Link href={`/books/${item.id}`}>
 
                 <Image
-                  src={`${item.productId.coverImage}`}
-                  alt={`Cover of ${item.productId.title}`}
+                  src={`${item.coverImage}`}
+                  alt={`Cover of ${item.title}`}
                   fill
                   sizes="80px"
                   
@@ -49,7 +49,7 @@ export const WishlistItemCard=({item,stock,isAdded}:props)=>{
                   </div>
                   <button
                     onClick={() =>handleDelete()}
-                    aria-label={`Remove ${item.productId.title} from wishlist`}
+                    aria-label={`Remove ${item.title} from wishlist`}
                     className="rounded-full p-1 text-gray-300 hover:bg-gray-50 hover:text-gray-500"
                   >
                     {deletePending?<CircularProgress color="inherit" size={12} />:
@@ -58,18 +58,18 @@ export const WishlistItemCard=({item,stock,isAdded}:props)=>{
                 </div>
 
                 <h2 className="mt-1 text-[16px] font-bold leading-snug text-gray-900">
-                  {item.productId.title}
+                  {item.title}
                 </h2>
-                <p className="text-[13px] text-gray-500">{item.productId.author}</p>
+                <p className="text-[13px] text-gray-500">{item.author}</p>
 
                 <div className="mt-auto flex items-end justify-between pt-2">
                   <p className="text-[17px] font-bold text-gray-900">
-                    {formatPrice(item.productId.price)}
+                    {formatPrice(item.price)}
                   </p>
                   <button
                     onClick={() => handleMoveToCart()}
-                    disabled={item.productId.stock === 0}
-                    aria-label={`Add ${item.productId.title} to cart`}
+                    disabled={item.stock === 0}
+                    aria-label={`Add ${item.title} to cart`}
                     className={`flex h-9 w-9 items-center justify-center rounded-lg transition ${
                       "bg-indigo-600 text-white hover:bg-indigo-700"
                     } disabled:cursor-not-allowed disabled:bg-gray-300`}

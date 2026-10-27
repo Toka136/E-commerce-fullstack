@@ -1,9 +1,9 @@
 import { api } from "@/axios/api"
 
 export const  addToWishlist=async(id:string)=>{
-    const res = await api.post("/wishlist/addProduct",
+    const res = await api.post("/wishlist/addBook",
         {
-            productId:id
+            bookId:id
         }
     )
     return res
