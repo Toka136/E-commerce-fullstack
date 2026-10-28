@@ -27,6 +27,7 @@ model User {
   resetPassword     resetPassword?
   reviews           BookReview[]
   wishList          wishList?
+  cart              Cart?
 }
 
 model emailVerification {
@@ -93,6 +94,7 @@ model Book {
   rate          BookRate?
   reviews       BookReview[]
   wishList      wishList[]
+  cartItems     CartItem[]
 }
 
 model wishList {
@@ -100,6 +102,32 @@ model wishList {
   userId String @unique
   items  Book[]
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id       String  @id @default(uuid())
+  userId   String  @unique
+  subtotal Decimal @default(0) @db.Decimal(10, 2)
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id              String  @id @default(uuid())
+  cartId          String
+  bookId          String
+  quantity        Int     @default(1)
+  priceAtPurchase Decimal @default(0) @db.Decimal(10, 2)
+
+  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, bookId])
+  @@index([bookId])
 }
 
 enum userRole {

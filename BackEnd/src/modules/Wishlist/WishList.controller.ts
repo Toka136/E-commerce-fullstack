@@ -52,7 +52,7 @@ export const moveToCartC=async(req:Request,res:Response,next:NextFunction)=>{
     if(!useId){
         throw new appError("You are not logged in",401,responseStatus.FAILED)
     }
-    const result=await moveToCartS(useId,req.body.productId)
+    const result=await moveToCartS(useId,req.body.bookId)
     res.status(200).json({
         status:"success",
         message:"Product Deleted Successfully",

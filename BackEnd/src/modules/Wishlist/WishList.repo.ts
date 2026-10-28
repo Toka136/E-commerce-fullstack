@@ -83,7 +83,7 @@ export const WHasBook = async (
   userId: string,
   bookId: string,
   tx: Prisma.TransactionClient = prisma
-) => {
+): Promise<string | null> => {
   const wishList = await tx.wishList.findFirst({
     where: {
       userId,
@@ -94,9 +94,16 @@ export const WHasBook = async (
       },
     },
     select: {
-      id: true,
+      items: {
+        where: {
+          id: bookId,
+        },
+        select: {
+          id: true,
+        },
+      },
     },
   });
 
-  return wishList ;
+  return wishList?.items[0]?.id ?? null;
 };

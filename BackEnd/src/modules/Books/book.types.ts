@@ -1,9 +1,10 @@
 import { ObjectId } from "mongodb"
+import { Prisma } from "../../generated/prisma/client";
 
 export interface bookI{
     title:string,
     author:string,
-    price:number ,
+    price:Prisma.Decimal ,
     description:string,
     coverImage:string,
     stock:number,
@@ -24,7 +25,7 @@ export interface editBookI{
     title?:string,
     author?:string,
     slug?:string,
-    price?:number,
+    price?:Prisma.Decimal,
     description?:string,
     coverImage?:string,
     stock?:number,

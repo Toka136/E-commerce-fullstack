@@ -58,11 +58,11 @@ export const addBook_S = async (
     title,
     author,
     categoryId: bookCategory.id,
-    price: Number(price),
+    price: price,
     description,
-    stock: Number(stock),
+    stock: stock,
     coverImage: "",
-    pages: Number(pages),
+    pages: pages,
     imagePublicId: "",
   };
 
@@ -136,8 +136,8 @@ export const editBook_S = async (
     author: body.author ?? book.author,
     categoryId: bookCategory,
     price: body.price != null
-      ? Number(body.price)
-      : book.price.toNumber(),
+      ? new Prisma.Decimal(body.price)
+      : book.price,
     description: body.description ?? book.description,
     stock: body.stock != null
       ? Number(body.stock)

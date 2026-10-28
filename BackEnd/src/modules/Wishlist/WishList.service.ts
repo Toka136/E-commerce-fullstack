@@ -6,7 +6,10 @@ import { responseStatus } from "../../utils/responseStatus"
 import mongoose, { ClientSession } from "mongoose"
 import { findBookById, findOnlyBookById } from "../Books/book.repo"
 import { addProductInCart_S } from "../Cart/Cart.service"
-import { findCartByUserId, insertCart } from "../Cart/Cart.repo"
+import { Prisma } from "../../generated/prisma/client"
+import { getCartByUserId, insertCart } from "../Cart/Cart.repo"
+import { prisma } from "../../config/prisma"
+// import { findCartByUserId, insertCart } from "../Cart/Cart.repo"
 
 export const getWishListS=async(userId:string)=>{
     const res =await getWishListByUserId(userId)
@@ -19,13 +22,14 @@ export const getWishListS=async(userId:string)=>{
 export const addBookWishListS=async(userId:string,bookId:string)=>{
   
     const wishList=await getWishListByUserId(userId)
-    const hasBook=await WHasBook(userId,bookId)
+   
      if(!wishList){
      await addWishList(userId,[bookId])
      return bookId
     }
+     const hasBook=await WHasBook(userId,bookId)
     if(hasBook){
-        return hasBook.id
+        return hasBook
     }
    
     await addBookW(bookId,userId)     
@@ -33,120 +37,70 @@ export const addBookWishListS=async(userId:string,bookId:string)=>{
 
 }
 export const deleteBookWS=async(userId:string,bookId:string)=>{
+    const wishList=await getWishListByUserId(userId)
+    if(!wishList){
+        throw new appError("WishList Not Found",404,responseStatus.FAILED)
+    }
+    const hasBook=await WHasBook(userId,bookId)
+    if(!hasBook){
+        throw new appError("book Not Found In Wishlist",404,responseStatus.FAILED)
+    }
     await deleteBookW(userId,bookId)
     return bookId
 }
 
-// export const moveToCartS = async (
-//   userId: string,
-//   bookId: string
-// ) => {
+export const moveToCartS = async (
+  userId: string,
+  bookId: string
+) => {
   
 
-//   return prisma.$transaction(async (tx) => {
-//     // 1. Check wishlist
-//     const wishList = await getWishListByUserId(userId, tx);
+  return prisma.$transaction(async (tx) => {
+    // 1. Check wishlist
+    const wishList = await getWishListByUserId(userId, tx);
 
-//     if (!wishList) {
-//       throw new appError(
-//         "WishList Not Found",
-//         404,
-//         responseStatus.FAILED
-//       );
-//     }
+    if (!wishList) {
+      throw new appError(
+        "WishList Not Found",
+        404,
+        responseStatus.FAILED
+      );
+    }
 
-//     // 2. Check book in wishlist
-//     const hasBook = await WHasBook(
-//       userId,
-//       bookId,
-//       tx
-//     );
+    // 2. Check book in wishlist
+    const hasBook = await WHasBook(
+      userId,
+      bookId,
+      tx
+    );
 
-//     if (!hasBook) {
-//       throw new appError(
-//         "book Not Found In Wishlist",
-//         404,
-//         responseStatus.FAILED
-//       );
-//     }
+    if (!hasBook) {
+      throw new appError(
+        "book Not Found In Wishlist",
+        404,
+        responseStatus.FAILED
+      );
+    }
 
-//     // 3. Get book
-//     const book = await findOnlyBookById(bookId, tx);
+    // 3. Get book
+   
 
-//     if (!book) {
-//       throw new appError(
-//         "book Not Found",
-//         404,
-//         responseStatus.FAILED
-//       );
-//     }
+    // 4. Add Book to cart
+    await addProductInCart_S({
+      userId,
+      bookId,
+      quantity:1},
+      tx
+      
+    );
 
-//     if (book.stock <= 0) {
-//       throw new appError(
-//         "Book Out Of Stock",
-//         400,
-//         responseStatus.FAILED
-//       );
-//     }
+    // 5. Remove Book from wishlist
+    await deleteBookW(
+      userId,
+      bookId,
+      tx
+    );
 
-//     // 4. Add Book to cart
-//     // await addBookIntoCartW_S(
-//     //   userId,
-//     //   bookId,
-//     //   book.price,
-//     //   tx
-//     // );
-
-//     // 5. Remove Book from wishlist
-//     await deleteBookW(
-//       userId,
-//       bookId,
-//       tx
-//     );
-
-//     return bookId;
-//   });
-// };
-// export const addBookIntoCartW_S = async (
-//   userId: string,
-//   productId: string,
-//   price: number,
-//   session?: ClientSession,
-  
-// ) => {
-//   const cart = await findCartByUserId(userId, session);
-//   if (!cart) {
-//     return await insertCart(
-//       {
-//         userId:userId,
-//         productId:productId,
-//         price:price
-//       },
-//       session
-//     );
-//   }
-
-//   const item = cart.items.find(
-//     (item) => item.product.toString() === productId
-//   );
-
-//   if (item) {
-//     item.quantity++;
-//     cart.subtotal += price;
-//   } else {
-//     cart.items.push({
-//       product: productId,
-//       quantity: 1,
-//       priceAtPurchase: price,
-//     });
-//     cart.subtotal += price;
-//   }
-
-// if (session) {
-//   await cart.save({ session });
-// } else {
-//   await cart.save();
-// }
-//   return cart;
-// };
-  
+    return bookId;
+  });
+};
