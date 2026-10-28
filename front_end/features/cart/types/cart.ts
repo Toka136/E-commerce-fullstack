@@ -14,8 +14,8 @@ export interface cartStore{
   setCount:(count:number)=>void
  
 }
-export interface cartProduct {
-  _id: string;
+export interface cartBook {
+  id: string;
   title: string;
   price: number;
   coverImage: string;
@@ -23,7 +23,7 @@ export interface cartProduct {
 }
 
 export interface CartItem {
-  product: cartProduct;
+  book: cartBook;
   quantity: number;
   priceAtPurchase: number;
 }
@@ -36,11 +36,10 @@ export interface UICartItem{
 }
 
 export interface CartData {
-  _id: string;
+  id: string;
   userId: string;
   items: CartItem[];
   subtotal: number;
-  __v: number;
 }
 
 export interface CartResponse {

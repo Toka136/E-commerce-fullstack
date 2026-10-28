@@ -6,18 +6,19 @@ import { useChangeQuantity } from "../utils/changeQuantity";
 import { useCartStore } from "../store/cart-store";
 import { useAddToCartMutation } from "../hooks/useAddToCart";
 import { useRemoveFromCartMutation } from "../hooks/useRemoveFromCart";
+import { useUpdateCartMutation } from "../hooks/useUpdateCart";
 interface sideCartItemProps{
      item: UICartItem;
 }
 export default function SideCartItem({item}:sideCartItemProps){
-    const { mutate: addToCartMutation, isPending } = useAddToCartMutation();
+    const { mutate: updateCartMutation, isPending } = useUpdateCartMutation();
     const { mutate: removeFromCartMutation } = useRemoveFromCartMutation();
   
   const onQuantityChange=(quantity:number)=>{
     if(quantity===0)  
       removeFromCartMutation({productId:item.id})
       else
-    addToCartMutation({productId:item.id,quantity})
+    updateCartMutation({productId:item.id,quantity})
   }
   
     return(

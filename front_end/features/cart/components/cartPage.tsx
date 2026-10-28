@@ -11,17 +11,18 @@ import { CartItemRow } from "./cartItem";
 import { useAddToCartMutation } from "../hooks/useAddToCart";
 import { useRemoveFromCartMutation } from "../hooks/useRemoveFromCart";
 import Link from "next/link";
+import { useUpdateCartMutation } from "../hooks/useUpdateCart";
 
 export default function CartPage() {
   const {data,isPending,error}=useGetCart()
   const itemsCount=data?.data.items.length??0;
-    const { mutate: addToCartMutation, isPending: cartPending } = useAddToCartMutation();
+    const { mutate: updateCartMutation, isPending: cartPending } = useUpdateCartMutation();
       const { mutate: removeFromCartMutation,isPending:cartRemovePending } = useRemoveFromCartMutation();
   const onRemove=(id:string)=>{
     removeFromCartMutation({productId:id})
   }
   const onAdd=(id:string,quantity:number)=>{
-    addToCartMutation({productId:id,quantity:quantity})
+    updateCartMutation({productId:id,quantity:quantity})
   }
   console.log("cart data",data)
 
@@ -69,7 +70,7 @@ export default function CartPage() {
         {/* Cart items */}
         <div className="mt-5 space-y-4 md:w-[50%] w-full">
           {data.data.items.map((item) => (
-            <CartItemRow key={item.product._id} item={item} onRemove={onRemove} onAdd={onAdd} deletPending={cartRemovePending} addPending={cartPending} />  
+            <CartItemRow key={item.book.id} item={item} onRemove={onRemove} onAdd={onAdd} deletPending={cartRemovePending} addPending={cartPending} />  
           ))}
         </div>
 

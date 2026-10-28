@@ -28,7 +28,7 @@ export default function RecentlyAdded({ books, totalCount }: RecentlyAddedProps)
       <div className="flex flex-col gap-8 mb-12">
         {sorted.map((book) => (
           <BookListItem
-            key={book._id}
+            key={book.id}
             book={book}
             badge={
               book.stock === 0

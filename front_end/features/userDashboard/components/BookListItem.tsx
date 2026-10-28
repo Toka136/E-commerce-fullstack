@@ -20,7 +20,7 @@ export default function BookListItem({ book, badge }: BookListItemProps) {
   const { mutate: addToCartMutation, isPending } = useAddToCartMutation();
   const onAdd = () => {
      addToCartMutation({
-               productId: book._id,
+               productId: book.id,
                quantity: 1
               });
              

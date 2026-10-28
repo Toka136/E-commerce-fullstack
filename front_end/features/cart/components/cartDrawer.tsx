@@ -26,6 +26,7 @@ export default function SideCart({
      if(data)
       setCount(data.data.items.length)
   }, [data])
+  
   return (
     <>
     {!isPending&&
@@ -54,13 +55,13 @@ export default function SideCart({
           <p className="text-sm text-gray-500 text-center mt-8">Your cart is empty.</p>
         ) : (
           data?.data.items.map((item) => (
-            <div key={item.product._id}>
+            <div key={item.book.id}>
           <SideCartItem  item= {{
-              id:item.product._id,
-              title:item.product.title,
-              coverImage:item.product.coverImage,
+              id:item.book.id,
+              title:item.book.title,
+              coverImage:item.book.coverImage,
               quantity:item.quantity,
-              priceAtPurchase:item.product.price}
+              priceAtPurchase:item.book.price}
           } />
           </div>
           ))
@@ -88,13 +89,14 @@ export default function SideCart({
           fullWidth
           variant="contained"
           disableElevation
-          onClick={onCheckout}
+          onClick={()=>{onCheckout&& onCheckout();onClose()}}
           disabled={data?.data.items.length === 0}
           className="bg-primary hover:bg-blue-700 normal-case py-3! rounded-lg text-sm font-semibold"
         >
           Proceed to Checkout
         </Button>
          <Button
+         onClick={onClose}
           fullWidth
           variant="contained"
           disableElevation

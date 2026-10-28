@@ -1,9 +1,9 @@
 import { api } from "@/axios/api"
 
-export const moveToCart=async(productId:string)=>
+export const moveToCart=async(bookId:string)=>
 {
     const res=await api.post("wishlist/moveToCart",{
-        productId:productId
+        bookId:bookId
     })
     return res.data
 

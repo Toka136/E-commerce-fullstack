@@ -2,10 +2,10 @@ import { api } from "@/axios/api"
 import { CartResponse } from "../types/cart"
 import { AxiosError } from "axios";
 
-export const RemoveFromCartApi=async(productId:string):Promise<any>=>{
+export const RemoveFromCartApi=async(bookId:string):Promise<any>=>{
   try{
   const res=await api.patch("/cart/removeProductFromCart",{
-    productId:productId,
+    bookId:bookId,
   })
   console.log(res.data);
   return res.data}
