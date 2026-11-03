@@ -4,19 +4,16 @@ import { GetUserInfo } from "../../utils/userInfo"
 import { addAddress, deleteAddress, getAddress, getAddresses, removeDefaultAddress, setAddressDefault, setAddressUnDefault, thereisDefault, updateAddress } from "./Address.repo"
 import { address, updateAddressParams } from "./Address.types"
 
-export const addAddressS=async(address:address,token:string)=>{
-    const userInfo=await GetUserInfo(token)
-    if(!userInfo){
-        throw new appError("Invalid Token",400,responseStatus.FAILED)
-    }
-    const defaultAddress=await thereisDefault(userInfo.id.toString())
+export const addAddressS=async(address:address,userId:string)=>{
+   
+    const defaultAddress=await thereisDefault(userId)
     if(!defaultAddress){
          address.isDefault=true
     }
     else{
         address.isDefault=false
     }
-    const userId=userInfo.id.toString()
+   
     const newAddress=await addAddress({address,userId})
     return newAddress
     
@@ -35,8 +32,8 @@ export const getAddressS=async(userId:string,addressId:string)=>{
     
     return address
 }
-export const updateAddressS=async(address:updateAddressParams)=>{
-    const updatedAddress=await updateAddress(address.addressId,{...address,updatedAt:new Date()})
+export const updateAddressS=async(addressId:string,address:updateAddressParams)=>{
+    const updatedAddress=await updateAddress(addressId,{...address,updatedAt:new Date()})
     return updatedAddress
 }
 export const setAddressDefaultS=async(userId:string,addressId:string)=>{

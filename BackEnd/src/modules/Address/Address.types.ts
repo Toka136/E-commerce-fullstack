@@ -16,7 +16,6 @@ export interface addAddressParams
 }
 export interface updateAddressParams
 {
-    addressId:string,
     title?:string,
     city?:string,
     addressLine1?:string,

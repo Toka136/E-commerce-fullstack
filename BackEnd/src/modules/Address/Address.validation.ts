@@ -13,7 +13,6 @@ export const addSchema=z.object({
     
 })
 export const updateSchema=z.object({
-    addressId:z.string(),
     title:z.string().min(2).optional(),
     city:z.string().optional(),
     addressLine1:z.string().optional(),

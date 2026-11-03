@@ -5,12 +5,12 @@ import { addAddressS, deleteAddressS, getAddressesS, getAddressS, setAddressDefa
 
 export const addAddressC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
-        const token=req.cookies.accessToken
-        if(!token){
+        const userId=req.user?.id
+        if(!userId){
             throw new appError("You are not logged in",401,responseStatus.FAILED)
         }
         const address=req.body
-        const newAddress=await addAddressS(address,token)
+        const newAddress=await addAddressS(address,userId)
         res.status(200).json({
             status:"success",
             message:"Address Added Successfully",
@@ -23,8 +23,12 @@ export const addAddressC=async(req:Request,res:Response,next:NextFunction)=>{
 
 export const getAddressesC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
+         const userId=req.user?.id
+        if(!userId){
+            throw new appError("You are not logged in",401,responseStatus.FAILED)
+        }
         
-        const address=await getAddressesS(req.user?.id.toString()!)
+        const address=await getAddressesS(userId)
         res.status(200).json({
             status:"success",
             message:"Address Found Successfully",
@@ -36,15 +40,15 @@ export const getAddressesC=async(req:Request,res:Response,next:NextFunction)=>{
 }
 export const getAddressC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
-        const token=req.cookies.accessToken
-        if(!token){
+         const userId=req.user?.id
+        if(!userId){
             throw new appError("You are not logged in",401,responseStatus.FAILED)
         }
         const addressId=req.body.addressId
         if(!addressId){
             throw new appError("Address Id is required",400,responseStatus.FAILED)
         }
-        const address=await getAddressS(req.user?.id.toString()!,addressId)
+        const address=await getAddressS(userId,addressId)
         res.status(200).json({
             status:"success",
             message:"Address Found Successfully",
@@ -57,9 +61,13 @@ export const getAddressC=async(req:Request,res:Response,next:NextFunction)=>{
 export const updateAddressC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
         
+        
         const address=req.body
-        address._id=Array.isArray(req.params.addressId)?req.params.addressId[0]:req.params.addressId
-        const newAddress=await updateAddressS(address)
+        const addressId=Array.isArray(req.params.addressId)?req.params.addressId[0]:req.params.addressId
+        if(!addressId){
+            throw new appError("Address Id is required",400,responseStatus.FAILED)
+        }
+        const newAddress=await updateAddressS(addressId,address)
         res.status(200).json({
             status:"success",
             message:"Address Updated Successfully",
@@ -94,7 +102,7 @@ export const setAddressDefaultC=async(req:Request,res:Response,next:NextFunction
         if(!addressId){
             throw new appError("Address Id is required",400,responseStatus.FAILED)
         }
-        const newAddress=await setAddressDefaultS(userId.toString(),addressId)
+        const newAddress=await setAddressDefaultS(userId,addressId)
         res.status(200).json({
             status:"success",
             message:"Address Set as Default Successfully",

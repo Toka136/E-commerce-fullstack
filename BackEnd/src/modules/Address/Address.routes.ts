@@ -8,7 +8,7 @@ import { addressPermision } from "../../MiddleWares/addressPermision"
 import { set } from "mongoose"
 
 const router=express.Router()
-router.route("/addAddress").post(validationSchema(addSchema),Wrapper(addAddressC))
+router.route("/addAddress").post(authenticationMiddleware,validationSchema(addSchema),Wrapper(addAddressC))
 router.route("/getAddresses").get(authenticationMiddleware,Wrapper(getAddressesC))
 router.route("/getAddress").get(authenticationMiddleware,Wrapper(getAddressC))
 router.route("/updateAddress/:addressId").patch(authenticationMiddleware,addressPermision,validationSchema(updateSchema),Wrapper(updateAddressC))

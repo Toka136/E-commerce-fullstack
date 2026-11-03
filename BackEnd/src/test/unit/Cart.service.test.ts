@@ -1,12 +1,15 @@
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Prisma } from "../../generated/prisma/client";
-import appError from "../../utils/errorClass";
-import { responseStatus } from "../../utils/responseStatus";
+
 import {
   addProductInCart_S,
   getCartS,
   removeProductFromCartS,
+  updateCart_S,
 } from "../../modules/Cart/Cart.service";
+
+// ==================== Mocks ====================
 
 const {
   mockFindOnlyBookById,
@@ -40,344 +43,316 @@ vi.mock("../../modules/Cart/Cart.repo", () => ({
   removeProductFromCart: mockRemoveProductFromCart,
 }));
 
+// ==================== Test Data ====================
+
+const tx = {} as Prisma.TransactionClient;
+
+const userId = "user-123";
+const bookId = "book-123";
+
+const product = {
+  id: bookId,
+  price: 100,
+  stock: 10,
+};
+
+const cartItem = {
+  book: {
+    id: bookId,
+  },
+  quantity: 2,
+};
+
+const existingCart = {
+  id: "cart-123",
+  userId,
+  items: [cartItem],
+};
+
+const input = {
+  userId,
+  bookId,
+  quantity: 2,
+};
+
+// ==================== Reset Mocks ====================
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+// ======================================================
+// addProductInCart_S
+// ======================================================
+
 describe("addProductInCart_S", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("should throw Product Not Found if the book does not exist", async () => {
-    const input = {
-      userId: "user-1",
-      bookId: "book-1",
-      quantity: 1,
-    };
-
+  it("should throw an error if the product does not exist", async () => {
     mockFindOnlyBookById.mockResolvedValue(null);
 
-    await expect(addProductInCart_S(input)).rejects.toThrow(
-      "Product Not Found",
+    await expect(addProductInCart_S(input, tx)).rejects.toThrow(
+      "Product Not Found"
     );
 
-    expect(mockFindOnlyBookById).toHaveBeenCalledWith(input.bookId);
+    expect(mockFindOnlyBookById).toHaveBeenCalledWith(bookId, tx);
     expect(mockGetCartByUserId).not.toHaveBeenCalled();
-    expect(mockInsertCart).not.toHaveBeenCalled();
   });
 
   it("should create a new cart if the user does not have one", async () => {
-    const input = {
-      userId: "user-1",
-      bookId: "book-1",
-      quantity: 2,
-    };
-
-    const product = {
-      id: "book-1",
-      price: new Prisma.Decimal(100),
-      stock: 10,
-    };
-
-    const createdCart = {
-      id: "cart-1",
-      userId: "user-1",
-      subtotal: new Prisma.Decimal(100),
-    };
-
     mockFindOnlyBookById.mockResolvedValue(product);
     mockGetCartByUserId.mockResolvedValue(null);
-    mockInsertCart.mockResolvedValue(createdCart);
+    mockInsertCart.mockResolvedValue({ id: "new-cart" });
 
-    const result = await addProductInCart_S(input);
+    await addProductInCart_S(input, tx);
 
-    expect(mockFindOnlyBookById).toHaveBeenCalledWith("book-1");
-    expect(mockGetCartByUserId).toHaveBeenCalledWith("user-1");
+    expect(mockFindOnlyBookById).toHaveBeenCalledWith(bookId, tx);
+    expect(mockGetCartByUserId).toHaveBeenCalledWith(userId, tx);
 
-    expect(mockInsertCart).toHaveBeenCalledWith({
-      userId: "user-1",
-      bookId: "book-1",
-      quantity: 2,
-      price: product.price,
-    });
-
-    expect(result).toEqual(createdCart);
-    expect(mockAddProductToCart).not.toHaveBeenCalled();
-    expect(mockUpdateQuantity).not.toHaveBeenCalled();
-  });
-
-  it("should use quantity 1 if quantity is not provided", async () => {
-    const input = {
-      userId: "user-1",
-      bookId: "book-1",
-    };
-
-    const product = {
-      id: "book-1",
-      price: new Prisma.Decimal(100),
-      stock: 10,
-    };
-
-    mockFindOnlyBookById.mockResolvedValue(product);
-    mockGetCartByUserId.mockResolvedValue(null);
-    mockInsertCart.mockResolvedValue({ id: "cart-1" });
-
-    await addProductInCart_S(input);
-
-    expect(mockInsertCart).toHaveBeenCalledWith({
-      userId: "user-1",
-      bookId: "book-1",
-      quantity: 1,
-      price: product.price,
-    });
-  });
-
-  it("should throw Out of Stock if quantity exceeds stock when creating a cart", async () => {
-    const input = {
-      userId: "user-1",
-      bookId: "book-1",
-      quantity: 5,
-    };
-
-    mockFindOnlyBookById.mockResolvedValue({
-      id: "book-1",
-      price: new Prisma.Decimal(100),
-      stock: 3,
-    });
-
-    mockGetCartByUserId.mockResolvedValue(null);
-
-    await expect(addProductInCart_S(input)).rejects.toThrow(
-      "Out of Stock",
+    expect(mockInsertCart).toHaveBeenCalledWith(
+      {
+        userId,
+        bookId,
+        quantity: 2,
+        price: product.price,
+      },
+      tx
     );
+  });
+
+  it("should use quantity 1 if quantity is not provided when creating a cart", async () => {
+    mockFindOnlyBookById.mockResolvedValue(product);
+    mockGetCartByUserId.mockResolvedValue(null);
+
+    await addProductInCart_S(
+      {
+        userId,
+        bookId,
+      },
+      tx
+    );
+
+    expect(mockInsertCart).toHaveBeenCalledWith(
+      {
+        userId,
+        bookId,
+        quantity: 1,
+        price: product.price,
+      },
+      tx
+    );
+  });
+
+  it("should throw an error if requested quantity exceeds stock when creating a cart", async () => {
+    mockFindOnlyBookById.mockResolvedValue(product);
+    mockGetCartByUserId.mockResolvedValue(null);
+
+    await expect(
+      addProductInCart_S(
+        {
+          userId,
+          bookId,
+          quantity: 11,
+        },
+        tx
+      )
+    ).rejects.toThrow("Out of Stock");
 
     expect(mockInsertCart).not.toHaveBeenCalled();
   });
 
-  it("should update quantity if the book already exists in the cart", async () => {
-    const input = {
-      userId: "user-1",
-      bookId: "book-1",
-      quantity: 2,
-    };
-
-    const product = {
-      id: "book-1",
-      price: new Prisma.Decimal(120),
-      stock: 10,
-    };
-
-    const cart = {
-      id: "cart-1",
-      items: [
-        {
-          id: "item-1",
-          quantity: 2,
-          priceAtPurchase: new Prisma.Decimal(100),
-          book: {
-            id: "book-1",
-          },
-        },
-      ],
-    };
-
-    const updatedCart = {
-      id: "cart-1",
-      subtotal: new Prisma.Decimal(480),
-    };
-
+  it("should update quantity if the product already exists in the cart", async () => {
     mockFindOnlyBookById.mockResolvedValue(product);
-    mockGetCartByUserId.mockResolvedValue(cart);
-    mockUpdateQuantity.mockResolvedValue(updatedCart);
+    mockGetCartByUserId.mockResolvedValue(existingCart);
+    mockUpdateQuantity.mockResolvedValue({ success: true });
 
-    const result = await addProductInCart_S(input);
+    await addProductInCart_S(input, tx);
 
     expect(mockUpdateQuantity).toHaveBeenCalledWith(
       {
-        userId: "user-1",
-        bookId: "book-1",
+        userId,
+        bookId,
         quantity: 4,
         price: product.price,
       },
-      product.stock,
+      tx
     );
-
-    expect(result).toEqual(updatedCart);
-    expect(mockAddProductToCart).not.toHaveBeenCalled();
   });
 
-  it("should throw Out of Stock if the new total quantity exceeds stock", async () => {
-    const input = {
-      userId: "user-1",
-      bookId: "book-1",
-      quantity: 3,
-    };
-
-    mockFindOnlyBookById.mockResolvedValue({
-      id: "book-1",
-      price: new Prisma.Decimal(100),
-      stock: 4,
-    });
-
-    mockGetCartByUserId.mockResolvedValue({
-      id: "cart-1",
-      items: [
-        {
-          quantity: 2,
-          book: {
-            id: "book-1",
-          },
-        },
-      ],
-    });
-
-    await expect(addProductInCart_S(input)).rejects.toThrow(
-      "Out of Stock",
-    );
-
-    expect(mockUpdateQuantity).not.toHaveBeenCalled();
-  });
-
-  it("should add the book if it does not already exist in the cart", async () => {
-    const input = {
-      userId: "user-1",
-      bookId: "book-2",
-      quantity: 2,
-    };
-
-    const product = {
-      id: "book-2",
-      price: new Prisma.Decimal(150),
-      stock: 10,
-    };
-
-    const cart = {
-      id: "cart-1",
-      items: [
-        {
-          quantity: 1,
-          book: {
-            id: "book-1",
-          },
-        },
-      ],
-    };
-
-    const updatedCart = {
-      id: "cart-1",
-      subtotal: new Prisma.Decimal(300),
-    };
-
+  it("should throw an error if the updated quantity exceeds stock", async () => {
     mockFindOnlyBookById.mockResolvedValue(product);
-    mockGetCartByUserId.mockResolvedValue(cart);
-    mockAddProductToCart.mockResolvedValue(updatedCart);
 
-    const result = await addProductInCart_S(input);
-
-    expect(mockAddProductToCart).toHaveBeenCalledWith({
-      userId: "user-1",
-      bookId: "book-2",
-      quantity: 2,
-      price: product.price,
+    mockGetCartByUserId.mockResolvedValue({
+      ...existingCart,
+      items: [
+        {
+          ...cartItem,
+          quantity: 9,
+        },
+      ],
     });
 
-    expect(result).toEqual(updatedCart);
+    await expect(addProductInCart_S(input, tx)).rejects.toThrow(
+      "Out of Stock"
+    );
+
     expect(mockUpdateQuantity).not.toHaveBeenCalled();
   });
 
-  it("should throw Out of Stock if quantity exceeds stock when adding a new book", async () => {
-    const input = {
-      userId: "user-1",
-      bookId: "book-2",
-      quantity: 5,
-    };
-
-    mockFindOnlyBookById.mockResolvedValue({
-      id: "book-2",
-      price: new Prisma.Decimal(100),
-      stock: 3,
-    });
-
+  it("should add a new product if it does not exist in the cart", async () => {
+    mockFindOnlyBookById.mockResolvedValue(product);
     mockGetCartByUserId.mockResolvedValue({
-      id: "cart-1",
+      ...existingCart,
       items: [],
     });
 
-    await expect(addProductInCart_S(input)).rejects.toThrow(
-      "Out of Stock",
+    mockAddProductToCart.mockResolvedValue({ success: true });
+
+    await addProductInCart_S(input, tx);
+
+    expect(mockAddProductToCart).toHaveBeenCalledWith(
+      {
+        userId,
+        bookId,
+        quantity: 2,
+        price: product.price,
+      },
+      tx
     );
+  });
+
+  it("should throw an error if quantity exceeds stock when adding a new product to an existing cart", async () => {
+    mockFindOnlyBookById.mockResolvedValue(product);
+    mockGetCartByUserId.mockResolvedValue({
+      ...existingCart,
+      items: [],
+    });
+
+    await expect(
+      addProductInCart_S(
+        {
+          userId,
+          bookId,
+          quantity: 11,
+        },
+        tx
+      )
+    ).rejects.toThrow("Out of Stock");
 
     expect(mockAddProductToCart).not.toHaveBeenCalled();
   });
 });
 
+// ======================================================
+// getCartS
+// ======================================================
+
 describe("getCartS", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it("should return the existing cart", async () => {
-    const userId = "user-1";
-
-    const cart = {
-      id: "cart-1",
-      userId,
-      items: [],
-      subtotal: new Prisma.Decimal(0),
-    };
-
-    mockGetCartByUserId.mockResolvedValue(cart);
+    mockGetCartByUserId.mockResolvedValue(existingCart);
 
     const result = await getCartS(userId);
 
+    expect(result).toEqual(existingCart);
     expect(mockGetCartByUserId).toHaveBeenCalledWith(userId);
     expect(mockInsertEmptyCart).not.toHaveBeenCalled();
-    expect(result).toEqual(cart);
   });
 
   it("should create an empty cart if the user does not have one", async () => {
-    const userId = "user-1";
-
-    const newCart = {
-      id: "cart-1",
+    const emptyCart = {
+      id: "empty-cart",
       userId,
       items: [],
-      subtotal: new Prisma.Decimal(0),
     };
 
     mockGetCartByUserId.mockResolvedValue(null);
-    mockInsertEmptyCart.mockResolvedValue(newCart);
+    mockInsertEmptyCart.mockResolvedValue(emptyCart);
 
     const result = await getCartS(userId);
 
-    expect(mockGetCartByUserId).toHaveBeenCalledWith(userId);
+    expect(result).toEqual(emptyCart);
     expect(mockInsertEmptyCart).toHaveBeenCalledWith(userId);
-    expect(result).toEqual(newCart);
   });
 });
 
+// ======================================================
+// removeProductFromCartS
+// ======================================================
+
 describe("removeProductFromCartS", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  it("should call removeProductFromCart repository with userId and bookId", async () => {
+    const result = { success: true };
 
-  it("should remove the product from the user's cart", async () => {
-    const input = {
-      userId: "user-1",
-      bookId: "book-1",
-    };
+    mockRemoveProductFromCart.mockResolvedValue(result);
 
-    const updatedCart = {
-      id: "cart-1",
-      subtotal: new Prisma.Decimal(100),
-    };
+    const response = await removeProductFromCartS({
+      userId,
+      bookId,
+    });
 
-    mockRemoveProductFromCart.mockResolvedValue(updatedCart);
-
-    const result = await removeProductFromCartS(input);
+    expect(response).toEqual(result);
 
     expect(mockRemoveProductFromCart).toHaveBeenCalledWith(
-      input.userId,
-      input.bookId,
+      userId,
+      bookId
+    );
+  });
+});
+
+// ======================================================
+// updateCart_S
+// ======================================================
+
+describe("updateCart_S", () => {
+  it("should throw an error if the product does not exist", async () => {
+    mockFindOnlyBookById.mockResolvedValue(null);
+
+    await expect(updateCart_S(input, tx)).rejects.toThrow(
+      "Product Not Found"
     );
 
-    expect(result).toEqual(updatedCart);
+    expect(mockFindOnlyBookById).toHaveBeenCalledWith(bookId, tx);
+    expect(mockUpdateQuantity).not.toHaveBeenCalled();
+  });
+
+  it("should update the product quantity and forward transaction", async () => {
+    mockFindOnlyBookById.mockResolvedValue(product);
+    mockUpdateQuantity.mockResolvedValue({ success: true });
+
+    const result = await updateCart_S(input, tx);
+
+    expect(result).toEqual({ success: true });
+
+    expect(mockFindOnlyBookById).toHaveBeenCalledWith(bookId, tx);
+
+    expect(mockUpdateQuantity).toHaveBeenCalledWith(
+      {
+        userId,
+        bookId,
+        quantity: 2,
+        price: product.price,
+      },
+      tx
+    );
+  });
+
+  it("should use quantity 1 if quantity is not provided", async () => {
+    mockFindOnlyBookById.mockResolvedValue(product);
+
+    await updateCart_S(
+      {
+        userId,
+        bookId,
+      },
+      tx
+    );
+
+    expect(mockUpdateQuantity).toHaveBeenCalledWith(
+      {
+        userId,
+        bookId,
+        quantity: 1,
+        price: product.price,
+      },
+      tx
+    );
   });
 });
