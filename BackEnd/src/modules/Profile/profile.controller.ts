@@ -6,11 +6,12 @@ import { updateProfileI } from "./profile.types"
 
 export const getUserProfileC=async(req:Request,res:Response,next:NextFunction)=>{
  
-   const userInfo=req.user
-   if(!userInfo){
+   const userId=req.user?.id
+   if(!userId){
     throw new appError("You are not logged in",401,responseStatus.FAILED)
    }
-   const user=await getUserProfileS(userInfo.id.toString())
+   const user=await getUserProfileS(userId)
+   console.log("user",user)
    res.status(200).json({
     status:"success",
     message:"User Found Successfully",

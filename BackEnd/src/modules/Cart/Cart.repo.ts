@@ -26,6 +26,11 @@ export const getCartByUserId = async (userId: string,tx:Prisma.TransactionClient
           },
         },
       },
+      coupon:{
+        select:{
+          code:true
+        }
+      }
     },
   });
 };
@@ -159,3 +164,15 @@ export const updateQuantity = async (newCartItem: insertCartI,tx:Prisma.Transact
   })
 
  };
+ export const addCouponToCart=async(userId:string,couponId:string,discountAmount:Prisma.Decimal,totalAfterCoupon:Prisma.Decimal,tx:Prisma.TransactionClient=prisma)=>{
+  return await tx.cart.update({
+    where:{userId},
+    data:{couponId:couponId,discountAmount:discountAmount,totalAfterCoupon:totalAfterCoupon}
+  })
+ }
+  export const removeCouponFromCart=async(userId:string,totalAfterCoupon:Prisma.Decimal,tx:Prisma.TransactionClient=prisma)=>{
+  return await tx.cart.update({
+    where:{userId},
+    data:{couponId:null,discountAmount:0,totalAfterCoupon}
+  })
+ }

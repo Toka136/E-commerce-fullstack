@@ -20,6 +20,12 @@ const {
   mockCartItemUpdate: vi.fn()
 }));
 
+
+
+
+
+import { addCouponToCart } from "../../modules/Cart/Cart.repo";
+
 vi.mock("../../config/prisma", () => ({
   prisma: {
     cart: {
@@ -565,6 +571,58 @@ describe("addProductToCart", () => {
 });
 
     expect(result).toEqual(updatedCart);
+  });
+});
+
+
+const userId = "user-123";
+const couponId = "coupon-123";
+const discountAmount = new Prisma.Decimal(20);
+const totalAfterCoupon = new Prisma.Decimal(100);
+
+const updatedCart = {
+  userId,
+  couponId,
+  discountAmount,
+  totalAfterCoupon
+};
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+describe("addCouponToCart", () => {
+  it("should update cart with couponId and discountAmount", async () => {
+    mockCartUpdate.mockResolvedValue(updatedCart);
+
+    const result = await addCouponToCart(
+      userId,
+      couponId,
+      discountAmount,
+      totalAfterCoupon
+    );
+
+    expect(mockCartUpdate).toHaveBeenCalledWith({
+      where: {
+        userId,
+      },
+      data: {
+        couponId,
+        discountAmount,
+      },
+    });
+
+    expect(result).toEqual(updatedCart);
+  });
+
+  it("should throw an error if Prisma update fails", async () => {
+    const error = new Error("Database Error");
+
+    mockCartUpdate.mockRejectedValue(error);
+
+    await expect(
+      addCouponToCart(userId, couponId, discountAmount,totalAfterCoupon)
+    ).rejects.toThrow("Database Error");
   });
 });
 

@@ -1,5 +1,5 @@
 import { Request,Response,NextFunction } from "express"
-import { addProductInCart_S, getCartS, removeProductFromCartS, updateCart_S } from "./Cart.service"
+import { addCouponToCartS, addProductInCart_S, getCartS, removeCouponFromCartS, removeProductFromCartS, updateCart_S } from "./Cart.service"
 import appError from "../../utils/errorClass"
 import { responseStatus } from "../../utils/responseStatus"
 export const addProductInCartC=async(req:Request,res:Response,next:NextFunction)=>{
@@ -67,3 +67,38 @@ export const removeProductFromCartC=async(req:Request,res:Response,next:NextFunc
         next(err)
     }
 }
+export const addCouponToCartC=async(req:Request,res:Response,next:NextFunction)=>{
+   try{
+     const userId=req.user?.id
+    if(!userId){
+        throw new appError("You are not logged in",401,responseStatus.FAILED)
+    }
+    const couponCode=req.body.couponCode
+    const result=await addCouponToCartS({userId,couponCode})
+    res.status(200).json({
+        status:"success",
+        message:"Coupon Added Successfully",
+        data:result
+    })
+   }catch(err){
+    next(err)
+   }
+}
+export const removeCouponFromCartC=async(req:Request,res:Response,next:NextFunction)=>{
+   try{
+     const userId=req.user?.id
+    if(!userId){
+        throw new appError("You are not logged in",401,responseStatus.FAILED)
+    }
+   
+    const result=await removeCouponFromCartS(userId)
+    res.status(200).json({
+        status:"success",
+        message:"Coupon Removed Successfully",
+        data:result
+    })
+   }catch(err){
+    next(err)
+   }
+}
+removeCouponFromCartS

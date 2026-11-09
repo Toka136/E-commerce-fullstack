@@ -1,11 +1,14 @@
-import { cartI } from "./Cart.types";
+import { cartCouponI, cartI } from "./Cart.types";
 import { GetUserInfo } from "../../utils/userInfo";
-import {  addProductToCart, getCartByUserId, insertCart, insertEmptyCart, removeProductFromCart, updateQuantity } from "./Cart.repo";
+import {  addCouponToCart, addProductToCart, getCartByUserId, insertCart, insertEmptyCart, removeCouponFromCart, removeProductFromCart, updateQuantity } from "./Cart.repo";
 import { ObjectId } from "mongodb";
 import appError from "../../utils/errorClass";
 import { responseStatus } from "../../utils/responseStatus";
 import { findBookById, findOnlyBookById } from "../Books/book.repo";
 import { Prisma } from "../../generated/prisma/client";
+import { getCouponByCode, getCouponById } from "../Coupon/Coupon.repo";
+import { getCouponUsageByUserIdAndCouponId } from "../CouponUsage/CouponUsage.repo";
+import { calculateCouponDiscount, isCouponValidForCart } from "../Coupon/utils/couponvalidation&discount";
 
 export const addProductInCart_S=async({bookId,userId,quantity}:cartI,tx?:Prisma.TransactionClient)=>{
     
@@ -65,4 +68,49 @@ export const updateCart_S=async({bookId,userId,quantity}:cartI,tx?:Prisma.Transa
     }
     const cart=await updateQuantity({userId:userId,bookId:bookId,quantity:newQuantity,price:product.price},tx)
     return cart
+}
+export const addCouponToCartS=async({userId,couponCode}:cartCouponI)=>{
+    const coupon=await getCouponByCode(couponCode)
+    const cart=await getCartByUserId(userId)
+    if(!coupon)
+    {
+        throw new appError("Coupon Not Found", 404, responseStatus.FAILED);
+    }
+    
+    if(!cart)
+    {
+        throw new appError("Cart Not Found", 404, responseStatus.FAILED);
+    }
+    if(cart?.couponId)
+    {
+        throw new appError("Coupon Already Applied", 400, responseStatus.FAILED);
+    }
+     const errorMessage=isCouponValidForCart(coupon,cart.subtotal)
+     if(errorMessage){
+        throw new appError(errorMessage, 400, responseStatus.FAILED);
+     }
+    const usageCount=await getCouponUsageByUserIdAndCouponId(userId,coupon.id)
+    if(usageCount >= coupon.maxUsesPerUser)
+    {
+        throw new appError("Coupon usage limit reached", 400, responseStatus.FAILED);
+    }
+   const {discountAmount,totalAfterCoupon}=calculateCouponDiscount(cart.subtotal,coupon)
+    const newCart=await addCouponToCart(userId,coupon.id,discountAmount,totalAfterCoupon)
+    return {
+        cart:newCart,
+    }
+}
+export const removeCouponFromCartS=async(userId:string)=>{
+    const cart=await getCartByUserId(userId)
+    if(!cart)
+    {
+        throw new appError("Cart Not Found", 404, responseStatus.FAILED);
+    }
+   
+    const totalAfterCoupon=cart.subtotal
+
+    const newCart=await removeCouponFromCart(userId,totalAfterCoupon)
+    return {
+        cart:newCart,
+    }
 }

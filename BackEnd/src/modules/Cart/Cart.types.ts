@@ -11,3 +11,7 @@ export interface insertCartI {
   quantity?: number;
   price: Prisma.Decimal;
 }
+export interface cartCouponI{
+  userId:string,
+  couponCode:string
+}
