@@ -52,6 +52,7 @@ export const insertCart=async(cart:insertCartI,tx:Prisma.TransactionClient=prism
   include: {
     items: true,
   },
+ 
 });
   return newCart
 }
@@ -91,7 +92,8 @@ export const removeProductFromCart=async(userId:string,bookId:string,tx:Prisma.T
     await tx.cartItem.delete({where:{id:cartItem.id}})
     return await tx.cart.update({
       where:{id:cart.id},
-      data:{subtotal:newSubtotal}
+      data:{subtotal:newSubtotal},
+      select:{id:true,subtotal:true}
     })
     
   
@@ -100,43 +102,62 @@ export const removeProductFromCart=async(userId:string,bookId:string,tx:Prisma.T
 export const removeCart=async(userId:string,tx:Prisma.TransactionClient=prisma)=>{
     return await tx.cart.delete({where:{userId}})
 }
-export const updateQuantity = async (newCartItem: insertCartI,tx:Prisma.TransactionClient=prisma) => {
-      const cart=await tx.cart.findUnique({
-      where:{userId:newCartItem.userId},
-      select :{
-        id:true,
-        items:{
-           where: { bookId: newCartItem.bookId },
-          select:{
-            id:true,
-            priceAtPurchase:true,
-            quantity:true
-          }
+export const updateQuantity = async (
+  newCartItem: insertCartI,
+  tx: Prisma.TransactionClient = prisma
+) => {
+  const cart = await tx.cart.findUnique({
+    where: { userId: newCartItem.userId },
+    select: {
+      id: true,
+      subtotal: true,
+      items: {
+        where: { bookId: newCartItem.bookId },
+        select: {
+          id: true,
+          priceAtPurchase: true,
+          quantity: true,
         },
-        subtotal:true
-      }
-    })
-    const cartItem=cart?.items[0]
-    if(!cartItem||!cart)
-    {
-      throw new Error("Product Not Found")
-    }
-    const quantity = newCartItem.quantity!;
-    const itemTotal=cartItem.priceAtPurchase.mul(cartItem.quantity)
-    const newSubtotal=cart.subtotal.sub(itemTotal).plus(newCartItem.price.mul(quantity))
-    await tx.cartItem.update({
-      where:{id:cartItem.id},
-      data:{quantity:quantity,priceAtPurchase:newCartItem.price}
-    })
-    return await tx.cart.update({
-      where:{id:cart.id},
-      data:{subtotal:newSubtotal},
-  select: {
-    id: true,
-    subtotal: true,
-  },
-    })
-  
+      },
+    },
+  });
+
+  if (!cart) {
+    throw new Error("Cart Not Found");
+  }
+
+  const cartItem = cart.items[0];
+
+  if (!cartItem) {
+    throw new Error("Product Not Found");
+  }
+
+  const quantity = newCartItem.quantity!;
+
+  const oldItemTotal = cartItem.priceAtPurchase.mul(cartItem.quantity);
+
+  const newItemTotal = newCartItem.price.mul(quantity);
+
+  const newSubtotal = cart.subtotal
+    .sub(oldItemTotal)
+    .plus(newItemTotal);
+
+  await tx.cartItem.update({
+    where: { id: cartItem.id },
+    data: {
+      quantity,
+      priceAtPurchase: newCartItem.price,
+    },
+  });
+
+  return await tx.cart.update({
+    where: { id: cart.id },
+    data: { subtotal: newSubtotal },
+    select: {
+      id: true,
+      subtotal: true,
+    },
+  });
 };
  export const addProductToCart = async (cartItem: insertCartI,tx:Prisma.TransactionClient=prisma) => {
   return tx.cart.update({

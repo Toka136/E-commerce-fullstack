@@ -9,42 +9,108 @@ import { Prisma } from "../../generated/prisma/client";
 import { getCouponByCode, getCouponById } from "../Coupon/Coupon.repo";
 import { getCouponUsageByUserIdAndCouponId } from "../CouponUsage/CouponUsage.repo";
 import { calculateCouponDiscount, isCouponValidForCart } from "../Coupon/utils/couponvalidation&discount";
+import { prisma } from "../../config/prisma";
+import { recalculateCartCoupon } from "./helper/recalculateCartCoupon";
 
-export const addProductInCart_S=async({bookId,userId,quantity}:cartI,tx?:Prisma.TransactionClient)=>{
-    
-    const product = await findOnlyBookById(bookId,tx);
-    const newQuantity=quantity??1
+export const addProductInCart_S = async (
+  { bookId, userId, quantity }: cartI,
+  tx?: Prisma.TransactionClient
+) => {
+  const execute = async (transaction: Prisma.TransactionClient) => {
+    const product = await findOnlyBookById(bookId, transaction);
+
     if (!product) {
-        throw new appError("Product Not Found", 404, responseStatus.FAILED);
+      throw new appError("Product Not Found", 404, responseStatus.FAILED);
     }
-   
-    const cart=await getCartByUserId(userId,tx);
-    if(!cart)
-    {
-         if(newQuantity>product.stock)
-    {
+
+    const newQuantity = quantity ?? 1;
+
+    if (newQuantity < 1) {
+      throw new appError("Invalid Quantity", 400, responseStatus.FAILED);
+    }
+
+    const existingCart = await getCartByUserId(userId, transaction);
+
+    // No cart exists: create a new cart
+    if (!existingCart) {
+      if (newQuantity > product.stock) {
         throw new appError("Out of Stock", 400, responseStatus.FAILED);
+      }
+
+      const newCart = await insertCart(
+        {
+          userId,
+          bookId,
+          quantity: newQuantity,
+          price: product.price,
+        },
+        transaction
+      );
+
+      return { cart: newCart };
     }
-        const newCart=await insertCart({userId:userId,bookId:bookId,quantity:newQuantity,price:product.price},tx)
-        return newCart
-    }
-    const cartItem=cart.items.find((item)=>item.book.id.toString()===bookId)
-    if(cartItem)
-    {
-        const totalQuantity=cartItem.quantity+newQuantity
-         if(totalQuantity>product.stock)
-    {
+
+    const cartItem = existingCart.items.find(
+      (item) => item.book.id === bookId
+    );
+
+    let updatedCart;
+
+    // Product already exists: update quantity
+    if (cartItem) {
+      const totalQuantity = cartItem.quantity + newQuantity;
+
+      if (totalQuantity > product.stock) {
         throw new appError("Out of Stock", 400, responseStatus.FAILED);
-    }
-        return await updateQuantity({userId:userId,bookId:bookId,quantity:totalQuantity,price:product.price},tx)
-    }
-     if(newQuantity>product.stock)
-    {
+      }
+
+      updatedCart = await updateQuantity(
+        {
+          userId,
+          bookId,
+          quantity: totalQuantity,
+          price: product.price,
+        },
+        transaction
+      );
+    } else {
+      // Product doesn't exist: add new item
+      if (newQuantity > product.stock) {
         throw new appError("Out of Stock", 400, responseStatus.FAILED);
+      }
+
+      updatedCart = await addProductToCart(
+        {
+          userId,
+          bookId,
+          quantity: newQuantity,
+          price: product.price,
+        },
+        transaction
+      );
     }
-   return await addProductToCart({userId:userId,bookId:bookId,quantity:newQuantity,price:product.price},tx)
-    
-}
+
+   const couponResult = await recalculateCartCoupon(
+      userId,
+      existingCart.couponId,
+      updatedCart.subtotal,
+      transaction
+    );
+
+   return {
+    message: "Cart updated successfully",
+    ...couponResult,
+    };
+  };
+
+  if (tx) {
+    return execute(tx);
+  }
+
+  return prisma.$transaction(async (transaction) => {
+    return execute(transaction);
+  });
+};
 export const getCartS=async(userId:string)=>{
     
     const cart=await getCartByUserId(userId)
@@ -54,21 +120,93 @@ export const getCartS=async(userId:string)=>{
     }
     return cart
 }
-export const removeProductFromCartS=async({bookId,userId}:cartI)=>{
-  
-    const cart=removeProductFromCart(userId,bookId)
-    return cart
+export const removeProductFromCartS = async (
+  { bookId, userId }: cartI,
+  tx?: Prisma.TransactionClient
+) => {
+  const execute = async (transaction: Prisma.TransactionClient) => {
+    const existingCart = await getCartByUserId(userId, transaction);
 
-}
-export const updateCart_S=async({bookId,userId,quantity}:cartI,tx?:Prisma.TransactionClient)=>{
-     const product = await findOnlyBookById(bookId,tx);
-    const newQuantity=quantity??1
-    if (!product) {
-        throw new appError("Product Not Found", 404, responseStatus.FAILED);
+    if (!existingCart) {
+      throw new appError("Cart Not Found", 404, responseStatus.FAILED);
     }
-    const cart=await updateQuantity({userId:userId,bookId:bookId,quantity:newQuantity,price:product.price},tx)
-    return cart
-}
+
+    // Remove product and recalculate subtotal
+    const updatedCart = await removeProductFromCart(
+      userId,
+      bookId,
+      transaction
+    );
+    const couponResult = await recalculateCartCoupon(
+      userId,
+      existingCart.couponId,
+      updatedCart.subtotal,
+      transaction
+    );
+
+    return couponResult ?? { cart: updatedCart };
+     
+  };
+
+  if (tx) {
+    return execute(tx);
+  }
+
+  return prisma.$transaction(async (transaction) => {
+    return execute(transaction);
+  });
+};
+export const updateCart_S = async (
+  { bookId, userId, quantity }: cartI,
+  tx?: Prisma.TransactionClient
+) => {
+  const execute = async (transaction: Prisma.TransactionClient) => {
+    const existingCart = await getCartByUserId(userId, transaction);
+
+    if (!existingCart) {
+      throw new appError("Cart Not Found", 404, responseStatus.FAILED);
+    }
+
+    const product = await findOnlyBookById(bookId, transaction);
+
+    if (!product) {
+      throw new appError("Product Not Found", 404, responseStatus.FAILED);
+    }
+
+    const newQuantity = quantity ?? 1;
+
+    if (newQuantity < 1) {
+      throw new appError("Invalid Quantity", 400, responseStatus.FAILED);
+    }
+
+    const updatedCart = await updateQuantity(
+      {
+        userId,
+        bookId,
+        quantity: newQuantity,
+        price: product.price,
+      },
+      transaction
+    );
+
+    const couponResult = await recalculateCartCoupon(
+      userId,
+      existingCart.couponId,
+      updatedCart.subtotal,
+      transaction
+    );
+
+    return couponResult ?? { cart: updatedCart };
+  };
+
+  if (tx) {
+    return execute(tx);
+  }
+
+  return prisma.$transaction(async (transaction) => {
+    return execute(transaction);
+  });
+};
 export const addCouponToCartS=async({userId,couponCode}:cartCouponI)=>{
     const coupon=await getCouponByCode(couponCode)
     const cart=await getCartByUserId(userId)
@@ -90,7 +228,7 @@ export const addCouponToCartS=async({userId,couponCode}:cartCouponI)=>{
         throw new appError(errorMessage, 400, responseStatus.FAILED);
      }
     const usageCount=await getCouponUsageByUserIdAndCouponId(userId,coupon.id)
-    if(usageCount >= coupon.maxUsesPerUser)
+    if(usageCount?.usageCount??0 >= coupon.maxUsesPerUser)
     {
         throw new appError("Coupon usage limit reached", 400, responseStatus.FAILED);
     }

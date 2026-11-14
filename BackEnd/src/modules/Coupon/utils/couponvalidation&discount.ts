@@ -1,4 +1,5 @@
 import { Coupon, Prisma } from "../../../generated/prisma/client";
+import { getCouponUsageByUserIdAndCouponId } from "../../CouponUsage/CouponUsage.repo";
 
 export const calculateCouponDiscount = (
   subtotal: Prisma.Decimal,
@@ -32,15 +33,15 @@ export const isCouponValidForCart = (
   const now = new Date();
 
   if (!coupon.isActive) {
-    return "Coupon is not active";
+    return "Coupon can't be applied :  Coupon is not active";
   }
 
   if (coupon.startDate > now) {
-    return "Coupon is not available yet";
+    return "Coupon can't be applied :  Coupon is not available yet";
   }
 
   if (coupon.endDate < now) {
-    return "Coupon is expired";
+    return "Coupon can't be applied :  Coupon is expired";
   }
 
   const isAmountValid =
@@ -51,12 +52,13 @@ export const isCouponValidForCart = (
     );
 
   if (!isAmountValid) {
-    return "Invalid Cart Amount";
+    return "Coupon can't be applied : Invalid Cart Amount";
   }
 
   if (coupon.useCount >= coupon.maxUses) {
-    return "Coupon usage limit reached";
+    return "Coupon can't be applied : Coupon usage limit reached";
   }
+   
 
   return "";
 };

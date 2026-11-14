@@ -48,13 +48,20 @@ export const getBooksCount=async(filter:any)=>{
     where:filter
   })
 }
-// export const findOrderBooks=async(orderBooksIds:string[],session:ClientSession)=>{
-//     return await Book.find({_id:{$in:orderBooksIds}},null,{session})
-// }
-// export const updateStock=async(bookId:string,quantity:number,session:ClientSession)=>{
-//     const result=await Book.findByIdAndUpdate(bookId,{$inc:{stock:-quantity}},{new:true,session})
-//     return result
-// }
+export const findOrderBooks=async(orderBooksIds:string[],tx:Prisma.TransactionClient=prisma)=>{
+  return await tx.book.findMany({
+    where:{id:{in:orderBooksIds}}
+  })
+}
+export const updateStock=async(bookId:string,quantity:number,tx:Prisma.TransactionClient=prisma)=>{
+    const result=await tx.book.updateMany({
+      where:{id:bookId,
+        stock:{gte:quantity}
+      },
+      data:{stock:{decrement:quantity}}
+    })
+    return result.count===1
+}
 export const getBooksbyCategory=async(category:string)=>{
     return await prisma.book.findMany({where:{categoryId:category}})
 }

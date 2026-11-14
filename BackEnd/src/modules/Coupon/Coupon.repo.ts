@@ -1,4 +1,5 @@
 import {prisma} from "../../config/prisma"
+import { Prisma } from "../../generated/prisma/client"
 import { addCouponParams, editCouponParams } from "./Coupon.types"
 export const addCoupon=async(coupon:addCouponParams)=>{
     return await prisma.coupon.create({data:coupon})
@@ -6,8 +7,8 @@ export const addCoupon=async(coupon:addCouponParams)=>{
 export const getCouponByCode=async(code:string)=>{
     return await prisma.coupon.findUnique({where:{code}})
 }
-export const getCouponById=async(couponId:string)=>{
-    return await prisma.coupon.findUnique({where:{id:couponId}})
+export const getCouponById=async(couponId:string,tx:Prisma.TransactionClient=prisma)=>{
+    return await tx.coupon.findUnique({where:{id:couponId}})
 }
 export const getCoupons=async()=>{
     return await prisma.coupon.findMany()
@@ -25,3 +26,36 @@ export const deactivateCoupon=async(couponId:string)=>{
 export const activateCoupon=async(couponId:string)=>{
     return await prisma.coupon.update({where:{id:couponId},data:{isActive:true}})
 }
+export const useCoupon = async (
+  couponId: string,
+  tx: Prisma.TransactionClient
+) => {
+  const coupon = await tx.coupon.findUnique({
+    where: { id: couponId },
+    select: { maxUses: true },
+  });
+
+  if (!coupon) return null;
+
+  const result = await tx.coupon.updateMany({
+    where: {
+      id: couponId,
+      isActive: true,
+      useCount: {
+        lt: coupon.maxUses,
+      },
+    },
+    data: {
+      useCount: {
+        increment: 1,
+      },
+    },
+  });
+
+  if (result.count === 0) return null;
+
+  return tx.coupon.findUnique({
+    where: { id: couponId },
+  });
+};
+
