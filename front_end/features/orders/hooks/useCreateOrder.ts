@@ -8,8 +8,7 @@ export const useCreateOrder=()=>{
     return useMutation({
         mutationFn:(data:CreateOrderParams)=>createOrder(data),
          onSuccess: (response) => {
-      const orderId = response.data._id;
-      console.log("Order ID:", orderId);
+      const orderId = response.data.id;
 
       router.push(`/order-success/?orderId=${orderId}`);
     },

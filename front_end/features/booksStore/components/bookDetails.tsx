@@ -21,12 +21,14 @@ import { useAddToWishlist } from "@/features/wishlist/hooks/useAddToWishlist";
 import { useAddReview } from "@/features/reviews/hooks/useAddReview";
 import ReviewForm from "@/features/reviews/components/reviewForm";
 import { ReviewCard } from "@/features/reviews/components/reviewCard";
-import { useAuthStore } from "@/features/Auth/store/auth-store";
 import { useEditReview } from "@/features/reviews/hooks/useEditReview";
-import { addReviewAProps, editReviewAProps } from "@/features/reviews/types/review";
+import {  editReviewAProps } from "@/features/reviews/types/review";
 import { useDeleteReview } from "@/features/reviews/hooks/useDeleteReview";
 import { useGetProfile } from "@/features/profile/hooks/useGetProfile";
 import { AxiosError } from "axios";
+import { useGetWishlist } from "@/features/wishlist/hooks/useGetWishlist";
+import { CircularProgress } from "@mui/material";
+import Image from "next/image";
 
 
 interface BookDetailProps {
@@ -36,6 +38,15 @@ interface BookDetailProps {
 
 export default function BookDetail({ book, bookReviews }: BookDetailProps) {
   const [quantity, setQuantity] = useState(1);
+    const {data:response,isLoading,error,isFetching} = useGetWishlist()
+    const [inWishlist, setInWishlist] = useState(false);
+    useEffect(() => {
+      if (response) {
+        const isInWishlist = response.items.some((item) => item.id === book.id);
+        setInWishlist(isInWishlist);
+      }
+    }, [response, book.id]);
+  
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   console.log("bookReviews",bookReviews)
   const coverUrl = useMemo(() => getCoverImageUrl(book.coverImage), [book.coverImage]);
@@ -64,7 +75,7 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
 }, [addErrorMessage, editErrorMessage, deleteErrorMessage]);
   const decrement = () => setQuantity((q) => Math.max(1, q - 1));
   const increment = () => setQuantity((q) => Math.min(book.stock, q + 1));
-  const { mutate: addToCartMutation } = useAddToCartMutation();
+  const { mutateAsync: addToCartMutation } = useAddToCartMutation();
     const {mutate:addToWishlist,isPending:wishlistPending}=useAddToWishlist()
     const onWishlist=()=>{
       addToWishlist(book.id)
@@ -78,13 +89,18 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
       deleteReview(reviewId)
     }
   
-  const onAdd = () => {
-     addToCartMutation({
+  const onAdd = async() => {
+   await addToCartMutation({
                productId: book.id,
                quantity: quantity
               });
   }
   return (
+    <>
+    {isLoading&&<div className="flex min-h-screen flex-col bg-[#F7F7FB]">
+        <CircularProgress/>
+        </div>}
+        {!isLoading&&
     <div className="min-h-screen bg-[#F7F7FB] pb-28">
 
       {/* Breadcrumb */}
@@ -103,11 +119,11 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
       {/* Cover image */}
       <div className="px-4 w-full md:w-[50%]"> 
         <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl bg-gray-900">
-          <img
+          <Image
             src={coverUrl}
             alt={`Cover of ${book.title}`}
-            // fill
-            // sizes="(max-width: 640px) 100vw, 480px"
+            fill
+            sizes="(max-width: 640px) 100vw, 480px"
             className="object-cover h-auto w-full"
             // priority
           />
@@ -120,7 +136,7 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
           {book.category.name}
         </span>
 
-        <h1 className="mt-3 text-[28px] font-bold leading-tight text-gray-900">
+        <h1 className="mt-3 text-xl tracking-tight sm:text-2xl md:text-3xl lg:text-5xl capitalize font-bold leading-tight text-gray-900">
           {book.title}
         </h1>
         <p className="mt-1 text-[15px] text-gray-500">by {book.author}</p>
@@ -155,11 +171,8 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
           {formatPrice(book.price)}
         </p>
 
-        {/* Synopsis */}
         <section className="mt-5">
-          <h2 className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">
-            Synopsis
-          </h2>
+          
           <p className="mt-2 text-[15px] leading-relaxed text-gray-700">
             {book.description}
           </p>
@@ -170,10 +183,10 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
           <div className="flex items-start gap-2">
             <Layers className="mt-0.5 h-4 w-4 text-gray-400" />
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+              <p className="text-sm font-semibold uppercase  text-gray-400">
                 Pages
               </p>
-              <p className="text-[14px] font-medium text-gray-800">{book.pages} Pages</p>
+              <p className=" text-sm font-medium texy-start text-gray-800">{book.pages} Pages</p>
             </div>
           </div>
           <div className="flex items-start gap-2">
@@ -187,11 +200,11 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
               }`}
             />
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+              <p className="text-sm font-semibold uppercase tracking-wide text-gray-400">
                 Availability
               </p>
               <p
-                className={`text-[14px] font-medium ${
+                className={`text-sm font-medium ${
                   stock.tone === "out"
                     ? "text-red-500"
                     : stock.tone === "low"
@@ -238,12 +251,12 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
             Add to Cart
           </button>
         </div>
-
+       {!inWishlist&&
         <button onClick={onWishlist} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-200 py-3.5 text-[15px] font-semibold text-indigo-600 transition hover:bg-indigo-50">
           {wishlistPending && <Loader className="h-4 w-4 animate-spin" />}
           <Heart className="h-4 w-4" />
           Save to Wishlist
-        </button>
+        </button>}
          
         
       </div>
@@ -295,6 +308,7 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
         
 </div>
       
-    </div>
+    </div>}
+    </>
   );
 }

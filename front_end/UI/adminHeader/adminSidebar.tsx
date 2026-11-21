@@ -5,6 +5,7 @@ import { User, X } from "lucide-react";
 import { SidebarProps } from "@/Types/HeaderTypes";
 import { renderItem } from "../userHeader/sidebarItem";
 import Image from "next/image";
+import { useLogout } from "@/features/Auth/hooks/useLogout";
 
 export default function AdminSidebar({
   open,
@@ -34,6 +35,7 @@ export default function AdminSidebar({
       document.body.style.overflow = previousOverflow;
     };
   }, [open, onClose]);
+  const {handleLogout}=useLogout()
 
   return (
     <>
@@ -96,12 +98,12 @@ export default function AdminSidebar({
         <nav className="flex-1 overflow-y-auto py-4">
           <ul className="space-y-1 px-3">
             {navItems?.map((item) =>
-              renderItem(item, false, activeId, () => onNavigate?.(item.id))
+              renderItem(item, false, activeId, () => onNavigate?.(item.id), handleLogout)
             )}
           </ul>
         </nav>
 
-        {/* Footer / Profile */}
+        {/* Footer  / Profile */}
         <div className="border-t border-slate-200 bg-[#eff4ff] p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#b6c4ff]/30">

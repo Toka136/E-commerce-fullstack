@@ -1,20 +1,18 @@
 import { useRouter } from "next/navigation"
-import { useAuthStore } from "../store/auth-store"
 import { Logout } from "../api/logoutApi"
 
 export const useLogout=()=>{
-    const logout=useAuthStore((state)=>state.logout)
     const router=useRouter()
-    const handleLogout=async ()=>{
-        try{
-            const res= await Logout()
-              logout()
-             router.push("/login")
+    const handleLogout = async () => {
+    try {
+        await Logout();
 
-        }catch(err){
-            console.log("err",err)
-        }
-      
+        router.replace("/");
+        router.refresh();
+
+    } catch (err) {
+        console.error("Logout error:", err);
     }
+    };
     return {handleLogout}
 }

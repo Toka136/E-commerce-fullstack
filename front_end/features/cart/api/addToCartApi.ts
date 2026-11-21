@@ -1,8 +1,8 @@
 import { api } from "@/axios/api"
-import { CartResponse } from "../types/cart"
+import {  CartUpdateResponse } from "../types/cart"
 import { AxiosError } from "axios";
 
-export const AddToCartApi=async(bookId:string,quantity?:number):Promise<CartResponse>=>{
+export const AddToCartApi=async(bookId:string,quantity?:number):Promise<CartUpdateResponse>=>{
   try{
   const res=await api.post("cart/addProductIntoCart",{
     bookId:bookId,

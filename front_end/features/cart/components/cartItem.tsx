@@ -1,16 +1,33 @@
+
+'use client'
 import {X,Minus,Plus} from "lucide-react";
 import { CartItem } from "../types/cart";
 import Image from "next/image";
 import { formatPrice } from "@/features/userDashboard/utils/format";
 import { CircularProgress } from "@mui/material";
+import { useUpdateCartMutation } from "../hooks/useUpdateCart";
+import { useRemoveFromCartMutation } from "../hooks/useRemoveFromCart";
+import { useApplyCoupon } from "../hooks/useApplyCoupon";
+import { useRemoveCoupon } from "../hooks/useRemoveCoupon";
+import { useRouter } from "next/navigation";
 type props={
     item:CartItem,
-    onRemove:(id:string)=>void,
-    onAdd:(id:string,quantity:number)=>void,
-    deletPending:boolean,
-    addPending:boolean
+   
 }
-export const CartItemRow=({item,onRemove,onAdd,deletPending,addPending}:props)=>{
+export const CartItemRow=({item}:props)=>{
+   const { mutateAsync: updateCartMutation, isPending: updatePending } = useUpdateCartMutation();
+    const { mutateAsync: removeFromCartMutation,isPending:deletPending } = useRemoveFromCartMutation();
+     const router = useRouter();
+    const onRemove=async(id:string)=>{
+      await removeFromCartMutation({productId:id})
+       router.refresh();
+    }
+   
+   
+    const onAdd=async(id:string,quantity:number)=>{
+      await updateCartMutation({productId:id,quantity:quantity})
+      router.refresh();
+    }
     return(
         <>
     
@@ -18,12 +35,12 @@ export const CartItemRow=({item,onRemove,onAdd,deletPending,addPending}:props)=>
               key={item.book.id}
               className="flex gap-3  relative rounded-2xl bg-white p-3 shadow-sm shadow-gray-200/60"
             >
-                    {(deletPending || addPending) && (
+                    {(deletPending || updatePending) && (
     <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/70 backdrop-blur-[1px]">
       <CircularProgress size={28} />
     </div>
   )}
-              <div className="relative h-24 w-[72px] flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+              <div className="relative h-24 w-18 shrink-0 overflow-hidden rounded-lg bg-gray-100">
                 <Image
                   src={`${item.book.coverImage}`}
                   alt={`Cover of ${item.book.title}`}

@@ -16,5 +16,5 @@ export function formatOrderDate(isoDate: string) {
 const IMAGE_BASE_URL =  "http://localhost:4000/api/Uploads";
 
 export function getItemImageUrl(image?: string) {
-  return image ? `${IMAGE_BASE_URL}/${image}` : undefined;
+  return image ?? undefined;
 }

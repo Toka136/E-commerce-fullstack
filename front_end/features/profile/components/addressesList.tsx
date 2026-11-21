@@ -74,7 +74,7 @@ export default function AddressList({ addresses }: { addresses: Address[] }) {
     <div className="flex flex-col gap-4">
         {addresses.map((address) => (
         <AddressCard
-          key={address._id}
+          key={address.id}
           address={address}
           onEdit={handleEdit}
           onSetDefault={handleSetDefault}

@@ -2,7 +2,7 @@ import { OrderStatus } from "../types/orders";
 import { ORDER_STATUS_CONFIG } from "../utils/orderStatus";
 
 export default function OrderStatusBadge({ status }: { status: OrderStatus }) {
-  const config = ORDER_STATUS_CONFIG[status];
+  const config = ORDER_STATUS_CONFIG[status.toLocaleLowerCase() as OrderStatus];
   const Icon = config.icon;
 
   return (

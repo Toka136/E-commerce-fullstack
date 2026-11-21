@@ -1,5 +1,5 @@
 export interface Address {
-  _id: string;
+  id: string;
   userId: string;
   title: string;
   addressLine1: string;
@@ -31,7 +31,6 @@ export interface CreateAddressParams {
 
 export interface editAddressParams
 {
-    addressId:string,
     title?:string,
     city?:string,
     addressLine1?:string,

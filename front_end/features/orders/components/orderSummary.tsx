@@ -3,23 +3,20 @@
 import { CartItem } from "@/features/cart/types/cart";
 import { Receipt } from "lucide-react";
 import BookRow from "./bookRow";
+import { cartProps } from "@/features/cart/components/cartSummary";
+import { formatPrice } from "@/features/userDashboard/utils/format";
 
 
-// Adjust these to match your real pricing rules, or pass them in as props
-// once shipping/tax are computed server-side.
-const SHIPPING_FLAT = 5;
-const TAX_RATE = 0.07;
 
-interface OrderSummaryProps {
+interface OrderSummaryProps extends cartProps {
   items: CartItem[];
-  subtotal: number;
 }
 
-export default function OrderSummary({ items, subtotal }: OrderSummaryProps) {
-  const shipping =  0;
+export default function OrderSummary({discountAmount,subtotal,totalPrice,couponCode,items}:OrderSummaryProps) {
+  const shipping =  50;
   const tax = 0;
-  const grandTotal = subtotal + shipping + tax;
-
+  const grandTotal = totalPrice + shipping + tax;
+   console.log("grasubtotalnd total",subtotal)
   return (
     <section>
       <div className="mb-3 flex items-center gap-2">
@@ -32,15 +29,19 @@ export default function OrderSummary({ items, subtotal }: OrderSummaryProps) {
       <div className="rounded-2xl bg-surface-container-low p-4">
         <div className="divide-y divide-outline-variant/40">
           {items.map((item) => (
-            <BookRow key={item.product._id} item={item} />
+            <BookRow key={item.book.id} item={item} />
           ))}
         </div>
 
         <div className="mt-3 space-y-1.5 border-t border-outline-variant/40 pt-3 text-sm">
           <div className="flex justify-between text-on-surface-variant">
             <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>${Number(subtotal).toFixed(2)}</span>
           </div>
+           {(discountAmount||0)>0&&<div className="flex items-center justify-between">
+                          <span>{couponCode}</span>
+                          <span className="font-medium text-gray-900">-{formatPrice(discountAmount||0)}</span>
+                        </div>}
           <div className="flex justify-between text-on-surface-variant">
             <span>Shipping</span>
             <span>${shipping.toFixed(2)}</span>
@@ -56,7 +57,7 @@ export default function OrderSummary({ items, subtotal }: OrderSummaryProps) {
             Grand Total
           </span>
           <span className="text-lg font-bold text-primary">
-            ${grandTotal.toFixed(2)}
+            ${Number(grandTotal).toFixed(2)}
           </span>
         </div>
       </div>

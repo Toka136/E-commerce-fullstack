@@ -1,5 +1,4 @@
 import { BaseUrl } from "@/constant/api";
-import { useAuthStore } from "@/features/Auth/store/auth-store";
 import axios from "axios";
 import { cookies } from "next/headers";
 

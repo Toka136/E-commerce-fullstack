@@ -42,9 +42,9 @@ export default  function SavedAddressesSection({
       <div className="flex flex-col gap-3">
         {addresses.map((address) => (
           <SavedAddressCard
-            key={address._id}
+            key={address.id}
             address={address}
-            selected={address._id === selectedAddressId}
+            selected={address.id === selectedAddressId}
             onSelect={onSelect}
           />
         ))}

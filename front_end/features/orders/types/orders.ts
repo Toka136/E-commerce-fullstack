@@ -21,7 +21,7 @@ export interface CreateOrderParams  {
 
 export interface CreateOrderResponse {
   data:{
-  _id: string;
+  id: string;
   orderStatus: string;
   paymentStatus: string;
   createdAt: string;
@@ -31,8 +31,8 @@ export interface CreateOrderResponse {
 
 
 export interface OrderItem {
-  _id: string;
-  book: string;
+  id: string;
+  bookId: string;
   quantity: number;
   priceAtPurchase: number;
   titleAtPurchase: string;
@@ -49,20 +49,29 @@ export type OrderStatus =
 export type PaymentStatus = "pending" | "paid" | "failed";
 
 export interface Order {
-  _id: string;
+  id: string;
   userId: string;
-  shippingAddress: ShippingFormValues;
-  items: OrderItem[];
+  orderShippingAddress: ShippingFormValues;
+  orderItems: OrderItem[];
   totalPrice: number;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   orderStatus: OrderStatus;
   createdAt: string;
   updatedAt: string;
+  shippingCost: number;
+  subtotal: number;
+  couponCode:string;
+  discountAmount:number
 }
 
 export interface OrdersResponse {
   status: string;
   message: string;
   data: Order[];
+}
+export interface OrderResponse {
+  status: string;
+  message: string;
+  data: Order;
 }

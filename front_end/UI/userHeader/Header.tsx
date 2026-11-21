@@ -14,24 +14,23 @@ import {
   BookOpen,
   Users,
   StoreIcon,
+  Tag,
 } from "lucide-react";
 
 import { SidebarNavItem, SidebarUser } from "@/Types/HeaderTypes";
 import Sidebar from "./Sidebar";
-import { useAuthStore } from "@/features/Auth/store/auth-store";
-import AdminNavbar from "../adminHeader/adminNavbar";
 import AdminSidebar from "../adminHeader/adminSidebar";
 import SideCart from "@/features/cart/components/cartDrawer";
 import { useCartStore } from "@/features/cart/store/cart-store";
 import { useGetProfile } from "@/features/profile/hooks/useGetProfile";
 import { usePathname } from "next/navigation";
+import { userProfile } from "@/features/profile/types/profile";
 
-const Header = ({menuOpen, setMenuOpen}:{menuOpen:boolean, setMenuOpen:(value:boolean)=>void}) => {
+const Header = ({menuOpen, setMenuOpen,userData}:{menuOpen:boolean, setMenuOpen:(value:boolean)=>void,userData?:userProfile}) => {
   
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const { onOpen } = useCartStore();
-  const { data: useData, isLoading } = useGetProfile();
 
   const onNavigate = (id: string) => {
     setMenuOpen(false);
@@ -46,24 +45,34 @@ const Header = ({menuOpen, setMenuOpen}:{menuOpen:boolean, setMenuOpen:(value:bo
   
   ];
 
-  const defaultAccountItems: SidebarNavItem[] = [
+  const gestAccountItems: SidebarNavItem[] = [
     {
-      id: "profile",
+      id:  "/login",
+      label:  "Login",
+      icon:  User,
+      variant:  "default",
+    },
+  ];
+  const userAccountItems: SidebarNavItem[]= [
+    {
+      id: "/profile",
       label: "profile",
       icon: Settings,
     },
     {
-      id: useData?.data._id ? "logout" : "/login",
-      label: useData?.data._id ? "Logout" : "Login",
-      icon: useData?.data._id ? LogOut : User,
-      variant: useData?.data._id ? "danger" : "default",
+      id:  "logout" ,
+      label:  "Logout" ,
+      icon:  LogOut ,
+      variant:  "danger" ,
     },
   ];
+    const defaultAccountItems=userData?.id?userAccountItems:gestAccountItems
+
 
   const defaultUser: SidebarUser = {
-    name: useData?.data.userName??"",
+    name: userData?.userName??"",
     role: "Reader",
-    image: useData?.data.image,
+    image: userData?.image,
   };
 
   const adminDefaultNavItems: SidebarNavItem[] = [
@@ -82,15 +91,16 @@ const Header = ({menuOpen, setMenuOpen}:{menuOpen:boolean, setMenuOpen:(value:bo
       label: "Orders",
       icon: Receipt,
     },
-    {
-      id: "customers",
-      label: "Customers",
-      icon: Users,
-    },
+    
     {
       id: "/admin/categories",
       label: "Categories",
       icon: Compass,
+    },
+    {
+      id: "/admin/coupons",
+      label: "Coupons",
+      icon: Tag,
     },
     {
       id: "adminLogout",
@@ -100,9 +110,9 @@ const Header = ({menuOpen, setMenuOpen}:{menuOpen:boolean, setMenuOpen:(value:bo
     },
   ];
 
+   console.log("userData",userData)
 
-
-  const isAdmin = useData?.data.role === "ADMIN";
+  const isAdmin = userData?.role === "ADMIN";
    const pathname = usePathname();
  useEffect(() => {
   console.log("isAdmin",isAdmin);

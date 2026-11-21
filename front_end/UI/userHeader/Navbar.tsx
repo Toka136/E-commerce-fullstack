@@ -14,16 +14,12 @@ export default function Navbar({
  
   onMenuClick,
   onCartClick,
-  onSearch,
+  guest
 }: userNavbarProps) {
-  const [query, setQuery] = useState("");
   const {data:wishlistItems}=useGetWishlist()
   console.log("wishlistItems",wishlistItems)
 const {count}=useCartStore()
-  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-    onSearch?.(query);
-  }
+
   return (
     <header className="relative w-full border-b border-tertiary-300 bg-white px-8">
       {/* Signature accent line */}
@@ -32,14 +28,14 @@ const {count}=useCartStore()
       <nav className="flex items-center gap-3 px-8 py-3 sm:gap-4 sm:px-6 flex-wrap">
         {/* Left: menu + logo */}
         <div className="flex items-center gap-3">
-  <button
-  type="button"
-  onClick={onMenuClick}
-  aria-label="Open menu"
-  className="rounded-lg p-2 text-[#3F5FBD] transition-colors hover:bg-tertiary-200 hover:text-primary-600 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 lg:hidden"
->
-  <Menu size={20} strokeWidth={2} />
-</button>
+        <button
+        type="button"
+        onClick={onMenuClick}
+        aria-label="Open menu"
+        className="rounded-lg p-2 text-[#3F5FBD] transition-colors hover:bg-tertiary-200 hover:text-primary-600 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 lg:hidden"
+      >
+        <Menu size={20} strokeWidth={2} />
+      </button>
 
           <span className="select-none whitespace-nowrap font-headline text-lg font-bold text-[#3F5FBD]">
             LibroDiscovery
@@ -49,6 +45,7 @@ const {count}=useCartStore()
       
 
         {/* Right: cart */}
+        {!guest&&
         <div className="flex items-center">
           <button
             type="button"
@@ -79,7 +76,7 @@ const {count}=useCartStore()
             )}
           </Link>
           }
-        </div>
+        </div>}
       </nav>
     </header>
   );

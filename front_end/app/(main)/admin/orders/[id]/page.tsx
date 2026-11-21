@@ -4,6 +4,8 @@ import { getOrder } from "@/features/ordersManagment/api/getOrder"
 import { formatOrderDate, getItemImageUrl, getOrderNumber } from "@/features/orders/utils/format"
 import OrderStatusSelect from "@/features/ordersManagment/components/OrderStatusSelect"
 import Image from "next/image"
+import { formatPrice } from "@/features/userDashboard/utils/format"
+import { OrderStatus } from "@/features/orders/types/orders"
 
 interface AdminOrderDetailPageProps {
     params: Promise<{ id: string }>
@@ -26,7 +28,7 @@ export default async function AdminOrderDetailPage({
                 </Link>
                 <div>
                     <h1 className="text-xl font-bold text-on-surface">
-                        Order #{getOrderNumber(order._id)}
+                        Order #{getOrderNumber(order.id)}
                     </h1>
                     <p className="text-sm text-on-surface-variant">
                         {formatOrderDate(order.createdAt)}
@@ -38,16 +40,16 @@ export default async function AdminOrderDetailPage({
                 <span className="text-sm font-semibold text-on-surface-variant">
                     Order Status
                 </span>
-                <OrderStatusSelect orderId={order._id} status={order.orderStatus} />
+                <OrderStatusSelect orderId={order.id} status={order.orderStatus.toLocaleLowerCase() as OrderStatus} />
             </div>
 
             <div className="space-y-4 rounded-2xl bg-white p-6 shadow-[0px_4px_20px_rgba(0,0,0,0.04)]">
                 <h2 className="font-semibold text-on-surface">Items</h2>
                 <div className="divide-y divide-outline-variant/10">
-                    {order.items.map((item) => {
+                    {order.orderItems.map((item) => {
                         const imageUrl = getItemImageUrl(item.imageAtPurchase)
                         return (
-                            <div key={item._id} className="flex items-center gap-4 py-3">
+                            <div key={item.id} className="flex items-center gap-4 py-3">
                                 {imageUrl ? (
                                     // eslint-disable-next-line @next/next/no-img-element
                                     <Image
@@ -81,7 +83,7 @@ export default async function AdminOrderDetailPage({
                 <div className="flex justify-between border-t border-outline-variant/20 pt-4">
                     <span className="font-semibold text-on-surface">Total</span>
                     <span className="text-lg font-bold text-primary">
-                        ${order.totalPrice.toFixed(2)}
+                        ${formatPrice(order.totalPrice)}
                     </span>
                 </div>
             </div>
@@ -89,17 +91,17 @@ export default async function AdminOrderDetailPage({
     <div className="border border-b-on-primary-fixed-variant space-y-1 w-full md:w-[45%] rounded-2xl bg-white p-6 shadow-[0px_4px_20px_rgba(0,0,0,0.04)]">
         <h2 className="mb-2 font-semibold text-on-surface">Shipping Address</h2>
         <p className="text-sm text-on-surface-variant">
-            {order.shippingAddress.addressLine1}
+            {order.orderShippingAddress.addressLine1}
         </p>
         <p className="text-sm text-on-surface-variant">
-            {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-            {order.shippingAddress.postalCode}
+            {order.orderShippingAddress.city}, {order.orderShippingAddress.state}{" "}
+            {order.orderShippingAddress.postalCode}
         </p>
         <p className="text-sm text-on-surface-variant">
-            {order.shippingAddress.country}
+            {order.orderShippingAddress.country}
         </p>
         <p className="text-sm text-on-surface-variant">
-            {order.shippingAddress.mobile}
+            {order.orderShippingAddress.mobile}
         </p>
     </div>
 

@@ -4,6 +4,7 @@ import { AdminOrdersTable } from "@/features/ordersManagment/components/AdminOrd
 
 export default async function AdminOrdersPage() {
     const { data: orders } = await getOrders()
+    console.log("admin orders",orders)
 
     return (
         <div className="p-8 space-y-6">

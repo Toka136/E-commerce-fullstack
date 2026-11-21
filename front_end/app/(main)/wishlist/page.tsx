@@ -8,11 +8,7 @@ import { useEffect } from "react";
 
 export default  function WishlistRoute() {
   const {data:response,isLoading,error,isFetching} = useGetWishlist()
-   console.log("response",response?.items)
-    console.log("Wishlist Route rendered");
-  console.log("response:", response?.items);
-  console.log("isLoading:", isLoading);
-  console.log("isFetching:", isFetching);
+   
 
   useEffect(() => {
     if (error instanceof AxiosError) {

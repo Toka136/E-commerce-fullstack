@@ -1,35 +1,36 @@
 import { BaseUrl } from "@/constant/api";
-import { useAuthStore } from "@/features/Auth/store/auth-store";
 import axios from "axios";
+
 export const api = axios.create({
-  baseURL: `${BaseUrl}`,
+  baseURL: BaseUrl,
   withCredentials: true,
 });
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-     console.log("error",error);
-    if (error.response.status === 401 && !originalRequest._retry) {
-      console.log("refresh");
-     
+
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
-      try{
-      const res = await axios.post("http://localhost:4000/api/auth/refreshToken", {
-        
-      },{
-        withCredentials: true,
-      });
-     console.log("refresh",res.data);
-      return api(originalRequest);
+
+      try {
+        await axios.post(
+          `${BaseUrl}auth/refreshToken`,
+          {},
+          { withCredentials: true }
+        );
+
+        return api(originalRequest);
+      } catch (refreshError) {
+        return Promise.reject(refreshError);
+      }
     }
-    catch(refreshError){
-       useAuthStore.getState().logout();
-        // window.location.href = "/login";
-       return Promise.reject(refreshError);
-      
-    }
-    }
+
     return Promise.reject(error);
   }
 );

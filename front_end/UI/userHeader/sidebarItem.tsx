@@ -2,14 +2,19 @@ import { useLogout } from "@/features/Auth/hooks/useLogout";
 import { SidebarNavItem } from "@/Types/HeaderTypes";
 import Link from "next/link";
 
-export  function renderItem(item: SidebarNavItem, isFirstAccountItem: boolean, activeId: string, onNavigate?: () => void) {
+export function renderItem(
+  item: SidebarNavItem,
+  isFirstAccountItem: boolean,
+  activeId: string,
+  onNavigate?: () => void,
+  handleLogout?: () => void
+) {
     const Icon = item.icon;
     const isActive = item.id.includes( activeId);
     const isDanger = item.variant === "danger";
-    const {handleLogout}=useLogout()
-
     return (
-    
+      <>
+        
       <li
         key={item.id}
         className={isFirstAccountItem ? "mt-4 border-t border-slate-200 pt-4" : undefined}
@@ -17,7 +22,7 @@ export  function renderItem(item: SidebarNavItem, isFirstAccountItem: boolean, a
       >
         {item.id === "logout" || item.id === "adminLogout" ?
           <a
-        onClick={ () => {handleLogout();onNavigate?.()} }
+        onClick={ () => {handleLogout!();onNavigate?.()} }
         
           aria-current={isActive ? "page" : undefined}
           className={`flex cursor-pointer items-center gap-4 rounded-xl p-4 font-body text-sm transition-colors ${
@@ -47,5 +52,6 @@ export  function renderItem(item: SidebarNavItem, isFirstAccountItem: boolean, a
           <span>{item.label}</span>
         </Link>}
       </li>
+      </>
     );
   }

@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react"
 import { Order } from "@/features/orders/types/orders"
 import { getOrderNumber } from "@/features/orders/utils/format"
 import OrderStatusBadge from "@/features/orders/components/ordersStatusBadge"
+import { formatPrice } from "@/features/userDashboard/utils/format"
 
 
 export default function RecentOrdersSection({ orders }: { orders: Order[] }) {
@@ -41,23 +42,23 @@ export default function RecentOrdersSection({ orders }: { orders: Order[] }) {
                         </thead>
                         <tbody className="divide-y divide-outline-variant/10">
                             {recentOrders.map((order) => (
-                                <tr key={order._id}>
+                                <tr key={order.id}>
                                     <td className="py-3 pr-4">
                                         <Link
-                                            href={`/admin/orders/${order._id}`}
+                                            href={`/admin/orders/${order.id}`}
                                             className="text-sm font-medium text-primary hover:underline"
                                         >
-                                            {getOrderNumber(order._id)}
+                                            {getOrderNumber(order.id)}
                                         </Link>
                                     </td>
                                     <td className="max-w-55 truncate py-3 pr-4 text-sm text-on-surface-variant">
-                                        {order.items.map((item) => item.titleAtPurchase).join(", ")}
+                                        {order.orderItems.map((item) => item.titleAtPurchase).join(", ")}
                                     </td>
                                     <td className="py-3 pr-4">
                                         <OrderStatusBadge status={order.orderStatus} />
                                     </td>
                                     <td className="py-3 text-right text-sm font-semibold text-on-surface">
-                                        ${order.totalPrice.toFixed(2)}
+                                        ${formatPrice(order.totalPrice)}
                                     </td>
                                 </tr>
                             ))}

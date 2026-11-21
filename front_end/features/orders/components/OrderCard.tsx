@@ -6,7 +6,7 @@ import { formatOrderDate, getOrderNumber } from "../utils/format";
 import OrderStatusBadge from "./ordersStatusBadge";
 
 export default function OrderCard({ order }: { order: Order }) {
-  const itemCount = order.items.length;
+  const itemCount = order.orderItems.length;
   const isDelivered = order.orderStatus === "delivered";
 
   return (
@@ -14,7 +14,7 @@ export default function OrderCard({ order }: { order: Order }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-on-surface">
-            Order #{getOrderNumber(order._id)}
+            Order #{getOrderNumber(order.id)}
           </p>
           <p className="mt-0.5 text-xs text-on-surface-variant">
             {formatOrderDate(order.createdAt)} • {itemCount}{" "}
@@ -25,30 +25,24 @@ export default function OrderCard({ order }: { order: Order }) {
       </div>
 
       <div className="mt-4">
-        <OrderItemThumbnails items={order.items} />
+        <OrderItemThumbnails items={order.orderItems} />
       </div>
 
       <div className="mt-4 flex items-center justify-between">
         <span className="text-lg font-bold text-on-surface">
-          ${order.totalPrice.toFixed(2)}
+          ${Number(order.totalPrice).toFixed(2)}
         </span>
 
         <div className="flex items-center gap-4">
           {!isDelivered&&   (
             <>
               <Link
-                href={`/orders/${order._id}`}
+                href={`/orders/${order.id}`}
                 className="text-sm font-medium text-primary hover:opacity-80"
               >
                 Details
               </Link>
-              <Link
-                href={`/orders/${order._id}/track`}
-                className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-medium text-on-primary transition hover:opacity-90"
-              >
-                Track
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
+             
             </>
           )}
         </div>

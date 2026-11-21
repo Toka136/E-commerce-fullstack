@@ -2,8 +2,9 @@ import Link from "next/link"
 import { Eye } from "lucide-react"
 
 import OrderStatusSelect from "./OrderStatusSelect"
-import { Order } from "@/features/orders/types/orders"
+import { Order, OrderStatus } from "@/features/orders/types/orders"
 import { formatOrderDate, getOrderNumber } from "@/features/orders/utils/format"
+import { formatPrice } from "@/features/userDashboard/utils/format"
 
 export const AdminOrdersTable = ({ orders }: { orders: Order[] }) => {
     return (
@@ -34,23 +35,23 @@ export const AdminOrdersTable = ({ orders }: { orders: Order[] }) => {
                 <tbody className="divide-y divide-outline-variant/10">
                     {orders.map((order) => (
                         <tr
-                            key={order._id}
+                            key={order.id}
                             className="hover:bg-surface-container-low/30 transition-colors group"
                         >
                             <td className="px-6 py-4">
                                 <p className="text-[#0b1c30] leading-tight font-medium">
-                                    Order #{getOrderNumber(order._id)}
+                                    Order #{getOrderNumber(order.id)}
                                 </p>
                                 <p className="text-sm text-on-surface-variant">
                                     {formatOrderDate(order.createdAt)}
                                 </p>
                             </td>
                             <td className="px-6 py-4 text-sm text-on-surface-variant">
-                                {order.items.length}{" "}
-                                {order.items.length === 1 ? "item" : "items"}
+                                {order.orderItems.length}{" "}
+                                {order.orderItems.length === 1 ? "item" : "items"}
                             </td>
                             <td className="px-6 py-4 font-semibold text-[#0b1c30]">
-                                ${order.totalPrice.toFixed(2)}
+                                ${formatPrice(order.totalPrice)}
                             </td>
                             <td className="px-6 py-4 text-sm text-on-surface-variant">
                                 <span className="uppercase">{order.paymentMethod}</span>
@@ -58,11 +59,11 @@ export const AdminOrdersTable = ({ orders }: { orders: Order[] }) => {
                                 <span className="capitalize">{order.paymentStatus}</span>
                             </td>
                             <td className="px-6 py-4">
-                                <OrderStatusSelect orderId={order._id} status={order.orderStatus} />
+                                <OrderStatusSelect orderId={order.id} status={order.orderStatus.toLocaleLowerCase()as OrderStatus} />
                             </td>
                             <td className="px-6 py-4 text-right">
                                 <Link
-                                    href={`/admin/orders/${order._id}`}
+                                    href={`/admin/orders/${order.id}`}
                                     title="View Details"
                                     className="inline-flex p-2 text-primary hover:bg-primary/10 rounded-lg transition-all"
                                 >

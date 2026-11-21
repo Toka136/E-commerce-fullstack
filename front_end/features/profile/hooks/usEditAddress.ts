@@ -8,7 +8,7 @@ import { editAddress } from "../api/editAddress"
 export const useEditAddress=()=>{
     const router=useRouter()
     return useMutation({
-        mutationFn:(data:editAddressParams)=>editAddress(data),
+        mutationFn:({data,addressId}:{data:editAddressParams,addressId:string})=>editAddress(data,addressId),
         onSuccess:()=>{
             router.refresh()
         }

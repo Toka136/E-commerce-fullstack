@@ -1,4 +1,3 @@
-import { useAuthStore } from "@/features/Auth/store/auth-store"
 
 export  async function authFetch(url:RequestInfo,options:RequestInit){
     console.log("options",options)
@@ -19,9 +18,6 @@ export  async function authFetch(url:RequestInfo,options:RequestInit){
         credentials:"include"
         })
 
-        }else
-        {
-            useAuthStore.getState().logout()
         }
     }
     return response

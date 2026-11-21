@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { User, X } from "lucide-react";
 import { SidebarProps } from "@/Types/HeaderTypes";
 import { renderItem } from "./sidebarItem";
+import { useLogout } from "@/features/Auth/hooks/useLogout";
 
 export default function Sidebar({
   open,
@@ -20,7 +21,7 @@ export default function Sidebar({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-
+    
     document.addEventListener("keydown", handleKeyDown);
     
     const isMobile = window.innerWidth < 1024;
@@ -34,7 +35,7 @@ export default function Sidebar({
       document.body.style.overflow = previousOverflow;
     };
   }, [open, onClose]);
-
+   const {handleLogout}=useLogout()
   return (
     <>
       <div
@@ -79,10 +80,23 @@ export default function Sidebar({
         <nav className="flex-1 overflow-y-auto py-4">
           <ul className="space-y-1 px-3">
             {navItems?.map((item) =>
-              renderItem(item, false, activeId, () => onNavigate?.(item.id))
+              renderItem(
+                item,
+                false,
+                activeId,
+                () => onNavigate?.(item.id),
+                handleLogout
+              )
             )}
+
             {accountItems?.map((item, idx) =>
-              renderItem(item, idx === 0, activeId, () => onNavigate?.(item.id))
+              renderItem(
+                item,
+                idx === 0,
+                activeId,
+                () => onNavigate?.(item.id),
+                handleLogout
+              )
             )}
           </ul>
         </nav>

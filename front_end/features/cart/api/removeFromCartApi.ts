@@ -1,8 +1,8 @@
 import { api } from "@/axios/api"
-import { CartResponse } from "../types/cart"
+import {  CartUpdateResponse } from "../types/cart"
 import { AxiosError } from "axios";
 
-export const RemoveFromCartApi=async(bookId:string):Promise<any>=>{
+export const RemoveFromCartApi=async(bookId:string):Promise<CartUpdateResponse>=>{
   try{
   const res=await api.patch("/cart/removeProductFromCart",{
     bookId:bookId,

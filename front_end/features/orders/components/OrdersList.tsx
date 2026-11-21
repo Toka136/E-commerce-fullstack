@@ -31,7 +31,7 @@ export default function OrdersList({ orders }: { orders: Order[] }) {
       ) : (
         <div className="flex flex-col gap-4">
           {filteredOrders.map((order) => (
-            <OrderCard key={order._id} order={order} />
+            <OrderCard key={order.id} order={order} />
           ))}
         </div>
       )}

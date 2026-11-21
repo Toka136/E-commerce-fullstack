@@ -1,25 +1,28 @@
-import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react"
+import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
 
 interface StatCardFooter {
-  label: string
-  value: string
-  tone?: "default" | "error"
+  label: string;
+  value: string;
+  tone?: "default" | "error";
 }
 
 interface StatCardProps {
-  icon: LucideIcon
-  iconClassName?: string
-  label: string
-  value: string
-  growthPercentage: number
-  isPositiveTrend: boolean
-  footer: StatCardFooter
+  icon: LucideIcon;
+  iconClassName?: string;
+  label: string;
+  value: string;
+  growthPercentage: number;
+  isPositiveTrend: boolean;
+  footer: StatCardFooter;
 }
 
-const FOOTER_TONE_CLASSES: Record<NonNullable<StatCardFooter["tone"]>, string> = {
+const FOOTER_TONE_CLASSES: Record<
+  NonNullable<StatCardFooter["tone"]>,
+  string
+> = {
   default: "bg-surface-container-low text-on-surface-variant",
   error: "bg-error-container text-on-error-container",
-}
+};
 
 export default function StatCard({
   icon: Icon,
@@ -30,7 +33,9 @@ export default function StatCard({
   isPositiveTrend,
   footer,
 }: StatCardProps) {
-  const TrendIcon = isPositiveTrend ? TrendingUp : TrendingDown
+  const TrendIcon = isPositiveTrend ? TrendingUp : TrendingDown;
+
+  const showGrowth = growthPercentage !== 0;
 
   return (
     <div className="flex w-full md:w-[80%] flex-col gap-4 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-sm">
@@ -44,16 +49,24 @@ export default function StatCard({
         <p className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
           {label}
         </p>
+
         <div className="mt-1 flex items-center gap-2">
-          <span className="text-2xl font-bold text-on-surface">{value}</span>
-          <span
-            className={`flex items-center gap-0.5 text-xs font-semibold ${
-              isPositiveTrend ? "text-primary" : "text-error"
-            }`}
-          >
-            <TrendIcon className="h-3.5 w-3.5" />
-            {Math.abs(growthPercentage)}%
+          <span className="text-2xl font-bold text-on-surface">
+            {value}
           </span>
+
+          {showGrowth && (
+            <span
+              className={`flex items-center gap-0.5 text-xs font-semibold ${
+                isPositiveTrend ? "text-primary" : "text-error"
+              }`}
+            >
+              <TrendIcon className="h-3.5 w-3.5" />
+
+              {growthPercentage > 0 ? "+" : ""}
+              {growthPercentage}%
+            </span>
+          )}
         </div>
       </div>
 
@@ -66,5 +79,5 @@ export default function StatCard({
         <span className="font-semibold">{footer.value}</span>
       </div>
     </div>
-  )
+  );
 }

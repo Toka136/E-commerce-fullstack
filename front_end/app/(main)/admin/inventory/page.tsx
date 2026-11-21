@@ -9,6 +9,7 @@ import { gteBooksParams } from "@/features/userDashboard/types/books";
 import { getBooksA } from "@/features/userDashboard/api/getBooks";
 import { getCategoriesA } from "@/features/categories/api/getCategories";
 import { AddBookParent } from "@/features/BooksManagment/components/addBookParent";
+import { connection } from "next/server";
 interface StorePageProps {
   // Next.js (app router, v15+) passes searchParams as a Promise on the
   // server. If you're on an older version, drop the `await` below and
@@ -17,18 +18,19 @@ interface StorePageProps {
 }
 export default async function InventoryPage({ searchParams }: StorePageProps) {
 
-     const params = await searchParams;
-     
-   
-     const { data: result } = await getBooksA({
-       pageSize:  params.pageSize??4,
-       currentPage: params.currentPage,
-       searchText: params.searchText,
-       category: params.category,
-       minPrice: params.minPrice,
-       maxPrice:  params.maxPrice,
-       sort:  params.sort
-     });
+       await connection();
+
+  const params = await searchParams;
+
+  const { data: result } = await getBooksA({
+    pageSize: params.pageSize ?? 4,
+    currentPage: params.currentPage,
+    searchText: params.searchText,
+    category: params.category,
+    minPrice: params.minPrice,
+    maxPrice: params.maxPrice,
+    sort: params.sort,
+  });
      console.log("result book",result)
      const {data:categories}=await getCategoriesA()
   return (

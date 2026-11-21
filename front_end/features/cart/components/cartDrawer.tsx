@@ -26,10 +26,11 @@ export default function SideCart({
      if(data)
       setCount(data.data.items.length)
   }, [data])
+  console.log("cart",data)
   
   return (
     <>
-    {!isPending&&
+    {!isPending&& data&&
     <Drawer
       anchor="right"
       open={isOpen}

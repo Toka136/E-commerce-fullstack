@@ -38,10 +38,9 @@ export default function EditAddressModal({
     try {
       const payload: editAddressParams = {
         ...values,
-        addressId: address._id,
       };
 
-      await editAddressApi(payload);
+      await editAddressApi({data:payload,addressId: address.id});
       handleClose();
     } catch (err) {
       const error = err as AxiosError;
@@ -94,12 +93,12 @@ export default function EditAddressModal({
         },}
       }}
     >
-      <form onSubmit={formik.handleSubmit} noValidate>
+      <form onSubmit={formik.handleSubmit} noValidate >
         <DialogTitle sx={{ fontWeight: 600, color: "var(--color-on-surface)" }}>
           Edit Address
         </DialogTitle>
 
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2.5}}>
           {submitError && <p>{submitError}</p>}
           <AddressFormFields formik={formik} />
         </DialogContent>

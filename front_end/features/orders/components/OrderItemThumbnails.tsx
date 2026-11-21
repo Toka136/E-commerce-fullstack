@@ -4,13 +4,16 @@ import { useState } from "react";
 import { BookOpen } from "lucide-react";
 import { OrderItem } from "../types/orders";
 import { getItemImageUrl } from "../utils/format";
+import Image from "next/image";
 
 
-function Thumbnail({ item }: { item: OrderItem }) {
+export function Thumbnail({ item }: { item: OrderItem }) {
   const [imgError, setImgError] = useState(false);
-  const src = getItemImageUrl(item.imageAtPurchase);
+  const src = item.imageAtPurchase;
 
-  if (!src || imgError) {
+  if (!src ) {
+      console.log("src", src);
+
     return (
       <div className="flex h-16 w-12 shrink-0 items-center justify-center rounded-md bg-surface-container text-on-surface-variant">
         <BookOpen className="h-5 w-5" />
@@ -24,6 +27,9 @@ function Thumbnail({ item }: { item: OrderItem }) {
       src={src}
       alt={item.titleAtPurchase}
       onError={() => setImgError(true)}
+      // width={48}
+      // height={64}
+      // unoptimized
       className="h-16 w-12 shrink-0 rounded-md border border-outline-variant/30 object-cover"
     />
   );
@@ -33,7 +39,7 @@ export default function OrderItemThumbnails({ items }: { items: OrderItem[] }) {
   return (
     <div className="flex gap-2">
       {items.map((item) => (
-        <Thumbnail key={item._id} item={item} />
+        <Thumbnail key={item.id} item={item} />
       ))}
     </div>
   );

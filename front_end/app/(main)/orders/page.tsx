@@ -3,6 +3,7 @@ import OrdersList from "@/features/orders/components/OrdersList";
 
 export default async function OrdersPage() {
   const { data: orders } = await getOrdersApi();
+  console.log("fata orders",orders)
 
   return (
     <div className="mx-auto flex w-full flex-col gap-6 px-4 py-6">

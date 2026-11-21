@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { BookOpen } from "lucide-react";
 import { CartItem } from "@/features/cart/types/cart";
+import Image from "next/image";
 
 export default function BookRow({ item }: { item: CartItem }) {
   const [imgError, setImgError] = useState(false);
@@ -10,12 +11,14 @@ export default function BookRow({ item }: { item: CartItem }) {
 
   return (
     <div className="flex items-center gap-3 py-3">
-      {item.product.coverImage  ? (
+      {item.book.coverImage  ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={`${item.product.coverImage}`}
-          alt={item.product.title}
+        <Image
+          src={`${item.book.coverImage}`}
+          alt={item.book.title}
           onError={() => setImgError(true)}
+          width={48}
+          height={64}
           className="h-14 w-11 shrink-0 rounded-md object-cover"
         />
       ) : (
@@ -26,7 +29,7 @@ export default function BookRow({ item }: { item: CartItem }) {
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-on-surface">
-          {item.product.title}
+          {item.book.title}
         </p>
         {/* <p className="truncate text-xs text-on-surface-variant">
           {item.product.}

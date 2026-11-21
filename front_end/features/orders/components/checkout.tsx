@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { JSX, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useFormik } from "formik";
-// Adjust this import to wherever your cart hook actually lives.
 import { useGetCart } from "@/features/cart/hooks/useGetCart";
 import PaymentMethodSelector from "@/features/orders/components/paymentSelector";
 import { shippingInitialValues, shippingValidationSchema } from "@/features/orders/utils/Shippingform.schema";
@@ -12,35 +11,33 @@ import { ShippingFormValues } from "../types/orders";
 import { Address } from "@/features/profile/types/address";
 import SavedAddressesSection from "@/features/orders/components/savedAddressesSection";
 import ShippingDetailsForm from "@/features/orders/components/shippingDetailsForm";
-import CouponCode from "@/features/orders/components/couponCodes";
 import OrderSummary from "@/features/orders/components/orderSummary";
 import { PaymentMethod } from "../types/orders";
 import { useCreateOrder } from "../hooks/useCreateOrder";
-import { AxiosError } from "axios";
+import { ErrorFormate } from "@/features/cart/utils/errorFormate";
+import {  CartResponse } from "@/features/cart/types/cart";
+import { useRouter } from "next/navigation";
 
-
-export default function Checkout({addresses}:{addresses:Address[]}) {
-  const { data, isPending, error } = useGetCart();
+type Props = {
+  cart: CartResponse["data"];
+  addresses: Address[];
+};
+export default function Checkout({addresses,cart}:Props) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("online");
   const {mutateAsync:createOrder,isPending:createOrderPending}=useCreateOrder()
+  const router=useRouter()
   const handleCreateOrder = async () => {
     try{
       console.log("address",formik.values);
       await createOrder({address:formik.values,paymentMethod})
-    }catch(err){
-        const error = err as AxiosError;
-        const message =
-          (error.response?.data as { message?: string })?.message ??
-          "Failed to update profile. Please try again.";
-        if (err instanceof AxiosError) {
-          console.log("STATUS:", err.response?.status);
-          console.log("DATA:", err.response?.data);
-          console.log("MESSAGE:", err.response?.data?.message);
-      }
+      router.refresh()
+    }catch (err) {
+      const message = ErrorFormate({ error: err });
       setErrorMessage(message);
-      }
+    }
+    
   }
   const formik = useFormik<ShippingFormValues>({
     initialValues: shippingInitialValues,
@@ -48,11 +45,8 @@ export default function Checkout({addresses}:{addresses:Address[]}) {
     onSubmit:handleCreateOrder,
   });
 
-  // Selecting a saved address fills whatever overlapping fields it has.
-  // Saved addresses don't carry first/last name or email, so those are
-  // left as the user typed them.
   const handleSelectAddress = (address: Address) => {
-    setSelectedAddressId(address._id);
+    setSelectedAddressId(address.id);
     formik.setValues({
       ...formik.values,
       mobile: address.mobile,
@@ -61,26 +55,23 @@ export default function Checkout({addresses}:{addresses:Address[]}) {
       state: address.state,
       postalCode: address.postalCode,
       addressLine1: address.addressLine1,
-      addressLine2: address.addressLine2,
+      addressLine2: address.addressLine2??"",
     });
   };
-
-  const handleApplyCoupon = (code: string) => {
-    // TODO: wire to your coupon-validation API.
-    console.log("Applying coupon", code);
-  };
+    if (cart?.items.length===0) {
+      console.log("cartlength",cart.items.length)
+      return (
+        <div className="flex min-h-screen flex-col items-center justify-center">
+          <p className="text-2xl">You have no books in your cart</p>
+          <Link href="/books">Explore books</Link>
+        </div>
+      );
+    }
 
   return (
     <>
-    {data?.data.items.length===0&&
-    <div className="flex flex-col justify-center items-center min-h-screen">
-    <p className="text-2xl ">you have no books in your cart</p>
-    <Link href={"/books"}  className="flex w-[320px] items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm mt-8 font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50">
-    explore books
-    </Link>
-    </div>
-    }
-    {data?.data.items.length!==0&&
+    
+    
     <div className="min-h-screen bg-background pb-28">
       <div className="mx-auto flex w-full md:w-[90%] flex-col gap-8 px-4 py-6">
      
@@ -112,17 +103,12 @@ export default function Checkout({addresses}:{addresses:Address[]}) {
        </div>
 
        <div className="flex flex-col md:flex-row gap-4">
-         <div className="w-full md:w-[40%]"><CouponCode onApply={handleApplyCoupon} /></div>
+         
 
-        {isPending && (
-          <p className="text-sm text-on-surface-vahandleSelectAddressriant">Loading your cart…</p>
-        )}
-        {error && (
-          <p className="text-sm text-error">Couldn't load your cart.</p>
-        )}
-        {data && (
+  
+        {cart && (
           <div  className="w-full md:w-[60%]">
-            <OrderSummary items={data.data.items} subtotal={data.data.subtotal} />
+            <OrderSummary items={cart.items} discountAmount={cart.discountAmount??0} subtotal={cart.subtotal} totalPrice={(cart.coupon?.code?cart.totalAfterCoupon:cart.subtotal)??0} couponCode={cart.coupon?.code} />
           </div>
         )}
         </div>
@@ -133,18 +119,18 @@ export default function Checkout({addresses}:{addresses:Address[]}) {
           <button
             type="button"
             onClick={() => formik.handleSubmit()}
-            disabled={!data || data.data.items.length === 0||createOrderPending}
+            disabled={!cart || cart.items.length === 0||createOrderPending}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-semibold text-on-primary transition hover:opacity-90 disabled:opacity-50"
           >
             {paymentMethod==="cod"?"Place Order":"Continue to Payment"}
             <ArrowRight className="h-4 w-4" />
           </button>
           {errorMessage && (
-            <p className="mt-4 text-sm text-error">{errorMessage}</p>
-          )}
+          <p className="text-red-500">{errorMessage}</p>
+        )}
         </div>
       </div>
-    </div>}
+    </div>
     </>
   );
 }

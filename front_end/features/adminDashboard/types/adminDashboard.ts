@@ -9,7 +9,7 @@ export interface RevenueStats {
   grossRevenue: number
   growthPercentage: number
   isPositiveTrend: boolean
-  pendingShipments: number
+  pendingRevenue: number
 }
 
 export interface DashboardCardsData {

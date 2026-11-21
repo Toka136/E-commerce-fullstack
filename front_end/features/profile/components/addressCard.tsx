@@ -43,7 +43,7 @@ export default function AddressCard({ address, onSetDefault, onEdit, onDelete }:
           <button
             type="button"
             aria-label="Delete address"
-            onClick={()=>onDelete?.(address._id)}
+            onClick={()=>onDelete?.(address.id)}
             disabled={isPending}
             className="text-error hover:opacity-80 disabled:opacity-50"
           >
@@ -68,7 +68,7 @@ export default function AddressCard({ address, onSetDefault, onEdit, onDelete }:
       {!address.isDefault && (
         <button
           type="button"
-          onClick={()=>onSetDefault(address._id)}
+          onClick={()=>onSetDefault(address.id)}
           disabled={isPending}
           className="mt-3 text-sm font-medium text-primary hover:opacity-80 disabled:opacity-50"
         >

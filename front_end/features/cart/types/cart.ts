@@ -40,10 +40,23 @@ export interface CartData {
   userId: string;
   items: CartItem[];
   subtotal: number;
+ totalAfterCoupon?:number ,
+ discountAmount?:number
+  coupon?:{
+    code:string
+  }
 }
 
 export interface CartResponse {
   status: string;
   message: string;
   data: CartData;
+}
+export interface CartUpdateResponse {
+  status: string;
+  message: string;
+  data: {
+    couponMessage:string,
+    couponRemoved:boolean
+  };
 }
