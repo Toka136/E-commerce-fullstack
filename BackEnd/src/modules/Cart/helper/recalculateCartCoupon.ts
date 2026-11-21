@@ -29,6 +29,7 @@ export const recalculateCartCoupon = async (
   const errorMessage = isCouponValidForCart(cartCoupon, subtotal);
   
   if (errorMessage) {
+    
      await removeCouponFromCart(userId, subtotal, tx);
 
     return {

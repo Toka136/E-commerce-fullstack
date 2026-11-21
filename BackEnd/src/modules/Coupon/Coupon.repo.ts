@@ -17,6 +17,9 @@ export const editCoupon=async(couponId:string,coupon:editCouponParams)=>{
     return await prisma.coupon.update({where:{id:couponId},data:coupon})
     
 }
+export const decrementCouponUses=async(couponId:string,tx:Prisma.TransactionClient)=>{
+    return await tx.coupon.update({where:{id:couponId,useCount:{gt:0}},data:{useCount:{decrement:1}}})
+}
 export const deleteCoupon=async(couponId:string)=>{
     return await prisma.coupon.delete({where:{id:couponId}})
 }

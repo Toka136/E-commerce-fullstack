@@ -1,54 +1,55 @@
-import bookModal from "../Books/book.modal";
-import orderModal from "../Orders/order.modal";
+import { Prisma } from "../../generated/prisma/client";
+import { booksCount, booksCountByDate, booksCountWStock0 } from "../Books/book.repo";
+
 import { getCurrentMRevenue, getPendingRevenue, getPrevMRevenue, getRevenue } from "../Orders/order.repo";
 
 
 export const getGrossRevenueStats = async (startOfCurrentMonth:Date,startOfPreviousMonth:Date,endOfPreviousMonth:Date) => {
     const [
-      totalRevenueResult,
-      currentMonthRevenueResult,
-      previousMonthRevenueResult,
-      pendingShipmentsCount
+      grossRevenue,
+      currentMonthRevenue,
+      previousMonthRevenue,
+      pendingRevenue
     ] = await Promise.all([
        getRevenue(),
       getCurrentMRevenue(startOfCurrentMonth),
       getPrevMRevenue(startOfPreviousMonth, endOfPreviousMonth),
       getPendingRevenue()
     ]);
+   const current = new Prisma.Decimal(currentMonthRevenue);
+   const previous = new Prisma.Decimal(previousMonthRevenue);
 
-    const grossRevenue = totalRevenueResult[0]?.total || 0;
-    const currentMonthRevenue = currentMonthRevenueResult[0]?.total || 0;
-    const previousMonthRevenue = previousMonthRevenueResult[0]?.total || 0;
+    let growthRate = new Prisma.Decimal(0);
 
-    let growthRate = 0;
-    if (previousMonthRevenue > 0) {
-      growthRate = ((currentMonthRevenue - previousMonthRevenue) / previousMonthRevenue) * 100;
-    } else if (currentMonthRevenue > 0) {
-      growthRate = 100;
+    if (previous.greaterThan(0)) {
+    growthRate = current
+        .minus(previous)
+        .dividedBy(previous)
+        .times(100);
+    } else if (current.greaterThan(0)) {
+    growthRate = new Prisma.Decimal(100);
     }
 
   
       return {
-        grossRevenue,
+        grossRevenue: Number(grossRevenue),
         growthPercentage: Number(growthRate.toFixed(1)),
-        isPositiveTrend: growthRate >= 0,
-        pendingShipments: pendingShipmentsCount
-      }
+        isPositiveTrend: growthRate.greaterThanOrEqualTo(0),
+        pendingRevenue: Number(pendingRevenue),
+        };
    
 };
 export const getCatalogInventoryStats = async (startOfCurrentMonth:Date,startOfPreviousMonth:Date,endOfPreviousMonth:Date)  => {
    
 
     const [totalBooks, currentMonthCount, previousMonthCount, outOfStockCount] = await Promise.all([
-      bookModal.countDocuments(),
+     booksCount(),
       
-      bookModal.countDocuments({ createdAt: { $gte: startOfCurrentMonth } }),
+      booksCountByDate(startOfCurrentMonth),
       
-      bookModal.countDocuments({ 
-        createdAt: { $gte: startOfPreviousMonth, $lte: endOfPreviousMonth } 
-      }),
+      booksCountByDate(startOfPreviousMonth, endOfPreviousMonth),
       
-      bookModal.countDocuments({ stock: 0 })
+      booksCountWStock0()
     ]);
 
     let growthRate = 0;
@@ -60,7 +61,7 @@ export const getCatalogInventoryStats = async (startOfCurrentMonth:Date,startOfP
 
     return  {
         totalInventory: totalBooks,
-        growthPercentage: Number(growthRate.toFixed(1)), // تقريب لمنزلة عشرية واحدة
+        growthPercentage: Number(growthRate.toFixed(1)), 
         isPositiveTrend: growthRate >= 0,
         outOfStockTitles: outOfStockCount
       }

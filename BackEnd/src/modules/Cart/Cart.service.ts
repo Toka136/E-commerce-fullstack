@@ -228,8 +228,11 @@ export const addCouponToCartS=async({userId,couponCode}:cartCouponI)=>{
         throw new appError(errorMessage, 400, responseStatus.FAILED);
      }
     const usageCount=await getCouponUsageByUserIdAndCouponId(userId,coupon.id)
-    if(usageCount?.usageCount??0 >= coupon.maxUsesPerUser)
+    console.log("usageCount",usageCount)
+    console.log("coupon.maxUsesPerUser",coupon.maxUsesPerUser)
+    if((usageCount?.usageCount)!>= coupon.maxUsesPerUser)
     {
+      console.log("error")
         throw new appError("Coupon usage limit reached", 400, responseStatus.FAILED);
     }
    const {discountAmount,totalAfterCoupon}=calculateCouponDiscount(cart.subtotal,coupon)

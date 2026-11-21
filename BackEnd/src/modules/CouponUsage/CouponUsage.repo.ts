@@ -66,3 +66,9 @@ export const addCouponUsage = async (
 
   return result.count === 1;
 };
+export const decrementCouponUsage=async(couponId:string,userId:string,tx:Prisma.TransactionClient)=>{
+    return await tx.couponUsage.updateMany({
+        where:{couponId,userId,usageCount:{gt:0}},
+        data:{usageCount:{decrement:1}}
+    })
+}

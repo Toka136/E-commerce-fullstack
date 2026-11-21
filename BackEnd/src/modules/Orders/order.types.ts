@@ -28,6 +28,7 @@ export interface OrderI {
   shippingCost: Prisma.Decimal;
   totalPrice: Prisma.Decimal;
   couponCode?: string | null;
+  couponId: string| null,
 
   paymentMethod: paymentMethod
   paymentStatus: paymentStatus

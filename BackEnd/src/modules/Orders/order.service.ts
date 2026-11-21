@@ -2,15 +2,15 @@ import { prisma } from "../../config/prisma";
 import { orderStatus, paymentMethod, Prisma } from "../../generated/prisma/client";
 import appError from "../../utils/errorClass";
 import { responseStatus } from "../../utils/responseStatus";
-import { findOrderBooks, updateStock } from "../Books/book.repo";
+import { findBookById, findOnlyBookById, findOrderBooks, incrementStock, updateBook, updateStock } from "../Books/book.repo";
 import { bookI } from "../Books/book.types";
 import { getCartByUserId, removeCart } from "../Cart/Cart.repo";
 import { recalculateCartCoupon } from "../Cart/helper/recalculateCartCoupon";
-import {  getCouponByCode, getCouponById, useCoupon } from "../Coupon/Coupon.repo";
-import { addCouponUsage, getCouponUsageByUserIdAndCouponId } from "../CouponUsage/CouponUsage.repo";
+import {  decrementCouponUses, editCoupon, getCouponByCode, getCouponById, useCoupon } from "../Coupon/Coupon.repo";
+import { addCouponUsage, decrementCouponUsage, getCouponUsageByUserIdAndCouponId } from "../CouponUsage/CouponUsage.repo";
 import { checkQuantity } from "./helper/checkQuantity";
 import { recalculateOrderCoupon } from "./helper/recalculateOrderCoupon";
-import { createOrder, findOrderById, getOrders, getOrdersByUserId, updateOrderPaymentStatus, updateOrderStatus } from "./order.repo";
+import { cancelOrder, createOrder, findOrderById, getOrders, getOrdersByUserId, updateOrderPaymentStatus, updateOrderStatus } from "./order.repo";
 import { OrderI, OrderItemI, ShippingAddressI } from "./order.types";
 
 export const createOrderS=async(id:string,address:ShippingAddressI,paymentMethod:paymentMethod,tx?:Prisma.TransactionClient)=>{
@@ -60,6 +60,8 @@ export const createOrderS=async(id:string,address:ShippingAddressI,paymentMethod
         discountAmount,
         shippingCost:shippingPrice,
         subtotal:totalPrice,
+        couponCode:cart.coupon?.code??null,
+        couponId: cart.couponId ?? null,
       }
       const res =await createOrder(newOrder,transaction)
      for (const item of cart.items) {
@@ -123,7 +125,7 @@ export const createOrderS=async(id:string,address:ShippingAddressI,paymentMethod
     }
 export const getOrdersS=async(id:string,role:string)=>{
   
-    if(role==="admin"){
+    if(role==="ADMIN"){
         const orders=await getOrders()
          return orders
         }
@@ -136,17 +138,18 @@ export const changeOrderStatusS=async(id:string,orderStatus:orderStatus)=>{
     if(!order){
         throw new appError("Order Not Found",400,responseStatus.FAILED)
     }
-    if(orderStatus==="DELIVERED"){
+    
+    if(orderStatus.toLocaleUpperCase()==="DELIVERED"){
         await updateOrderPaymentStatus(id,"COMPLETED")
    
   }
  
- await updateOrderStatus(id,orderStatus)
+ await updateOrderStatus(id,orderStatus.toLocaleUpperCase() as orderStatus)
     return await findOrderById(id)
 }
 export const getOrderS=async(id:string,userId:string,role:string)=>{
    
-    if(role==="admin"){
+    if(role==="ADMIN"){
         const order= await findOrderById(id)
          if(!order){
         throw new appError("Order Not Found",400,responseStatus.FAILED)
@@ -161,4 +164,66 @@ export const getOrderS=async(id:string,userId:string,role:string)=>{
         throw new appError("You are not authorized to view this order",400,responseStatus.FAILED)
     }
     return order
+}
+export const cancelOrderS=async(id:string,tx?:Prisma.TransactionClient)=>{
+    
+    const execute=async(transaction: Prisma.TransactionClient)=>{
+         const order=await findOrderById(id,transaction)
+          if(!order){
+        throw new appError("Order Not Found",400,responseStatus.FAILED)
+    }
+         if(order?.orderStatus==="CANCELLED"){
+             throw new appError("Order is already cancelled",400,responseStatus.FAILED)
+         }
+         if(order?.orderStatus==="DELIVERED"){
+             throw new appError("Order is already delivered",400,responseStatus.FAILED)
+         }
+   
+    for(const item of order.orderItems){
+        if(item.bookId!==null){    
+            const book=await findOnlyBookById(item.bookId,transaction)
+            if(book){
+            await incrementStock(item.bookId,item.quantity,transaction)
+            }
+        }
+    }
+    if(order.couponId){
+        await decrementCouponUses(order.couponId,transaction)
+        const usage = await decrementCouponUsage(
+        order.couponId,
+        order.userId,
+        transaction
+        );
+        if (usage.count === 0) {
+        throw new appError(
+            "Coupon usage record not found",
+            400,
+            responseStatus.FAILED
+        );
+        }
+        
+    }
+    const result = await cancelOrder(id, transaction);
+
+    if (result.count === 0) {
+    throw new appError(
+        "Order cannot be cancelled",
+        400,
+        responseStatus.FAILED
+    );
+    }
+    return await findOrderById(id,transaction)
+    }
+    try {
+        if (tx) {
+          return await execute(tx);
+        }
+    
+        return await prisma.$transaction(async (transaction) => {
+          return await execute(transaction);
+        });
+      } catch (error) {
+        console.error("Create Order Error:", error);
+        throw error;
+      }
 }

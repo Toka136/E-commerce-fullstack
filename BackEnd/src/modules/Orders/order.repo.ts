@@ -14,7 +14,7 @@ export const createOrder = async (
       shippingCost: order.shippingCost,
       totalPrice: order.totalPrice,
       couponCode: order.couponCode?? null,
-
+      couponId: order.couponId,
       paymentMethod: order.paymentMethod,
       paymentStatus: order.paymentStatus,
       orderStatus: order.orderStatus,
@@ -52,46 +52,80 @@ export const getOrders=async()=>{
       }
     })
 }
-export const findOrderById=async(id:string)=>{
-    return await prisma.order.findUnique({where:{id},include:{orderItems:true,orderShippingAddress:true}})
+export const findOrderById=async(id:string,tx:Prisma.TransactionClient=prisma)=>{
+    return await tx.order.findUnique({where:{id},include:{orderItems:true,orderShippingAddress:true,}})
 }
 export const updateOrderStatus=async(id:string,orderStatus:orderStatus)=>{
    await prisma.order.update({where:{id},data:{orderStatus:orderStatus}})
 }
+export const cancelOrder = async (
+  id: string,
+  tx: Prisma.TransactionClient = prisma
+) => {
+  return await tx.order.updateMany({
+    where: {
+      id,
+      orderStatus: {
+        notIn: ["DELIVERED", "CANCELLED"],
+      },
+    },
+    data: {
+      orderStatus: "CANCELLED",
+    },
+  });
+};
 export const updateOrderPaymentStatus=async(id:string,paymentStatus:paymentStatus)=>{
   await prisma.order.update({where:{id},data:{paymentStatus:paymentStatus}})
 }
-// export const getRevenue=async()=>{
-//    return await orderModal.aggregate([
-//             { $match: { paymentStatus: "completed" } },
-//             { $group: { _id: null, total: { $sum: "$totalPrice" } } }
-//           ])
-// }
-// export const getCurrentMRevenue=async(startOfCurrentMonth:Date)=>{
-//     return orderModal.aggregate([
-//             { 
-//               $match: { 
-//                 paymentStatus: "completed", 
-//                 createdAt: { $gte: startOfCurrentMonth } 
-//               } 
-//             },
-//             { $group: { _id: null, total: { $sum: "$totalPrice" } } }
-//           ])
-// }
-// export const getPrevMRevenue=async(startOfPreviousMonth:Date,endOfPreviousMonth:Date)=>{
-//     return orderModal.aggregate([
-//             { 
-//               $match: { 
-//                 paymentStatus: "completed", 
-//                 createdAt: { $gte: startOfPreviousMonth, $lte: endOfPreviousMonth } 
-//               } 
-//             },
-//             { $group: { _id: null, total: { $sum: "$totalPrice" } } }
-//           ])
-// }
-// export const getPendingRevenue=async()=>{
-//     return  orderModal.countDocuments({ 
-//         paymentStatus: "completed", 
-//         orderStatus: { $in: ["pending", "processing"] } 
-//       })
-// }
+export const getRevenue = async () => {
+  const result = await prisma.order.aggregate({
+    where: {
+      paymentStatus: "COMPLETED",
+    },
+    _sum: {
+      totalPrice: true,
+    },
+  });
+
+  return result._sum.totalPrice ?? 0;
+};
+export const getCurrentMRevenue=async(startOfCurrentMonth:Date)=>{
+    const result = await prisma.order.aggregate({
+    where: {
+      paymentStatus: "COMPLETED",
+      createdAt:{gte:startOfCurrentMonth}
+    },
+    _sum: {
+      totalPrice: true,
+    },
+  });
+
+  return result._sum.totalPrice ?? 0;
+    
+}
+export const getPrevMRevenue=async(startOfPreviousMonth:Date,endOfPreviousMonth:Date)=>{
+    const result = await prisma.order.aggregate({
+    where: {
+      paymentStatus: "COMPLETED",
+      createdAt:{gte:startOfPreviousMonth,lt:endOfPreviousMonth}
+    },
+    _sum: {
+      totalPrice: true,
+    },
+  });
+
+  return result._sum.totalPrice ?? 0;
+}
+export const getPendingRevenue = async () => {
+  const result = await prisma.order.aggregate({
+    where: {
+      paymentStatus: "PENDING",
+      orderStatus: {in:["PENDING","PROCESSING"]},
+    },
+    _sum: {
+      totalPrice: true,
+    },
+  });
+
+  return result._sum.totalPrice ?? 0;
+};

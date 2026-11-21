@@ -49,7 +49,7 @@ export const recalculateOrderCoupon = async (
     tx
   );
 
-  if (usageCount?.usageCount??0 >= cartCoupon.maxUsesPerUser) {
+  if (usageCount?.usageCount! >= cartCoupon.maxUsesPerUser) {
     throw new appError(
       "Coupon usage limit reached",
       400,

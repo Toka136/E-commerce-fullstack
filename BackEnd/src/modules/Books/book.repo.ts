@@ -24,6 +24,13 @@ export const updateBook=async(book:insertBookI,id:string)=>{
   return await prisma.book.update({where:{id},data:book})
     
 }
+export const incrementStock=async(bookId:string,quantity:number,tx:Prisma.TransactionClient=prisma)=>{
+  return await tx.book.updateMany({
+    where:{id:bookId},
+    data:{stock:{increment:quantity}}
+  })
+  
+}
 export const deleteBook=async(id:string)=>{
     return await prisma.book.delete({where:{id}})
 }
@@ -104,6 +111,7 @@ export const editRate=async(bookId:string,rate:number,oldRate:number)=>{
     },
   });
 }
+
 export const deleteRate = async (bookId: string, rate: number) => {
   const currentRate = await prisma.bookRate.findUnique({
     where: { bookId },
@@ -123,3 +131,12 @@ export const deleteRate = async (bookId: string, rate: number) => {
     },
   });
 };
+export const booksCount=async()=>{
+  return await prisma.book.count()
+}
+export const booksCountByDate=async(startDate:Date,endDate?:Date)=>{
+  return await prisma.book.count({where:{createdAt:{gte:startDate,lt:endDate??new Date()}}})
+}
+export const booksCountWStock0=async()=>{
+  return await prisma.book.count({where:{stock:0}})
+}
