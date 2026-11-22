@@ -37,3 +37,10 @@ export interface OrderI {
   orderItems: OrderItemI[];
   orderShippingAddress: ShippingAddressI;
 }
+export type OrderWithRelations = Prisma.OrderGetPayload<{
+  include: {
+    orderItems: true;
+    orderShippingAddress: true;
+    user: true;
+  };
+}>;

@@ -30,6 +30,7 @@ export const createOrder = async (
     include: {
       orderItems: true,
       orderShippingAddress: true,
+      user: true,
     },
   });
 };

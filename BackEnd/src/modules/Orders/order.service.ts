@@ -1,19 +1,23 @@
-import { prisma } from "../../config/prisma";
 import { orderStatus, paymentMethod, Prisma } from "../../generated/prisma/client";
+import { createFawaterakTransaction } from "../../services/fawaterak/fawaterak.service";
 import appError from "../../utils/errorClass";
 import { responseStatus } from "../../utils/responseStatus";
-import { findBookById, findOnlyBookById, findOrderBooks, incrementStock, updateBook, updateStock } from "../Books/book.repo";
+import {  findOnlyBookById, findOrderBooks, incrementStock, updateBook, updateStock } from "../Books/book.repo";
 import { bookI } from "../Books/book.types";
 import { getCartByUserId, removeCart } from "../Cart/Cart.repo";
-import { recalculateCartCoupon } from "../Cart/helper/recalculateCartCoupon";
-import {  decrementCouponUses, editCoupon, getCouponByCode, getCouponById, useCoupon } from "../Coupon/Coupon.repo";
-import { addCouponUsage, decrementCouponUsage, getCouponUsageByUserIdAndCouponId } from "../CouponUsage/CouponUsage.repo";
+import {  decrementCouponUses ,getCouponById, useCoupon } from "../Coupon/Coupon.repo";
+import { addCouponUsage, decrementCouponUsage } from "../CouponUsage/CouponUsage.repo";
 import { checkQuantity } from "./helper/checkQuantity";
 import { recalculateOrderCoupon } from "./helper/recalculateOrderCoupon";
 import { cancelOrder, createOrder, findOrderById, getOrders, getOrdersByUserId, updateOrderPaymentStatus, updateOrderStatus } from "./order.repo";
-import { OrderI, OrderItemI, ShippingAddressI } from "./order.types";
+import { OrderI, OrderItemI, OrderWithRelations, ShippingAddressI } from "./order.types";
+import {prisma} from "../../config/prisma"
+import { createPayment } from "../Payment/Payment.repo";
+import { paymentI } from "../Payment/Payment.type";
+import { prepareFawaterakPayload } from "./helper/prepareFawaterakPayload";
 
-export const createOrderS=async(id:string,address:ShippingAddressI,paymentMethod:paymentMethod,tx?:Prisma.TransactionClient)=>{
+
+export const createOrderWithoutPayS=async(id:string,address:ShippingAddressI,paymentMethod:paymentMethod,tx?:Prisma.TransactionClient)=>{
    const execute=async(transaction: Prisma.TransactionClient)=>{
         const cart =await getCartByUserId(id,transaction)
     if(!cart){
@@ -227,3 +231,87 @@ export const cancelOrderS=async(id:string,tx?:Prisma.TransactionClient)=>{
         throw error;
       }
 }
+export const createOrderS=async(id:string,address:ShippingAddressI,paymentMethod:paymentMethod,paymentMethodNumber:number,tx?:Prisma.TransactionClient)=>{
+    let order;
+    if(tx){
+          order=await createOrderWithoutPayS(id,address,paymentMethod,tx)
+    }
+    else {
+        order=await prisma.$transaction(async (transaction) => {
+      return await createOrderWithoutPayS(id,address,paymentMethod,transaction);
+    });
+    }
+   if (paymentMethod.toLocaleUpperCase() === "COD") {
+        return order;
+        }
+    if (paymentMethod.toLocaleUpperCase() === "ONLINE") {
+        const result=await payOrder(order,paymentMethodNumber)
+        return result
+  
+    }
+
+}
+export const payOrder = async (
+  order: OrderWithRelations,
+  paymentMethodNumber: number
+) => {
+  const payload = prepareFawaterakPayload(
+    order,
+    paymentMethodNumber
+  );
+
+  const result = await createFawaterakTransaction(payload);
+
+  if (result.status !== "success") {
+    throw new appError(
+      "Failed to initiate payment",
+      400,
+      responseStatus.FAILED
+    );
+  }
+
+  const paymentData: paymentI = {
+    orderId: order.id,
+    amount: order.totalPrice,
+    provider: "FAWATERAK",
+    paymentMethod: paymentMethodNumber,
+    status: "PENDING",
+    intentKey: result.data.intent_key,
+  };
+
+  if (
+    "payment_data" in result.data &&
+    "redirectTo" in result.data.payment_data
+  ) {
+    paymentData.paymentUrl =
+      result.data.payment_data.redirectTo;
+  }
+
+  if (
+    "payment_data" in result.data &&
+    "referenceNumber" in result.data.payment_data
+  ) {
+    paymentData.referenceNumber =
+      result.data.payment_data.referenceNumber;
+
+    paymentData.expireDate =
+      result.data.payment_data.expireDate;
+  }
+
+  if (
+    "payment_data" in result.data &&
+    "systemReference" in result.data.payment_data
+  ) {
+    paymentData.systemReference =
+      result.data.payment_data.systemReference;
+
+    paymentData.isoQr = result.data.payment_data.isoQr;
+  }
+  console.log("Payment Data:", paymentData);
+  const payment = await createPayment(paymentData);
+
+  return {
+    order,
+    payment,
+  };
+};

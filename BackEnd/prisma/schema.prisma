@@ -202,8 +202,10 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  orderItems           OrderItem[]
-  orderShippingAddress OrderShippingAddress?
+  orderItems              OrderItem[]
+  orderShippingAddress    OrderShippingAddress?
+  payments                Payment[]
+  paymentProviderMethodId Int?
 }
 
 model OrderItem {
@@ -220,6 +222,28 @@ model OrderItem {
 
   @@index([orderId])
   @@index([bookId])
+}
+
+model Payment {
+  id      String @id @default(uuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  provider      String @default("FAWATERAK")
+  paymentMethod Int
+
+  intentKey  String?
+  paymentUrl String?
+
+  referenceNumber String?
+  systemReference String?
+  isoQr           String?
+
+  amount Decimal       @db.Decimal(10, 2)
+  status paymentStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model OrderShippingAddress {

@@ -9,7 +9,7 @@ export const createOrderC=async(req:Request,res:Response,next:NextFunction)=>{
    if(!id){
     throw new appError("You are not logged in",401,responseStatus.FAILED)
    }
-   const order=await createOrderS(id,req.body.address,req.body.paymentMethod)
+   const order=await createOrderS(id,req.body.address,req.body.paymentMethod,2)
    res.status(200).json({
     status:"success",
     message:"Order Created Successfully",
