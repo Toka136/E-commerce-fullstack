@@ -15,8 +15,8 @@ interface OrderSummaryProps extends cartProps {
 export default function OrderSummary({discountAmount,subtotal,totalPrice,couponCode,items}:OrderSummaryProps) {
   const shipping =  50;
   const tax = 0;
-  const grandTotal = totalPrice + shipping + tax;
-   console.log("grasubtotalnd total",subtotal)
+  const grandTotal = Number(totalPrice) + shipping + tax;
+   console.log("grasubtotalnd total",totalPrice,shipping,tax,grandTotal)
   return (
     <section>
       <div className="mb-3 flex items-center gap-2">

@@ -9,6 +9,8 @@ export function renderItem(
   onNavigate?: () => void,
   handleLogout?: () => void
 ) {
+  console.log("item",item)
+  console.log("active",activeId)
     const Icon = item.icon;
     const isActive = item.id.includes( activeId);
     const isDanger = item.variant === "danger";

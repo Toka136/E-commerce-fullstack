@@ -6,11 +6,18 @@ import { useRouter } from "next/navigation"
 export const useCreateOrder=()=>{
     const router=useRouter()
     return useMutation({
-        mutationFn:(data:CreateOrderParams)=>createOrder(data),
+        mutationFn:({data,idempotencyKey}:{data:CreateOrderParams,idempotencyKey:string})=>createOrder(data,idempotencyKey),
          onSuccess: (response) => {
-      const orderId = response.data.id;
+           console.log("responseOrderOnline", response);
 
-      router.push(`/order-success/?orderId=${orderId}`);
+             const orderId = response.data.id;
+            if(response?.data?.paymentMethod.toLowerCase()==="online")
+            {
+                router.push(`/payment/pay/${orderId}`);
+            }
+     
+      else
+      router.push(`/order-success/${orderId}`);
     },
     })
 }

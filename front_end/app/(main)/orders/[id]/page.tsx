@@ -15,7 +15,7 @@ import { Card } from "@/features/orders/components/Card";
 import { OrderStatus, PaymentStatus } from "@/features/orders/types/orders";
 
 const PAYMENT_STYLES: Record<PaymentStatus, { label: string; className: string }> = {
-  paid: { label: "Paid", className: "bg-green-100 text-green-800" },
+  completed: { label: "Paid", className: "bg-green-100 text-green-800" },
   pending: { label: "Payment pending", className: "bg-amber-100 text-amber-800" },
   failed: { label: "Payment failed", className: "bg-red-100 text-red-800" },
 };
@@ -48,8 +48,9 @@ type params={
 export default async function SingleOrderPage({params}:params) {
   const id=(await params).id
   const {data:order}=await getOrderApi(id);
-  const payment = PAYMENT_STYLES[order.paymentStatus.toLocaleLowerCase() as PaymentStatus];
-  const itemCount = order.orderItems.reduce((n, i) => n + i.quantity, 0);
+const paymentStyle = PAYMENT_STYLES[
+  order.order.paymentStatus.toLocaleLowerCase() as PaymentStatus
+];  const itemCount = order.order.orderItems.reduce((n, i) => n + i.quantity, 0);
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:py-10">
@@ -65,29 +66,29 @@ export default async function SingleOrderPage({params}:params) {
       <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-on-surface">
-            Order #{order.id.slice(-8)}
+            Order #{order.order.id.slice(-8)}
           </h1>
           <p className="mt-1 text-sm text-on-surface-variant">
-            Placed on {formatPublishedDate(order.createdAt)} · {itemCount}{" "}
+            Placed on {formatPublishedDate(order.order.createdAt)} · {itemCount}{" "}
             {itemCount === 1 ? "item" : "items"}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className={`rounded-full px-4 py-1.5 text-xs font-medium ${payment.className}`}
+            className={`rounded-full px-4 py-1.5 text-xs font-medium ${paymentStyle.className}`}
           >
-            {payment.label}
+            {paymentStyle.label}
           </span>
-          <OrderStatusBadge status={order.orderStatus} />
+          <OrderStatusBadge status={order.order.orderStatus} />
         </div>
       </header>
 
       {/* Tracker */}
       <div className="mb-6 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 sm:p-6">
-        <StatusTracker status={order.orderStatus.toLocaleLowerCase() as OrderStatus} />
-        {order.orderStatus !== "cancelled" && (
+        <StatusTracker status={order.order.orderStatus.toLocaleLowerCase() as OrderStatus} />
+        {order.order.orderStatus !== "cancelled" && (
           <p className="mt-4 text-xs text-on-surface-variant">
-            Last updated {formatPublishedDate(order.updatedAt)}
+            Last updated {formatPublishedDate(order.order.updatedAt)}
           </p>
         )}
       </div>
@@ -97,7 +98,7 @@ export default async function SingleOrderPage({params}:params) {
         <div className="lg:col-span-2">
           <Card title="Items">
             <ul className="divide-y divide-outline-variant/30">
-              {order.orderItems.map((item) => (
+              {order.order.orderItems.map((item) => (
                 <li key={item.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
                   <Thumbnail item={item} />
                   <div className="flex min-w-0 flex-1 flex-col justify-between">
@@ -126,9 +127,9 @@ export default async function SingleOrderPage({params}:params) {
         <div className="space-y-6">
           <Card title="Summary">
             <dl className="space-y-2.5">
-              <SummaryRow label="Subtotal" value={formatPrice(order.subtotal)} muted />
-              <SummaryRow label="Shipping" value={formatPrice(order.shippingCost)} muted />
-              {order.couponCode && (
+              <SummaryRow label="Subtotal" value={formatPrice(order.order.subtotal)} muted />
+              <SummaryRow label="Shipping" value={formatPrice(order.order.shippingCost)} muted />
+              {order.order.couponCode && (
                 <div>
                 <div className="flex items-center justify-between text-sm">
                   <dt className="flex items-center gap-1.5 text-on-surface-variant">
@@ -136,7 +137,7 @@ export default async function SingleOrderPage({params}:params) {
                     Coupon
                   </dt>
                   <dd className="rounded bg-surface-container px-2 py-0.5 font-mono text-xs text-on-surface">
-                    {order.couponCode}
+                    {order.order.couponCode}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between text-sm mt-4 ">
@@ -144,7 +145,7 @@ export default async function SingleOrderPage({params}:params) {
                     Discount Amount
                   </dt>
                   <dd className="rounded  px-2 py-0.5 font-mono text-xs text-on-surface">
-                    {formatPrice(order.discountAmount)}
+                    {formatPrice(order.order.discountAmount)}
                   </dd>
                 </div>
                 </div>
@@ -154,19 +155,45 @@ export default async function SingleOrderPage({params}:params) {
                 <div className="flex items-center justify-between">
                   <dt className="text-sm font-semibold text-on-surface">Total</dt>
                   <dd className="text-lg font-semibold text-on-surface">
-                    {formatPrice(order.totalPrice)}
+                    {formatPrice(order.order.totalPrice)}
                   </dd>
                 </div>
               </div>
             </dl>
           </Card>
 
-          <Card title="Payment" icon={CreditCard}>
-            <p className="text-sm capitalize text-on-surface">
-              {String(order.paymentMethod).replace(/[_-]/g, " ")}
-            </p>
-            <p className="mt-1 text-xs text-on-surface-variant">{payment.label}</p>
-          </Card>
+        <Card title="Payment" icon={CreditCard}>
+  <p className="text-sm capitalize text-on-surface">
+    {String(order.order.paymentMethod).replace(/[_-]/g, " ")}
+  </p>
+
+  <p className="mt-1 text-xs text-on-surface-variant">
+    {paymentStyle.label}
+  </p>
+
+  {order.payment && order.order.paymentStatus.toLowerCase() === "pending" && (
+    <div className="mt-4 border-t border-outline-variant/30 pt-4">
+      <p className="mb-3 text-xs text-on-surface-variant">
+        Your payment is still pending. You can view your payment details
+        and retrieve your Fawry reference number or QR code.
+      </p>
+
+      <Link
+        href={`/payment/details/${order.payment.id}`}
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
+      >
+        View Payment Details
+      </Link>
+
+      {order.payment.expireDate && (
+        <p className="mt-2 text-xs text-on-surface-variant">
+          Expires at:{" "}
+          {formatPublishedDate(order.payment.expireDate)}
+        </p>
+      )}
+    </div>
+  )}
+</Card>
 
           
         </div>

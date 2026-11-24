@@ -10,12 +10,18 @@ const nextConfig: NextConfig = {
         port: "4000",
         pathname: "/api/Uploads/**",
       },
-       {
+      {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
+      {
+        protocol: "https",
+        hostname: "staging.fawaterk.com",
+        pathname: "/clients/payment_options/**",
+      },
     ],
   },
+
   async redirects() {
     return [
       {
@@ -25,9 +31,17 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  /* config options here */
+
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "http://localhost:4000/api/:path*",
+      },
+    ];
+  },
+
   turbopack: {
-    // Set the root directory for Turbopack to the current directory
     root: __dirname,
   },
 };

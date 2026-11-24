@@ -1,6 +1,6 @@
 "use client";
 
-import { JSX, useState } from "react";
+import { JSX, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useFormik } from "formik";
@@ -17,6 +17,9 @@ import { useCreateOrder } from "../hooks/useCreateOrder";
 import { ErrorFormate } from "@/features/cart/utils/errorFormate";
 import {  CartResponse } from "@/features/cart/types/cart";
 import { useRouter } from "next/navigation";
+import { useCartStore } from "@/features/cart/store/cart-store";
+import OnlinePaymentMethodSelector from "./onlinePaymentSelector";
+import { useGetOPaymentMethods } from "../hooks/useGetOPaymentMethods";
 
 type Props = {
   cart: CartResponse["data"];
@@ -26,13 +29,23 @@ export default function Checkout({addresses,cart}:Props) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("online");
+  const [onlinePaymentMethod,setOnlinePaymentMethod]=useState<number>(0)
   const {mutateAsync:createOrder,isPending:createOrderPending}=useCreateOrder()
+  const {data:onlinePaymentMethods,isLoading,error}=useGetOPaymentMethods()
   const router=useRouter()
+  const {setCount}=useCartStore()
+  const idempotencyKey = useRef<string | null>(null);
   const handleCreateOrder = async () => {
+    if (!idempotencyKey.current) {
+    idempotencyKey.current = crypto.randomUUID();
+  }
     try{
-      console.log("address",formik.values);
-      await createOrder({address:formik.values,paymentMethod})
+        console.log("onlinePaymentMethod",onlinePaymentMethod);
+
+      await createOrder({data:{address:formik.values,paymentMethod},idempotencyKey:idempotencyKey.current})
       router.refresh()
+      setCount(0)
+       idempotencyKey.current = null;
     }catch (err) {
       const message = ErrorFormate({ error: err });
       setErrorMessage(message);
@@ -85,8 +98,16 @@ export default function Checkout({addresses,cart}:Props) {
           </p>
         </div>
        <div className="flex flex-col md:flex-row gap-4">
-        <div  className="w-full md:w-[60%]">
+        <div  className="w-full md:w-[60%] h-fit">
         <ShippingDetailsForm formik={formik} />
+        <div className="flex flex-col md:flex-row ">
+
+        {cart && (
+          <div  className="w-full ">
+            <OrderSummary items={cart.items} discountAmount={cart.discountAmount??0} subtotal={cart.subtotal} totalPrice={(cart.coupon?.code?cart.totalAfterCoupon:cart.subtotal)??0} couponCode={cart.coupon?.code} />
+          </div>
+        )}
+        </div>
 
         </div>
         <div  className="w-full md:w-[40%] ">
@@ -98,20 +119,20 @@ export default function Checkout({addresses,cart}:Props) {
         />
         </div>
         <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
+        {paymentMethod === "online" && (
+          <OnlinePaymentMethodSelector
+            value={onlinePaymentMethod}
+            onChange={setOnlinePaymentMethod}
+              loading={isLoading}
+            options={onlinePaymentMethods?.data.data??[]}
+            error={error?.message}
+          />
+        )}
         </div>
         
        </div>
 
-       <div className="flex flex-col md:flex-row gap-4">
-         
-
-  
-        {cart && (
-          <div  className="w-full md:w-[60%]">
-            <OrderSummary items={cart.items} discountAmount={cart.discountAmount??0} subtotal={cart.subtotal} totalPrice={(cart.coupon?.code?cart.totalAfterCoupon:cart.subtotal)??0} couponCode={cart.coupon?.code} />
-          </div>
-        )}
-        </div>
+       
       </div>
 
       <div className="fixed inset-x-0 bottom-0 border-t border-outline-variant/40 bg-surface-container-lowest p-4">

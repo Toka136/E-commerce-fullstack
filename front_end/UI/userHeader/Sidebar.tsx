@@ -54,7 +54,6 @@ export default function Sidebar({
         className={`
           bg-[#f8f9ff] border-r border-slate-200
 
-          /* Mobile: Drawer فوق الشاشة */
           fixed left-0 top-0 z-70 flex h-full w-72 flex-col
           transition-transform duration-300 ease-in-out
           ${open ? "translate-x-0" : "-translate-x-full"}

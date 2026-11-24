@@ -30,7 +30,7 @@ export default function SideCart({
   
   return (
     <>
-    {!isPending&& data&&
+    {(!isPending&& data)&&
     <Drawer
       anchor="right"
       open={isOpen}

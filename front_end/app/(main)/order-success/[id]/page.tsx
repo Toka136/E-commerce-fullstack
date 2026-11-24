@@ -5,7 +5,7 @@ interface OrderSuccessPageProps {
 }
 
 export default async function OrderSuccessPage({searchParams}: OrderSuccessPageProps) {
-  const { orderId } = await searchParams;
+  const  orderId  = (await searchParams).orderId;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
