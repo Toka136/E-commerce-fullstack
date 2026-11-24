@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import appError from "../../utils/errorClass"
 import { responseStatus } from "../../utils/responseStatus"
-import { cancelOrderS, changeOrderStatusS, createOrderS, getOrderS, getOrdersS } from "./order.service"
+import { cancelOrderS, changeOrderStatusS, createOrderS, getOrderS, getOrdersS, payOrderS } from "./order.service"
 
 export const createOrderC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
@@ -9,7 +9,16 @@ export const createOrderC=async(req:Request,res:Response,next:NextFunction)=>{
    if(!id){
     throw new appError("You are not logged in",401,responseStatus.FAILED)
    }
-   const order=await createOrderS(id,req.body.address,req.body.paymentMethod,2)
+   const  idempotencyKey = req.headers["idempotency-key"];
+   if (typeof idempotencyKey !== "string" || !idempotencyKey.trim()) {
+  throw new appError(
+    "Idempotency-Key is required",
+    400,
+    responseStatus.FAILED
+  );
+}
+   console.log("req.body",req.body)
+   const order=await createOrderS(id,req.body.address,req.body.paymentMethod,idempotencyKey)
    res.status(200).json({
     status:"success",
     message:"Order Created Successfully",
@@ -17,6 +26,24 @@ export const createOrderC=async(req:Request,res:Response,next:NextFunction)=>{
    })}catch(err){
     next(err)
    }
+}
+export const payOrderC=async(req:Request,res:Response,next:NextFunction)=>{
+    try{
+        const id=Array.isArray(req.params.id)?req.params.id[0]:req.params.id
+        const userId=req.user?.id
+        if(!id||!userId){
+            throw new appError("id and userId is required",400,responseStatus.FAILED)
+        }
+        
+        const result=await payOrderS(id,req.body.onlinePaymentMethod,userId)
+        res.status(200).json({
+            status:"success",
+            message:"initiate Order payment Successfully",
+            data:result
+        })
+    }catch(err){
+        next(err)
+    }
 }
 export const getOrdersC=async(req:Request,res:Response,next:NextFunction)=>{
     try{
@@ -49,11 +76,11 @@ export const getOrderC=async(req:Request,res:Response,next:NextFunction)=>{
             throw new appError("id is required",400,responseStatus.FAILED)
         }
          const userId=req.user?.id.toString()
-        const orders=await getOrderS(id,userId,req.user?.role)
+        const order=await getOrderS(id,userId,req.user?.role)
         res.status(200).json({
             status:"success",
             message:"Orders Found Successfully",
-            data:orders
+            data:order
         })
     }catch(err){
         next(err)

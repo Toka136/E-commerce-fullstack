@@ -8,10 +8,13 @@ export const prepareFawaterakPayload = (
   order: OrderWithRelations,
   paymentMethodId: number
 ): FawaterakTransactionPayload => {
-
+ 
   const user = order.user;
   const address = order.orderShippingAddress;
-
+  console.log(" successUrl"," process.env.FAWATERAK_SUCCESS_URL!.trim()")
+  console.log(" failUrl"," process.env.FAWATERAK_FAIL_URL!.trim()")
+  console.log(" pendingUrl"," process.env.FAWATERAK_PENDING_URL!.trim()")
+  console.log(" backUrl"," process.env.FAWATERAK_BACK_URL!.trim()")
   if (!address) {
     throw new appError(
       "Shipping Address Not Found",
@@ -49,7 +52,8 @@ export const prepareFawaterakPayload = (
 
   return {
     payment_method_id: paymentMethodId,
-    cartTotal: Number(order.totalPrice.toFixed(2)),
+    cartTotal: Number(
+  order.subtotal.plus(order.shippingCost).toFixed(2)),
     currency: "EGP",
 
     customer: {
@@ -82,11 +86,11 @@ export const prepareFawaterakPayload = (
     },
 
     redirectionUrls: {
-      successUrl: process.env.FAWATERAK_SUCCESS_URL!,
-      failUrl: process.env.FAWATERAK_FAIL_URL!,
-      pendingUrl: process.env.FAWATERAK_PENDING_URL!,
-      backUrl: process.env.FAWATERAK_BACK_URL!,
-      webhookUrl: process.env.FAWATERAK_WEBHOOK_URL!,
+     successUrl: process.env.FAWATERAK_SUCCESS_URL!.trim(),
+    failUrl: process.env.FAWATERAK_FAIL_URL!.trim(),
+    pendingUrl: process.env.FAWATERAK_PENDING_URL!.trim(),
+    backUrl: process.env.FAWATERAK_BACK_URL!.trim(),
+    webhookUrl: process.env.FAWATERAK_WEBHOOK_URL!.trim(),
     },
     discountData: {
     type: "literal",

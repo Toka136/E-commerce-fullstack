@@ -9,16 +9,25 @@ import {  decrementCouponUses ,getCouponById, useCoupon } from "../Coupon/Coupon
 import { addCouponUsage, decrementCouponUsage } from "../CouponUsage/CouponUsage.repo";
 import { checkQuantity } from "./helper/checkQuantity";
 import { recalculateOrderCoupon } from "./helper/recalculateOrderCoupon";
-import { cancelOrder, createOrder, findOrderById, getOrders, getOrdersByUserId, updateOrderPaymentStatus, updateOrderStatus } from "./order.repo";
+import { cancelOrder, createOrder, findOrderById, findOrderByIdempotencyKey, getOrders, getOrdersByUserId, updateOrderPaymentStatus, updateOrderStatus } from "./order.repo";
 import { OrderI, OrderItemI, OrderWithRelations, ShippingAddressI } from "./order.types";
 import {prisma} from "../../config/prisma"
-import { createPayment } from "../Payment/Payment.repo";
+import { createPayment, deletePayment, expirePayment, expirePendingPayments, findActivePendingPayment, getPaymentByOrderId } from "../Payment/Payment.repo";
 import { paymentI } from "../Payment/Payment.type";
 import { prepareFawaterakPayload } from "./helper/prepareFawaterakPayload";
 
 
-export const createOrderWithoutPayS=async(id:string,address:ShippingAddressI,paymentMethod:paymentMethod,tx?:Prisma.TransactionClient)=>{
+export const createOrderWithoutPayS=async(id:string,idempotencyKey:string,address:ShippingAddressI,paymentMethod:paymentMethod,tx?:Prisma.TransactionClient)=>{
    const execute=async(transaction: Prisma.TransactionClient)=>{
+    const existingOrder = await findOrderByIdempotencyKey(
+      id,
+      idempotencyKey,
+      transaction
+    );
+
+    if (existingOrder) {
+      return existingOrder;
+    }
         const cart =await getCartByUserId(id,transaction)
     if(!cart){
         throw new appError("Cart Not Found",400,responseStatus.FAILED)
@@ -54,6 +63,7 @@ export const createOrderWithoutPayS=async(id:string,address:ShippingAddressI,pay
         const discountAmount =couponResult.discountAmount ?? new Prisma.Decimal(0);
         const totalAfterCoupon = couponResult.totalAfterCoupon ?? totalPrice.sub(discountAmount);
         const newOrder:OrderI={
+          idempotencyKey:idempotencyKey,
         userId:id,
         orderItems:orderItmes,
         totalPrice:totalAfterCoupon.plus(shippingPrice),
@@ -67,7 +77,7 @@ export const createOrderWithoutPayS=async(id:string,address:ShippingAddressI,pay
         couponCode:cart.coupon?.code??null,
         couponId: cart.couponId ?? null,
       }
-      const res =await createOrder(newOrder,transaction)
+      const createdOrder =await createOrder(newOrder,transaction)
      for (const item of cart.items) {
     const stockUpdated= await updateStock(item.book.id,item.quantity,transaction)
       if (!stockUpdated) {
@@ -109,7 +119,7 @@ export const createOrderWithoutPayS=async(id:string,address:ShippingAddressI,pay
      }
 
       await removeCart(id,transaction)
-    return res
+    return createdOrder
       }
         
    
@@ -123,7 +133,20 @@ export const createOrderWithoutPayS=async(id:string,address:ShippingAddressI,pay
       return await execute(transaction);
     });
   } catch (error) {
-    console.error("Create Order Error:", error);
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      const existingOrder = await findOrderByIdempotencyKey(
+        id,
+        idempotencyKey
+      );
+
+      if (existingOrder) {
+        return existingOrder;
+      }
+    }
+
     throw error;
   }
     }
@@ -167,7 +190,12 @@ export const getOrderS=async(id:string,userId:string,role:string)=>{
     if(order.userId!==userId){
         throw new appError("You are not authorized to view this order",400,responseStatus.FAILED)
     }
-    return order
+    const payment=await getPaymentByOrderId(order.id)
+      return{
+        order,
+        payment
+      }
+  
 }
 export const cancelOrderS=async(id:string,tx?:Prisma.TransactionClient)=>{
     
@@ -231,35 +259,79 @@ export const cancelOrderS=async(id:string,tx?:Prisma.TransactionClient)=>{
         throw error;
       }
 }
-export const createOrderS=async(id:string,address:ShippingAddressI,paymentMethod:paymentMethod,paymentMethodNumber:number,tx?:Prisma.TransactionClient)=>{
-    let order;
-    if(tx){
-          order=await createOrderWithoutPayS(id,address,paymentMethod,tx)
-    }
-    else {
-        order=await prisma.$transaction(async (transaction) => {
-      return await createOrderWithoutPayS(id,address,paymentMethod,transaction);
-    });
-    }
-   if (paymentMethod.toLocaleUpperCase() === "COD") {
-        return order;
-        }
-    if (paymentMethod.toLocaleUpperCase() === "ONLINE") {
-        const result=await payOrder(order,paymentMethodNumber)
-        return result
-  
-    }
-
-}
-export const payOrder = async (
-  order: OrderWithRelations,
-  paymentMethodNumber: number
+export const createOrderS = async (
+  id: string,
+  address: ShippingAddressI,
+  paymentMethod: paymentMethod,
+  idempotencyKey: string
 ) => {
+  const order = await prisma.$transaction(async (tx) => {
+    return await createOrderWithoutPayS(
+      id,
+      idempotencyKey,
+      address,
+      paymentMethod,
+      tx
+    );
+  });
+
+  return order;
+};
+export const payOrderS = async (
+  orderId: string,
+  paymentMethodNumber: number,
+  userId: string
+) => {
+  const allowedPaymentMethods = [2, 3, 4];
+  console.log("paymentMethodNumber", paymentMethodNumber);
+if (!allowedPaymentMethods.includes(paymentMethodNumber)) {
+  throw new appError(
+    "Invalid payment method",
+    400,
+    responseStatus.FAILED
+  );
+}
+  const order = await findOrderById(orderId);
+  if(!order){
+    throw new appError("Order Not Found",404,responseStatus.FAILED)
+  }
+  if(order.userId!==userId){
+    throw new appError("You are not authorized to view this order",403,responseStatus.FAILED)
+  }
+  if(order.paymentMethod!=="ONLINE"){
+    throw new appError("Payment method is not online",400,responseStatus.FAILED)
+  }
+  if(order.paymentStatus==="COMPLETED"){
+    throw new appError("Order is already paid",400,responseStatus.FAILED)
+  }
+  if(order.orderStatus==="CANCELLED"){
+    throw new appError("Order is already cancelled",400,responseStatus.FAILED)
+  }
+  if(order.orderStatus==="DELIVERED"){
+    throw new appError("Order is already delivered",400,responseStatus.FAILED)
+  }
+ 
+  await expirePendingPayments(order.id);
+ const existingPayment = await findActivePendingPayment(order.id);
+
+if (existingPayment) {
+  if (existingPayment.paymentMethod !== paymentMethodNumber) {
+    throw new appError(
+      "You already have an active payment attempt using another payment method",
+      409,
+      responseStatus.FAILED
+    );
+  }
+
+  return {
+    existingPayment,
+  };
+}
+
   const payload = prepareFawaterakPayload(
     order,
     paymentMethodNumber
   );
-
   const result = await createFawaterakTransaction(payload);
 
   if (result.status !== "success") {
@@ -293,9 +365,6 @@ export const payOrder = async (
   ) {
     paymentData.referenceNumber =
       result.data.payment_data.referenceNumber;
-
-    paymentData.expireDate =
-      result.data.payment_data.expireDate;
   }
 
   if (
@@ -307,6 +376,9 @@ export const payOrder = async (
 
     paymentData.isoQr = result.data.payment_data.isoQr;
   }
+  const expireDate =  new Date(Date.now() + result.data.expires_in * 1000);
+
+paymentData.expireDate = expireDate;
   console.log("Payment Data:", paymentData);
   const payment = await createPayment(paymentData);
 

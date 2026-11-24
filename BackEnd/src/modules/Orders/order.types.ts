@@ -36,6 +36,7 @@ export interface OrderI {
 
   orderItems: OrderItemI[];
   orderShippingAddress: ShippingAddressI;
+  idempotencyKey:string
 }
 export type OrderWithRelations = Prisma.OrderGetPayload<{
   include: {

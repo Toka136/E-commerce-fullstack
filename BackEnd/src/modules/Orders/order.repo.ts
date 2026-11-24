@@ -34,6 +34,9 @@ export const createOrder = async (
     },
   });
 };
+export const findOrderByIdempotencyKey=async(idempotencyKey:string,userId:string,tx:Prisma.TransactionClient=prisma)=>{
+  return await tx.order.findUnique({where:{userId_idempotencyKey:{userId,idempotencyKey}},include:{orderItems:true,orderShippingAddress:true,user:true}})
+}
 export const getOrdersByUserId=async(userId:string)=>{
     return await prisma.order.findMany({
       where:{userId},
@@ -54,10 +57,10 @@ export const getOrders=async()=>{
     })
 }
 export const findOrderById=async(id:string,tx:Prisma.TransactionClient=prisma)=>{
-    return await tx.order.findUnique({where:{id},include:{orderItems:true,orderShippingAddress:true,}})
+    return await tx.order.findUnique({where:{id},include:{orderItems:true,orderShippingAddress:true,user:true}})
 }
-export const updateOrderStatus=async(id:string,orderStatus:orderStatus)=>{
-   await prisma.order.update({where:{id},data:{orderStatus:orderStatus}})
+export const updateOrderStatus=async(id:string,orderStatus:orderStatus,tx:Prisma.TransactionClient=prisma)=>{
+   return await tx.order.update({where:{id},data:{orderStatus:orderStatus}})
 }
 export const cancelOrder = async (
   id: string,
@@ -75,8 +78,8 @@ export const cancelOrder = async (
     },
   });
 };
-export const updateOrderPaymentStatus=async(id:string,paymentStatus:paymentStatus)=>{
-  await prisma.order.update({where:{id},data:{paymentStatus:paymentStatus}})
+export const updateOrderPaymentStatus=async(id:string,paymentStatus:paymentStatus,tx:Prisma.TransactionClient=prisma)=>{
+  return await tx.order.update({where:{id},data:{paymentStatus:paymentStatus}})
 }
 export const getRevenue = async () => {
   const result = await prisma.order.aggregate({

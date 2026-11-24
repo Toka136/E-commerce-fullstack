@@ -11,7 +11,7 @@ export interface paymentI {
   referenceNumber?: string;
   systemReference?: string;
   isoQr?: string;
-  expireDate?: string;
+  expireDate?: Date;
   status?: paymentStatus;
 }
 

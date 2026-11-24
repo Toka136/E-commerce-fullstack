@@ -34,6 +34,7 @@ export const getCartByUserId = async (userId: string,tx:Prisma.TransactionClient
     },
   });
 };
+
 export const insertCart=async(cart:insertCartI,tx:Prisma.TransactionClient=prisma)=>{
   const newCart = await tx.cart.create({
   data: {

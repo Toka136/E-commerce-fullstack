@@ -16,5 +16,4 @@ export const orderCreationSchema=z.object({
         postalCode:z.string(),
         mobile:z.string().min(11).max(11)
     })
-
 })

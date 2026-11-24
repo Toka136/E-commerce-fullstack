@@ -14,6 +14,7 @@ import adminDashboard from './modules/Admin/admin.route'
 import couponRoutes from "./modules/Coupon/Coupon.routes"
 import paymentRoutes from "./modules/Payment/payment.route"
 import resetPassword from "./modules/ResetPassword/resetPassword.routes"
+import webhooksRouter from "./services/fawaterak/webhooks.routes"
 import { responseStatus } from "./utils/responseStatus"
 import appError from "./utils/errorClass"
 import cookieParser from 'cookie-parser'
@@ -54,6 +55,7 @@ app.use("/api/adminDashboard",adminDashboard)
 app.use("/api/password",resetPassword)
 app.use("/api/coupon",couponRoutes)
 app.use("/api/payment",paymentRoutes)
+app.use("/api/v1/webhooks", webhooksRouter);
 app.use("/api/Uploads/", express.static(path.join(__dirname, "Uploads")));
 app.use((req, res) => {
   
