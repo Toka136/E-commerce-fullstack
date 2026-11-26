@@ -11,23 +11,7 @@ export const addBookW=async(bookId:string,userId:string)=>{
     return wishList
 
 }
-export const getWishList=async(userId:string)=>{
-    return await prisma.wishList.findUnique({
-        where:{userId},
-        include: {
-      items: {
-        select: {
-          id: true,
-          title: true,
-          coverImage: true,
-          price: true,
-          stock: true,
-          author: true,
-        },
-      },
-    },
-    })
-}
+
 export const getWishListByUserId = async (
   userId: string,
   tx: Prisma.TransactionClient = prisma
@@ -47,6 +31,27 @@ export const getWishListByUserId = async (
       },
     },
   });
+};
+export const getWishListItemsCount = async (
+  userId: string,
+  tx: Prisma.TransactionClient = prisma
+) => {
+  const wishList =await tx.wishList.findUnique({
+    where: { userId },
+    include: {
+      items: {
+        select: {
+          id: true,
+          title: true,
+          coverImage: true,
+          price: true,
+          stock: true,
+          author: true,
+        },
+      },
+    },
+  });
+  return wishList?.items.length
 };
 export const addEmptyWishList=async(userId:string)=>{
     const newWishList=await prisma.wishList.create({

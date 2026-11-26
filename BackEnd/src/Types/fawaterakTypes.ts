@@ -87,7 +87,7 @@ interface CashPaymentResponse extends FawaterakBaseResponse {
 interface WalletPaymentResponse extends FawaterakBaseResponse {
   data: FawaterakBaseResponse["data"] & {
     payment_data: {
-      systemReference: string;
+      systemReference: number;
       isoQr: string;
     };
   };

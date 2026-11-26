@@ -10,6 +10,7 @@ export const createOrderC=async(req:Request,res:Response,next:NextFunction)=>{
     throw new appError("You are not logged in",401,responseStatus.FAILED)
    }
    const  idempotencyKey = req.headers["idempotency-key"];
+   console.log("idempotencyKey",idempotencyKey)
    if (typeof idempotencyKey !== "string" || !idempotencyKey.trim()) {
   throw new appError(
     "Idempotency-Key is required",

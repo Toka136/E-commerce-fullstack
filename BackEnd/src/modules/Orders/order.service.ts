@@ -323,9 +323,7 @@ if (existingPayment) {
     );
   }
 
-  return {
-    existingPayment,
-  };
+  return existingPayment
 }
 
   const payload = prepareFawaterakPayload(
@@ -359,31 +357,23 @@ if (existingPayment) {
       result.data.payment_data.redirectTo;
   }
 
-  if (
-    "payment_data" in result.data &&
-    "referenceNumber" in result.data.payment_data
-  ) {
-    paymentData.referenceNumber =
-      result.data.payment_data.referenceNumber;
-  }
-
-  if (
+    if (
     "payment_data" in result.data &&
     "systemReference" in result.data.payment_data
   ) {
-    paymentData.systemReference =
-      result.data.payment_data.systemReference;
+    paymentData.systemReference = String(
+      result.data.payment_data.systemReference
+    );
 
     paymentData.isoQr = result.data.payment_data.isoQr;
   }
+
+  
   const expireDate =  new Date(Date.now() + result.data.expires_in * 1000);
 
 paymentData.expireDate = expireDate;
   console.log("Payment Data:", paymentData);
   const payment = await createPayment(paymentData);
 
-  return {
-    order,
-    payment,
-  };
+  return payment
 };

@@ -38,9 +38,8 @@ app.use(cors(
     }
 ))
 app.use(express.json())
-mongoose.connect(process.env.MONGO_URL as string).then(()=>{
-}).catch((err)=>{
-})
+app.use(express.urlencoded({ extended: true }));
+
 
 app.use("/api/auth",authRoutes)
 app.use("/api/books",bookRoutes)
@@ -55,7 +54,7 @@ app.use("/api/adminDashboard",adminDashboard)
 app.use("/api/password",resetPassword)
 app.use("/api/coupon",couponRoutes)
 app.use("/api/payment",paymentRoutes)
-app.use("/api/v1/webhooks", webhooksRouter);
+app.use("/api/webhooks/fawaterak", webhooksRouter);
 app.use("/api/Uploads/", express.static(path.join(__dirname, "Uploads")));
 app.use((req, res) => {
   

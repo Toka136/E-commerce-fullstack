@@ -10,7 +10,10 @@ export const getWishListC=async(req:Request,res:Response,next:NextFunction)=>{
         throw new appError("You are not logged in",401,responseStatus.FAILED)
     }
     const wishList=await getWishListS(userId)
-    res.status(200).json(wishList)}catch(err){
+    res.status(200).json
+    ({status:"success",message:"WishList Fetched Successfully",data:wishList})
+   }
+    catch(err){
         next(err)
     }
 }

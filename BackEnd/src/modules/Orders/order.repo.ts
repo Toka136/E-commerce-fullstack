@@ -18,6 +18,7 @@ export const createOrder = async (
       paymentMethod: order.paymentMethod,
       paymentStatus: order.paymentStatus,
       orderStatus: order.orderStatus,
+      idempotencyKey: order.idempotencyKey,
 
       orderItems: {
         create: order.orderItems,
@@ -46,6 +47,17 @@ export const getOrdersByUserId=async(userId:string)=>{
         orderShippingAddress:true
       }
     })
+}
+export const getOrdersCountByUserId=async(userId:string)=>{
+    const orders= await prisma.order.findMany({
+      where:{userId},
+      orderBy: { createdAt: "desc" },
+      include:{
+        orderItems:true,
+        orderShippingAddress:true
+      }
+    })
+    return orders.length
 }
 export const getOrders=async()=>{
     return await prisma.order.findMany({

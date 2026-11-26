@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { fawaterakWebhookController } from "./webhooks.controller";
+import { fawaterakFailedWebhookController, fawaterakPaidWebhookController } from "./webhooks.controller";
 
 const router = Router();
 
-router.post("/fawaterak_json", fawaterakWebhookController);
+router.post("/paid", fawaterakPaidWebhookController);
+router.post("/failed", fawaterakFailedWebhookController);
 
 export default router;

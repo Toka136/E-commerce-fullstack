@@ -90,7 +90,7 @@ export const createFawaterakTransaction = async (
     throw error;
   }
 };
-export const webHookS = async (
+export const paidWebHookS = async (
   orderId: string,
   transactionKey: string,
   orderAmount: number
@@ -168,6 +168,91 @@ export const webHookS = async (
     await changePaymentStatus(
       payment.intentKey!,
       "COMPLETED",
+      transaction
+    );
+
+    return order;
+  });
+};
+
+export const failedWebHookS = async (
+  orderId: string,
+  transactionKey: string,
+  orderAmount: number
+) => {
+  return await prisma.$transaction(async (transaction) => {
+    console.log("orderIdFawaterak",orderId)
+    // 1. Find Order
+    const order = await findOrderById(orderId, transaction);
+
+    if (!order) {
+      throw new appError(
+        "Order Not Found",
+        404,
+        responseStatus.FAILED
+      );
+    }
+
+    // 2. Find Payment
+    const payment = await getPaymentByIntentKey(
+      transactionKey,
+      transaction
+    );
+
+    if (!payment || payment.orderId !== orderId) {
+      throw new appError(
+        "Payment Not Found",
+        404,
+        responseStatus.FAILED
+      );
+    }
+
+    // 3. Idempotency Check
+    if (payment.status === "COMPLETED") {
+      return order;
+    }
+    if (order.paymentStatus === "COMPLETED") {
+  return order;
+}
+
+    // 4. Validate Amount
+    const expectedAmount = Math.round(
+      Number(order.totalPrice) * 100
+    );
+
+    const receivedAmount = Math.round(orderAmount * 100);
+
+    const paymentAmount = Math.round(
+      Number(payment.amount) * 100
+    );
+
+    if (
+      expectedAmount !== receivedAmount ||
+      paymentAmount !== receivedAmount
+    ) {
+      throw new appError(
+        "Order Amount Not Matched",
+        400,
+        responseStatus.FAILED
+      );
+    }
+
+    // 5. Update Order & Payment
+    await updateOrderPaymentStatus(
+      order.id,
+      "FAILED",
+      transaction
+    );
+
+    await updateOrderStatus(
+      order.id,
+      "PENDING",
+      transaction
+    );
+
+    await changePaymentStatus(
+      payment.intentKey!,
+      "FAILED",
       transaction
     );
 

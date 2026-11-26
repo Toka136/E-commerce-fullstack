@@ -4,6 +4,8 @@ interface FawaterakWebhookData {
   hashKey: string;
   invoice_id: number | string;
   invoice_key: string;
+   transaction_id: number | string;
+  transaction_key: string;
   payment_method: string;
 }
 
@@ -16,22 +18,19 @@ export const verifyWebhookHash = (
     throw new Error("FAWATERAK_VENDOR_KEY is missing");
   }
 
-  const queryParam =
-    `InvoiceId=${data.invoice_id}` +
-    `&InvoiceKey=${data.invoice_key}` +
+  const stringToSign =
+    `TransactionId=${data.transaction_id}` +
+    `&TransactionKey=${data.transaction_key}` +
     `&PaymentMethod=${data.payment_method}`;
 
   const generatedHash = crypto
     .createHmac("sha256", vendorKey)
-    .update(queryParam)
+    .update(stringToSign)
     .digest("hex");
 
   const receivedHash = data.hashKey;
 
-  if (
-    !/^[a-f0-9]{64}$/i.test(receivedHash) ||
-    !/^[a-f0-9]{64}$/i.test(generatedHash)
-  ) {
+  if (!/^[a-f0-9]{64}$/i.test(receivedHash)) {
     return false;
   }
 
