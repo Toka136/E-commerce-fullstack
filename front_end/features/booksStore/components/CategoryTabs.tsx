@@ -3,38 +3,42 @@
 import { useSearchParams } from "next/navigation";
 import { useUpdateQuery } from "../hooks/useUpdateQuery";
 import { Category } from "@/features/categories/types/categories";
-import { useState } from "react";
 
-
-export default function CategoryTabs({categories}:{categories:Category[]}) {
+/** Filter pills: "All books" + one pill per category (driven by ?category=slug). */
+export default function CategoryTabs({ categories }: { categories: Category[] }) {
   const searchParams = useSearchParams();
   const updateQuery = useUpdateQuery();
-  const active = searchParams.get("category") ?? "All";
+  const active = searchParams.get("category"); // null = all
+
+  const tabs = [
+    { id: "all", name: "All books", slug: null as string | null },
+    ...categories
+      .filter((c) => c.name !== "All")
+      .map((c) => ({ id: c.id, name: c.name, slug: c.slug as string | null })),
+  ];
 
   return (
     <div
-      className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 no-scrollbar"
+      className="no-scrollbar flex gap-2 overflow-x-auto mt-4"
       role="tablist"
       aria-label="Book categories"
     >
-      {categories.map((category) => {
-        const isActive = category.slug === active;
+      {tabs.map((tab) => {
+        const isActive = tab.slug === active;
         return (
           <button
-            key={category._id}
+            key={tab.id}
             type="button"
             role="tab"
             aria-selected={isActive}
-            onClick={() =>
-              updateQuery({ category: category.name === "All" ? null : category.slug })
-            }
-            className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+            onClick={() => updateQuery({ category: tab.slug })}
+            className={`shrink-0 whitespace-nowrap rounded-md border px-3 py-1 text-md font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0B66D0] ${
               isActive
-                ? "bg-[#4F46E5] text-white"
-                : "bg-[#EEF2FF] text-[#475569] hover:bg-[#E0E7FF]"
+                ? "border-primary bg-primary text-white"
+                : "border-[#CBD5E1] bg-white text-[#334155] hover:bg-surface hover:text-black"
             }`}
           >
-            {category.name}
+            {tab.name}
           </button>
         );
       })}

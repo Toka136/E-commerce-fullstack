@@ -1,86 +1,128 @@
 "use client";
 
-import {  Heart, Plus } from "lucide-react";
+import { useState } from "react";
+import Link from "next/link";
+import { Heart, Plus } from "lucide-react";
+import { CircularProgress } from "@mui/material";
+import { toast } from "react-toastify";
 import { Book } from "../types/books";
 import { formatPrice } from "../utils/utils";
 import BookCover from "@/UI/components/BookCover";
-import { CircularProgress } from "@mui/material";
 import { useAddToCartMutation } from "@/features/cart/hooks/useAddToCart";
-import Link from "next/link";
 import { useAddToWishlist } from "@/features/wishlist/hooks/useAddToWishlist";
+import { useAuth } from "@/providers/AuthProvider";
+import { useGetWishlist } from "@/features/wishlist/hooks/useGetWishlist";
 
 interface BookCardProps {
   book: Book;
+  badge?: string;
   eyebrow?: string;
-} 
-export default function BookCard({ book, eyebrow }: BookCardProps) {
+}
+
+export default function BookCard({ book, badge, eyebrow }: BookCardProps) {
+  const { isGuest } = useAuth();
+  const { mutate: addToCart, isPending: cartPending } = useAddToCartMutation();
+  const { mutate: addToWishlist, isPending: wishlistPending } = useAddToWishlist();
+   const {data:response} = useGetWishlist()
+
+  const [justAdded, setJustAdded] = useState(false);
+  const inWishlist =
+    justAdded || !!response?.data.items.some((item) => item.id === book.id);
+
   const isOutOfStock = book.stock <= 0;
-  const { mutate: addToCartMutation, isPending } = useAddToCartMutation();
+
+  const requireLogin = () => {
+    if (isGuest) {
+      toast.warning("You need to login first");
+      return true;
+    }
+    return false;
+  };
+
   const onAdd = () => {
-     addToCartMutation({
-               productId: book.id,
-               quantity: 1
-              });
-  }
- 
+    if (requireLogin()) return;
+    addToCart({ productId: book.id, quantity: 1 });
+  };
+
+  const onWishlist = () => {
+    if (requireLogin()) return;
+    if (inWishlist) {
+      toast.info("Already in your wishlist");
+      return;
+    }
+    addToWishlist(book.id, { onSuccess: () => setJustAdded(true) });
+  };
 
   return (
-    <div className="bg-white hover:-translate-y-0.5 relative rounded-2xl overflow-hidden shadow-sm flex flex-col h-full hover:shadow-md transition-shadow">
-      {/* Upper Cover Container */}
-              <Link href={`/books/${book.id}`}>
-             
-      <div className="relative aspect-4/5  w-full bg-[#679198] flex items-center justify-centeroverflow-hidden">
-        <BookCover coverImage={book.coverImage} title={book.title} />
-        {isOutOfStock && (
-          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 text-white text-xs font-semibold backdrop-blur-sm">
-            Out of stock
+    <article className="flex h-full flex-col rounded-lg border border-[#E2E8F0] bg-white p-2.5 shadow-sm transition-shadow hover:shadow-md">
+      {/* Cover */}
+      <div className="relative">
+        <Link href={`/books/${book.id}`} className="block">
+          <div className="relative aspect-4/5 w-full overflow-hidden rounded-md bg-slate-200">
+            <BookCover coverImage={book.coverImage} title={book.title} />
+          </div>
+        </Link>
+
+        {(isOutOfStock || badge) && (
+          <span
+            className={`absolute left-3 top-3 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wide ${
+              isOutOfStock ? "bg-black/70 text-white" : "bg-white/90 text-[#0B66D0]"
+            }`}
+          >
+            {isOutOfStock ? "Out of stock" : badge}
           </span>
         )}
+
+        <button
+          type="button"
+          onClick={onWishlist}
+          disabled={wishlistPending}
+          aria-label={inWishlist ? `${book.title} is in your wishlist` : `Add ${book.title} to wishlist`}
+          aria-pressed={inWishlist}
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-md bg-white/90 shadow-sm transition-colors hover:bg-white disabled:opacity-50"
+        >
+          <Heart
+            className={`h-4 w-4 transition-colors ${
+              inWishlist
+                ? "fill-[#0B66D0] text-[#0B66D0]"
+                : "text-[#334155] hover:text-[#0B66D0]"
+            }`}
+          />
+        </button>
       </div>
-      </Link>
 
+      {/* Details */}
+      <div className="flex grow flex-col px-2 pb-2 pt-5">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#0B66D0]">
+          {eyebrow ?? (book as any).category?.name ?? "Featured"}
+        </p>
+        <h3 className="mt-2 line-clamp-1 text-base font-bold text-[#0F172A]">
+          {book.title}
+        </h3>
+        <p className="mt-3 line-clamp-1 text-[13px] text-[#64748B]">{book.author}</p>
+        <p className="mt-3 line-clamp-2 min-h-[2.8em] text-xs leading-relaxed text-[#64748B]">
+          {(book as any).description}
+        </p>
 
-      {/* Content Container */}
-      <div className="p-4 flex flex-col grow justify-between bg-white">
-        <div>
-          {/* Eyebrow Label */}
-          <p className="text-[11px] font-bold text-[#6C5CE7] uppercase tracking-wider mb-1">
-            {eyebrow ?? "Featured"}
-          </p>
-
-          {/* Book Title */}
-          <h3 className="text-base font-bold text-[#1E293B] line-clamp-1 leading-snug">
-            {book.title}
-          </h3>
-
-          {/* Author Name */}
-          <p className="text-xs text-[#64748B] font-medium line-clamp-1 mt-0.5">
-            {book.author}
-          </p>
-        </div>
-
-        {/* Footer: Price & Add Button */}
-        <div className="flex justify-between items-center mt-4 pt-1">
-          <span className="text-sm font-bold text-[#4F46E5]">
+        <div className="mt-auto flex items-center justify-between border-t border-[#E2E8F0] pt-4">
+          <span className="text-base font-bold text-[#0F172A]">
             {formatPrice(book.price)}
           </span>
-
           <button
             type="button"
-            disabled={isOutOfStock||isPending}
-            onClick={(e) => {
-              e.stopPropagation();
-              onAdd();
-             
-            }}
+            disabled={isOutOfStock || cartPending}
+            onClick={onAdd}
             aria-label={`Add ${book.title} to cart`}
-            className="w-8 h-8 rounded-full bg-[#EEF2FF] text-[#4F46E5] flex items-center justify-center hover:bg-[#4F46E5] hover:text-white transition-colors disabled:opacity-40 disabled:pointer-events-none"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#DBEAFE] text-[#0B66D0] transition-colors hover:bg-[#0B66D0] hover:text-white disabled:pointer-events-none disabled:opacity-40"
           >
-            {isPending?<CircularProgress color="primary" />:
-            <Plus className="w-4 h-4 stroke-[2.5]" />}
+            {cartPending ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              <Plus className="h-4 w-4 stroke-[2.5]" />
+            )}
           </button>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

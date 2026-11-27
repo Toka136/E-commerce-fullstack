@@ -1,49 +1,41 @@
-"use client";
-
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode, Pagination } from "swiper/modules";
 import BookCard from "./BookCard";
 import { Book } from "../types/books";
-import "swiper/css";
-import "swiper/css/free-mode";
-import "swiper/css/pagination";
-import Link from "next/link";
+import { Category } from "@/features/categories/types/categories";
+import CategoryTabs from "@/features/booksStore/components/CategoryTabs";
 
 interface WeeklyFeaturesProps {
   books: Book[];
+  categories: Category[];
 }
 
-/** "Weekly Features" — a swipeable row of curated book cards. */
-export default function WeeklyFeatures({ books }: WeeklyFeaturesProps) {
+// Placeholder badges until your Book type has a real field (e.g. book.badge).
+
+export default function WeeklyFeatures({ books, categories }: WeeklyFeaturesProps) {
   return (
-    <section className="mt-12 w-[90%] mx-auto">
-      <div className="flex justify-between items-end mb-8">
-        <div>
-          <h2 className="text-2xl font-bold text-on-surface">
-            Weekly Features
-          </h2>
-          <p className="text-body-sm text-on-surface-variant">
-            Handpicked stories for your collection.
-          </p>
-        </div>
+    <section id="features" className="scroll-mt-6 border-t border-[#E2E8F0] pt-8">
+      <p className="text-sm md:text-md text-on-surface]">A fresh stack for curious readers</p>
+
+      <div className="mt-1 flex items-end justify-between">
+        <h2 className="font-serif text-4xl text-[#0F172A]">This week&apos;s features</h2>
         <Link
           href="/books"
-          type="button"
-          className="text-primary font-label-md hover:underline flex items-center gap-2 shrink-0"
+          className="flex shrink-0 items-center gap-1 text-xs font-medium text-[#0B66D0] hover:underline"
         >
-          See all <ArrowRight className="w-4.5 h-4.5" />
+          See all <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
-      <div className="overflow-hidden grid grid-cols-2 md:grid-cols-4 gap-6 pb-12 ">
-        {books.map((book) => (
-          <div key={book.id}>
-            <BookCard book={book} />
-            </div>
+      <div className="mt-8">
+        <CategoryTabs categories={categories} />
+      </div>
+
+      <div className="mt-12 grid grid-cols-1 gap-5 pb-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+        {books.map((book, i) => (
+          <BookCard key={book.id} book={book}  />
         ))}
-        </div>
-     
+      </div>
     </section>
   );
 }

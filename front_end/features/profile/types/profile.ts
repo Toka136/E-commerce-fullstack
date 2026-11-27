@@ -1,6 +1,5 @@
 export interface userProfileBase {
   userName: string;
-  email: string;
  
   phoneNumber?: string;
 }
@@ -10,7 +9,10 @@ export interface updateProfile extends userProfileBase {
 export interface userProfile extends userProfileBase {
   id: string;
    role: string;
+   email: string;
    image?: string;
+   ordersCount: number;
+   wishListItemsCount: number;
  
 }
 export interface GetProfileResponse{

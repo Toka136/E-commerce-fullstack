@@ -24,11 +24,13 @@ import { ReviewCard } from "@/features/reviews/components/reviewCard";
 import { useEditReview } from "@/features/reviews/hooks/useEditReview";
 import {  editReviewAProps } from "@/features/reviews/types/review";
 import { useDeleteReview } from "@/features/reviews/hooks/useDeleteReview";
-import { useGetProfile } from "@/features/profile/hooks/useGetProfile";
 import { AxiosError } from "axios";
 import { useGetWishlist } from "@/features/wishlist/hooks/useGetWishlist";
 import { CircularProgress } from "@mui/material";
 import Image from "next/image";
+import { useAuth } from "@/providers/AuthProvider";
+import { toast } from "react-toastify";
+import { LoaderC } from "@/UI/components/Loader";
 
 
 interface BookDetailProps {
@@ -40,9 +42,10 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
   const [quantity, setQuantity] = useState(1);
     const {data:response,isLoading,error,isFetching} = useGetWishlist()
     const [inWishlist, setInWishlist] = useState(false);
+    const {isGuest,user}=useAuth()
     useEffect(() => {
       if (response) {
-        const isInWishlist = response.items.some((item) => item.id === book.id);
+        const isInWishlist = response.data.items.some((item) => item.id === book.id);
         setInWishlist(isInWishlist);
       }
     }, [response, book.id]);
@@ -51,7 +54,6 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
   console.log("bookReviews",bookReviews)
   const coverUrl = useMemo(() => getCoverImageUrl(book.coverImage), [book.coverImage]);
   const stock = stockLabel(book);
-  const {data:userData}=useGetProfile()
   const { mutate: addReview, isPending: addReviewPending, isError: addReviewError, isSuccess: addReviewSuccess,error:addReviewErrorData } = useAddReview()
    const {mutate:editReview,isPending:editReviewPending,error:editReviewError}=useEditReview()
    const {mutate:deleteReview,isPending:deleteReviewPending,error:deleteReviewError}=useDeleteReview()
@@ -78,6 +80,10 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
   const { mutateAsync: addToCartMutation } = useAddToCartMutation();
     const {mutate:addToWishlist,isPending:wishlistPending}=useAddToWishlist()
     const onWishlist=()=>{
+        if(isGuest) {
+      toast.warning("You need to login first")
+      return
+    }
       addToWishlist(book.id)
       
       console.log("added to wishlist")
@@ -90,16 +96,20 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
     }
   
   const onAdd = async() => {
+    if(isGuest) {
+      toast.warning("You need to login first")
+      return
+    }
    await addToCartMutation({
                productId: book.id,
                quantity: quantity
               });
-  }
+  } 
+  if(isLoading)
+    return <LoaderC/> 
   return (
     <>
-    {isLoading&&<div className="flex min-h-screen flex-col bg-[#F7F7FB]">
-        <CircularProgress/>
-        </div>}
+      
         {!isLoading&&
     <div className="min-h-screen bg-[#F7F7FB] pb-28">
 
@@ -141,31 +151,7 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
         </h1>
         <p className="mt-1 text-[15px] text-gray-500">by {book.author}</p>
 
-        {/* Rating */}
-        {/* <div className="mt-2 flex items-center gap-2">
-          {hasRatings ? (
-            <>
-              <div className="flex items-center gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`h-4 w-4 ${
-                      i < Math.round(book.rate.average)
-                        ? "fill-amber-400 text-amber-400"
-                        : "fill-gray-200 text-gray-200"
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-[13px] text-gray-500">
-                {book.rate.average.toFixed(1)} ({book.rate.count} Reviews)
-              </span>
-            </>
-          ) : (
-            <span className="text-[13px] text-gray-400">No reviews yet</span>
-          )}
-        </div> */}
-
+        
         {/* Price */}
         <p className="mt-3 text-[26px] font-bold text-indigo-600">
           {formatPrice(book.price)}
@@ -282,6 +268,7 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
               <span className="text-[18px] text-gray-500 ">
                 {book.rate.average.toFixed(1)} ({book.rate.count} Reviews)
               </span>
+              {isGuest===true?<p>Login to add a review</p>:
               <ReviewForm
                 bookId={book.id}
                 addReview={addReview}
@@ -289,7 +276,7 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
                 isError={addReviewError}
                 errorMsg={errorMessage??""}
                 isSuccess={addReviewSuccess}
-              />
+              />}
 
             </>
           </div>
@@ -299,7 +286,7 @@ export default function BookDetail({ book, bookReviews }: BookDetailProps) {
             <h2 className="text-[17px] font-bold text-gray-900">Reader Reviews</h2>
             <div className="mt-3 space-y-3">
               {bookReviews.map((review) => (
-                <ReviewCard key={review.id} review={review} access={userData?.data.id===review.userId} onEdit={onEditReview} isEditing={editReviewPending} onDelete={onDeleteReview} isDeleting={deleteReviewPending}/>
+                <ReviewCard key={review.id} review={review} access={user?.data.id===review.userId} onEdit={onEditReview} isEditing={editReviewPending} onDelete={onDeleteReview} isDeleting={deleteReviewPending}/>
               ))}
             </div>
           </section>)}

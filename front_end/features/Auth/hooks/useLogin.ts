@@ -26,7 +26,7 @@ export const useLogin=()=>{
        if(error.message.includes("Invalid Credentials"))
        toast.error(error.message)
        else
-        toast.error("error data")
+        toast.error(error.message)
     }
   }
   return {handleLogin}

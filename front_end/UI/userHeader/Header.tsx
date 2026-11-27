@@ -17,7 +17,7 @@ import {
   Tag,
 } from "lucide-react";
 
-import { SidebarNavItem, SidebarUser } from "@/Types/HeaderTypes";
+import { HeaderUser, SidebarNavItem } from "@/Types/HeaderTypes";
 import Sidebar from "./Sidebar";
 import AdminSidebar from "../adminHeader/adminSidebar";
 import SideCart from "@/features/cart/components/cartDrawer";
@@ -37,13 +37,19 @@ const Header = ({menuOpen, setMenuOpen,userData}:{menuOpen:boolean, setMenuOpen:
     setActiveId(id);
   };
 
-  const defaultNavItems: SidebarNavItem[] = [
+  const userNavItems: SidebarNavItem[] = [
     { id: "/dashboard", label: "Explore", icon: Compass },
     { id: "/books", label: "Store", icon: StoreIcon },
     { id: "/orders", label: "My Orders", icon: Receipt },
     { id: "/wishlist", label: "wishlist", icon: Heart },
   
   ];
+   const guestNavItems: SidebarNavItem[] = [
+    { id: "/dashboard", label: "Explore", icon: Compass },
+    { id: "/books", label: "Store", icon: StoreIcon },
+
+  ];
+  const defaultNavItems=userData?.id?userNavItems:guestNavItems
 
   const gestAccountItems: SidebarNavItem[] = [
     {
@@ -69,7 +75,7 @@ const Header = ({menuOpen, setMenuOpen,userData}:{menuOpen:boolean, setMenuOpen:
     const defaultAccountItems=userData?.id?userAccountItems:gestAccountItems
 
 
-  const defaultUser: SidebarUser = {
+  const defaultUser: HeaderUser = {
     name: userData?.userName??"",
     role: "Reader",
     image: userData?.image,
@@ -111,7 +117,7 @@ const Header = ({menuOpen, setMenuOpen,userData}:{menuOpen:boolean, setMenuOpen:
   ];
 
    console.log("userData",userData)
-
+  const isGuest = !userData;
   const isAdmin = userData?.role === "ADMIN";
    const pathname = usePathname();
  useEffect(() => {
@@ -124,7 +130,7 @@ const Header = ({menuOpen, setMenuOpen,userData}:{menuOpen:boolean, setMenuOpen:
   return (
     <div className="flex flex-col min-h-screen">
     
-
+     
       {isAdmin ? (
         <AdminSidebar
           activeId={activeId??""}
@@ -132,7 +138,6 @@ const Header = ({menuOpen, setMenuOpen,userData}:{menuOpen:boolean, setMenuOpen:
           open={menuOpen}
           onClose={() => setMenuOpen(false)}
           navItems={adminDefaultNavItems}
-          user={defaultUser}
         />
       ) : (
         <Sidebar
@@ -142,7 +147,6 @@ const Header = ({menuOpen, setMenuOpen,userData}:{menuOpen:boolean, setMenuOpen:
           onClose={() => setMenuOpen(false)}
           navItems={defaultNavItems}
           accountItems={defaultAccountItems}
-          user={defaultUser}
         />
       )}
 

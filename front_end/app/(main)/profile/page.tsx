@@ -3,11 +3,7 @@ import { getProfileApi } from "@/features/profile/api/getProfile";
 import EditProfileButton from "@/features/profile/components/editProfileButton";
 
 // Stats are not part of the user payload yet, so they stay constant for now.
-const STATS = [
-  { label: "Orders Placed", value: 24, icon: Package },
-  { label: "Book Reviews", value: 12, icon: Star },
-  { label: "Wishlist Items", value: 8, icon: Heart },
-];
+
 
 function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
@@ -16,6 +12,11 @@ function capitalize(value: string) {
 export default async function ProfilePage() {
   const { data: user } = await getProfileApi();
   const displayName = capitalize(user.userName);
+  const STATS = [
+  { label: "Orders Placed", value: user.ordersCount??0, icon: Package },
+  { label: "Book Reviews", value: 12, icon: Star },
+  { label: "Wishlist Items", value: user.wishListItemsCount??0, icon: Heart },
+];
 
   // Only render personal-info fields that actually exist on the user object.
   const personalInfoFields: { label: string; value: string }[] = [

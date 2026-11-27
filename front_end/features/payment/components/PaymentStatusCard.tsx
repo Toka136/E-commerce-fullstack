@@ -37,8 +37,8 @@ export default function PaymentStatusCard({
   const t = tones[tone];
 
   return (
-    <div className="flex min-h-[calc(100vh-80px)] items-center justify-center bg-slate-50 px-4 py-10">
-      <div className="w-full max-w-md rounded-3xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-100">
+    <div className="flex h-fit justify-center bg-surface-container-low px-4 py-10">
+      <div className="w-full  rounded-3xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-100">
         <div
           className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full ${t.ring}`}
         >

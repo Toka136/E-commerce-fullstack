@@ -29,9 +29,7 @@ export default function Checkout({addresses,cart}:Props) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("online");
-  const [onlinePaymentMethod,setOnlinePaymentMethod]=useState<number>(0)
   const {mutateAsync:createOrder,isPending:createOrderPending}=useCreateOrder()
-  const {data:onlinePaymentMethods,isLoading,error}=useGetOPaymentMethods()
   const router=useRouter()
   const {setCount}=useCartStore()
   const idempotencyKey = useRef<string | null>(null);
@@ -40,7 +38,6 @@ export default function Checkout({addresses,cart}:Props) {
     idempotencyKey.current = crypto.randomUUID();
   }
     try{
-        console.log("onlinePaymentMethod",onlinePaymentMethod);
 
       await createOrder({data:{address:formik.values,paymentMethod},idempotencyKey:idempotencyKey.current})
       router.refresh()
@@ -119,15 +116,7 @@ export default function Checkout({addresses,cart}:Props) {
         />
         </div>
         <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
-        {paymentMethod === "online" && (
-          <OnlinePaymentMethodSelector
-            value={onlinePaymentMethod}
-            onChange={setOnlinePaymentMethod}
-              loading={isLoading}
-            options={onlinePaymentMethods?.data.data??[]}
-            error={error?.message}
-          />
-        )}
+        
         </div>
         
        </div>

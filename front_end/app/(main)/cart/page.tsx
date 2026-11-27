@@ -42,12 +42,11 @@ export default async function CartRoute() {
                 <CartItemRow key={item.book.id} item={item} />
               ))}
             </div>
-
-            {/* Order Summary */}
+            {itemsCount > 0 && (
             <div className="space-y-6 md:col-span-1">
-              {itemsCount > 0 && (
+              
                 <CouponCode appliedCoupon={cartData.coupon?.code} />
-              )}
+              
 
               <CartSummary
                 discountAmount={cartData.discountAmount ?? 0}
@@ -56,6 +55,7 @@ export default async function CartRoute() {
                 couponCode={cartData.coupon?.code}
               />
             </div>
+            )}
 
           </div>
          

@@ -25,9 +25,9 @@ export interface Wishlist {
 }
 
 export interface GetWishlistResponse {
-  status: "success" | "error";
+  status: string;
   message: string;
-  items: WishlistItem[];
+  data:{items: WishlistItem[]};
 }
 export interface wishlistStore {
   count: number;

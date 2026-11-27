@@ -3,17 +3,16 @@ import FilterSortBar from "@/features/booksStore/components/filterBar";
 import Pagination from "@/features/booksStore/components/Pagination";
 import SearchBar from "@/features/booksStore/components/searchBar";
 import { getCategoriesA } from "@/features/categories/api/getCategories";
+import { getProfileApi } from "@/features/profile/api/getProfile";
 import { getBooksA } from "@/features/userDashboard/api/getBooks";
 import BookCard from "@/features/userDashboard/components/BookCard";
 import { gteBooksParams } from "@/features/userDashboard/types/books";
+import { isAxiosError } from "axios";
 import { Suspense } from "react";
 
 
 
 interface StorePageProps {
-  // Next.js (app router, v15+) passes searchParams as a Promise on the
-  // server. If you're on an older version, drop the `await` below and
-  // type this as a plain object instead.
   searchParams: Promise<gteBooksParams>;
 }
 
@@ -30,7 +29,11 @@ export default async function StorePage({ searchParams }: StorePageProps) {
     maxPrice:  params.maxPrice,
     sort:  params.sort
   });
+
   const {data:categories}=await getCategoriesA()
+  let isGuest=false
+ 
+  
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-24">
 
@@ -41,18 +44,17 @@ export default async function StorePage({ searchParams }: StorePageProps) {
 
         <Suspense fallback={<div className="h-10 mb-4" />}>
           <div className="mb-4 w-[90%] mx-auto mt-8">
-            <CategoryTabs categories={[{_id:"All",name:"All",slug:"All",description:"All"},...categories]} />
+            <CategoryTabs categories={[{id:"All",name:"All",slug:"All",description:"All"},...categories]} />
           </div>
         </Suspense>
 
         <Suspense fallback={<div className="h-10 mb-5" />}>
           <FilterSortBar />
         </Suspense>
-
         {data.books.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[28%__28%_28%] gap-12 w-[90%] mx-auto">
             {data.books.map((book) => (
-              <BookCard key={book._id} book={book} />
+              <BookCard key={book.id} book={book}  />
             ))}
           </div>
         ) : (

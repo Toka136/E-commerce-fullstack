@@ -1,27 +1,24 @@
+import Hero from "./Hero";
 import WeeklyFeatures from "./WeeklyFeatures";
 import RecentlyAdded from "./RecentlyAdded";
-import { Book, gteBooksParams } from "../types/books";
-import { CircularProgress } from "@mui/material";
+import { gteBooksParams } from "../types/books";
 import { getBooksA } from "../api/getBooks";
+import { getCategoriesA } from "@/features/categories/api/getCategories";
 
-interface DashboardProps {
-  books: Book[];
-  // categories: Category[];
-  totalCount: number;
-}
+export default async function Dashboard({ pageSize, currentPage, searchText, category }: gteBooksParams & { category?: string }) {
+  const [data, categories] = await Promise.all([
+    getBooksA({ pageSize, currentPage, searchText, category } as gteBooksParams),
+    getCategoriesA(),
+  ]);
 
-/** Dashboard-only view: search, weekly features, categories, recently added. */
-export default async function Dashboard({pageSize,currentPage,searchText}:gteBooksParams) {
-   const data=await getBooksA({pageSize,currentPage,searchText})
-  console.log("data",data)
+  if (!data) return null;
+  const { books, totalCount } = data.data;
+
   return (
-    <main className="pt-8 max-w-container-max mx-auto px-md md:px-lg bg-[#F8F9FF]">
-   
-      {data && <>
-      <WeeklyFeatures books={data?.data.books} />
-      {/* <CategoryGrid categories={categories} /> */}
-      <RecentlyAdded books={data?.data.books} totalCount={data.data.totalCount} />
-      </>}
+    <main className="mx-auto max-w-container-max bg-[#F7FBFE] px-4 md:px-8">
+      <Hero  />
+      <WeeklyFeatures books={books} categories={categories.data} />
+      {/* <RecentlyAdded books={books} totalCount={totalCount} /> */}
     </main>
   );
 }

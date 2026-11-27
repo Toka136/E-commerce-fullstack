@@ -1,6 +1,6 @@
 'use client'
 
-import { Mail, Lock, Unlock, User, UploadCloud, X, Loader, Link } from 'lucide-react';
+import { Mail, Lock, Unlock, User, UploadCloud, X, Loader, Link, EyeClosed, Eye, EyeOff } from 'lucide-react';
 import { useFormik } from 'formik';
 import { useState, useRef } from 'react';
 import { useRegister } from '../hooks/useRegister';
@@ -225,9 +225,9 @@ export const RegisterForm = () => {
             <div className="relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer z-10" onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? (
-                   <Unlock className="h-5 w-5 text-gray-300" aria-hidden="true" />
+                   <EyeOff className="h-5 w-5 text-gray-300" aria-hidden="true" />
                 ) : (
-                  <Lock className="h-5 w-5 text-gray-300" aria-hidden="true" />
+                  <Eye className="h-5 w-5 text-gray-300" aria-hidden="true" />
                 )}
               </div>
               <input

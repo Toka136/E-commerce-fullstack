@@ -5,6 +5,7 @@ export const createOrder = async (
   data: CreateOrderParams,
   idempotencyKey: string
 ): Promise<CreateOrderResponse> => {
+  console.log("idempotencyKey", idempotencyKey);
   const res = await api.post(
     "/order/createOrder",
     {

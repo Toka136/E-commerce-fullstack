@@ -1,12 +1,12 @@
 import { PayOrder } from "@/features/orders/components/payOrder";
 
 type Props = {
-  params: Promise<{ id: string,paymentMethod: number }>;
+  params: Promise<{ id: string}>;
 };
 
 export default async function Page({ params }: Props) {
-  const  {id,paymentMethod}  = await params;
+  const  {id}  = await params;
   
 
-  return <PayOrder id={id} paymentMethod={paymentMethod} />;
+  return <PayOrder id={id}  />;
 }

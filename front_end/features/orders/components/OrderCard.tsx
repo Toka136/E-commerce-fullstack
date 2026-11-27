@@ -10,7 +10,7 @@ export default function OrderCard({ order }: { order: Order }) {
   const isDelivered = order.orderStatus === "delivered";
 
   return (
-    <div className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5 shadow-sm">
+    <div className="rounded-2xl  border border-outline-variant/40 bg-surface-container-lowest p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-on-surface">

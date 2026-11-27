@@ -1,3 +1,4 @@
+import { userProfile } from "@/features/profile/types/profile";
 import { LucideIcon } from "lucide-react";
 
 export interface SidebarNavItem {
@@ -8,7 +9,7 @@ export interface SidebarNavItem {
   /** "danger" renders the item in the destructive (logout) color. */
   variant?: "default" | "danger";
 }
-export interface SidebarUser {
+export interface HeaderUser {
   name: string;
   role: string;
   image?: string;
@@ -21,19 +22,20 @@ export interface SidebarProps {
   onNavigate?: (id: string) => void;
   navItems?: SidebarNavItem[];
   accountItems?: SidebarNavItem[];
-  user?: SidebarUser;
 }
 export interface userNavbarProps {
   cartCount?: number;
   onMenuClick?: () => void;
   onCartClick?: () => void;
   guest: boolean;
+  userData?:userProfile
 }
 export interface adminNavbarProps {
   notificationsCount?: number;
   onMenuClick?: () => void;
   onNotificationClick?: () => void;
   onSearch?: (query: string) => void;
+  userData?:userProfile
 }
 export interface userNavbarProps {
 

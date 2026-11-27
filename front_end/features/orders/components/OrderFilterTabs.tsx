@@ -1,11 +1,12 @@
 "use client";
 
-export type OrderFilter = "all" | "active" | "delivered";
+export type OrderFilter = "all" | "active" | "delivered"| "cancelled";
 
 const TABS: { value: OrderFilter; label: string }[] = [
   { value: "all", label: "All Orders" },
   { value: "active", label: "Active" },
   { value: "delivered", label: "Delivered" },
+  { value: "cancelled", label: "Cancelled" },
 ];
 
 export default function OrderFilterTabs({

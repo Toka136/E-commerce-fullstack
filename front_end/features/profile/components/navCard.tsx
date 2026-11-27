@@ -3,7 +3,6 @@ import Link from "next/link";
 import { LogOutButton } from "./LogOut";
 
 const NAV_ITEMS = [
-  { label: "Payment Methods", icon: CreditCard,to:"/profile/addresses" },
   { label: "Shipping Addresses", icon: MapPin ,to:"/profile/addresses"},
   { label: "Account Settings", icon: Settings, to:"/profile" },
 ];

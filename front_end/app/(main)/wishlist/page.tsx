@@ -18,6 +18,6 @@ export default  function WishlistRoute() {
   },[error])
   return<>
   {isLoading && <h1>Loading...</h1>}
-   {response && <WishlistPage items={response.items || []} />}
+   {response && <WishlistPage items={response.data.items || []} />}
   </>
 }

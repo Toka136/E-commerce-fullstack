@@ -15,7 +15,6 @@ export function renderItem(
     const isActive = item.id.includes( activeId);
     const isDanger = item.variant === "danger";
     return (
-      <>
         
       <li
         key={item.id}
@@ -44,16 +43,15 @@ export function renderItem(
           aria-current={isActive ? "page" : undefined}
           className={`flex items-center gap-4 rounded-xl p-4 font-body text-sm transition-colors ${
             isDanger
-              ? "text-[#ba1a1a] hover:bg-[#ffdad6]"
+              ? "text-error hover:bg-error-container"
               : isActive
-                ? "bg-[#9581FF] "
-                : "text-[#444652] hover:bg-[#e5eeff]"
+                ? "bg-primary text-white"
+                : "text-on-surface hover:bg-surface"
           }`}
         >
           <Icon size={20} strokeWidth={2} />
           <span>{item.label}</span>
         </Link>}
       </li>
-      </>
     );
   }

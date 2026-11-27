@@ -25,7 +25,7 @@ body{
   --color-on-primary-fixed: #00164f;
   --color-tertiary-container: #70757e;
   --color-primary-fixed: #dce1ff;
-  --color-surface: #f8f9ff;
+  --color-surface: #CEEFF6;
   --color-surface-container-low: #eff4ff;
   --color-surface-container-highest: #d3e4fe;
   --color-secondary-container: #9581ff;
@@ -37,7 +37,7 @@ body{
   --color-on-tertiary: #ffffff;
   --color-on-tertiary-container: #fdfcff;
   --color-error: #ba1a1a;
-  --color-on-surface-variant: #444652;
+  --color-on-surface-variant: #C7D0D9;
   --color-on-secondary-fixed-variant: #472dac;
   --color-surface-dim: #cbdbf5;
   --color-on-secondary: #ffffff;
@@ -47,9 +47,9 @@ body{
   --color-background: #f8f9ff;
   --color-primary-container: #506ed3;
   --color-inverse-surface: #213145;
-  --color-primary: #3455b9;
-  --color-surface-tint: #3757bb;
-  --color-on-surface: #0b1c30;
+  --color-primary: #0067CC;
+  --color-surface-tint: #EEF6FD;
+  --color-on-surface: #8E96A1;
   --color-on-primary: #ffffff;
   --color-inverse-on-surface: #eaf1ff;
   --color-on-background: #0b1c30;
@@ -123,4 +123,22 @@ body{
   --text-label-sm: 12px;
   --text-label-sm--line-height: 1;
   --text-label-sm--font-weight: 500;
+}
+@theme inline {
+  --animate-hero-in: hero-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-hero-float: hero-float 4s ease-in-out 0.9s infinite;
+
+  @keyframes hero-in {
+    from { opacity: 0; transform: translateX(80px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes hero-float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-14px); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-in,
+  .animate-hero-float { animation: none; }
 }

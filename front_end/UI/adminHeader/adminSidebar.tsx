@@ -13,7 +13,6 @@ export default function AdminSidebar({
   activeId = "explore",
   onNavigate,
   navItems,
-  user,
 }: SidebarProps) {
   useEffect(() => {
     if (!open) return;
@@ -103,35 +102,7 @@ export default function AdminSidebar({
           </ul>
         </nav>
 
-        {/* Footer  / Profile */}
-        <div className="border-t border-slate-200 bg-[#eff4ff] p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#b6c4ff]/30">
-              {user?.image ? (
-                <Image
-                  width={40}
-                  height={40}
-                  sizes="40px"
-                  priority
-                  unoptimized
-                  src={`${user.image}`}
-                  alt="avatar"
-                />
-              ) : (
-                <User size={26} />
-              )}
-            </div>
-
-            <div className="flex-1 overflow-hidden">
-              <p className="truncate font-body text-sm font-bold text-[#0b1c30]">
-                {user?.name}
-              </p>
-              <p className="truncate font-headline text-xs text-[#444652]">
-                {user?.role}
-              </p>
-            </div>
-          </div>
-        </div>
+     
       </aside>
     </>
   );

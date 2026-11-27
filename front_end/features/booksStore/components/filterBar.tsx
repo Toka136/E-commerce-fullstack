@@ -20,16 +20,7 @@ export default function FilterSortBar({ onOpenFilters }: FilterSortBarProps) {
 
   return (
     <div className="mb-8 flex items-center gap-3 w-[90%] mx-auto mt-8">
-      <div className="w-fit">
-      <button
-        type="button"
-        onClick={onOpenFilters}
-        className="flex items-center gap-2 rounded-xl bg-[#EEF2FF] px-4 py-2.5 text-sm font-semibold text-[#1E293B]"
-      >
-        <SlidersHorizontal className="w-4 h-4 text-[#4F46E5]" />
-        Filters
-      </button>
-    </div>
+   
       <div className="w-fit">
         <SortDropdown
           value={sort}

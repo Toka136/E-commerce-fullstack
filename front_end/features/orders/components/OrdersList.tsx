@@ -11,12 +11,15 @@ export default function OrdersList({ orders }: { orders: Order[] }) {
   const [filter, setFilter] = useState<OrderFilter>("all");
 
   const filteredOrders = useMemo(() => {
-    if (filter === "active") {
+     if (filter === "all") {
+      return orders
+    }
+   else if (filter === "active") {
       return orders.filter((order) => isActiveStatus(order.orderStatus));
     }
-    if (filter === "delivered") {
-      return orders.filter((order) => order.orderStatus === "delivered");
-    }
+
+      return orders.filter((order) => order.orderStatus.toLocaleLowerCase() === filter);
+    
     return orders;
   }, [orders, filter]);
 
@@ -29,9 +32,11 @@ export default function OrdersList({ orders }: { orders: Order[] }) {
           No orders here yet.
         </p>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row gap-4 flex-wrap justify-center">
           {filteredOrders.map((order) => (
-            <OrderCard key={order.id} order={order} />
+           <div className="md:w-[45%] w-full">
+             <OrderCard key={order.id} order={order} />
+           </div>
           ))}
         </div>
       )}

@@ -67,7 +67,6 @@ export default function EditProfileModal({
   const formik = useFormik({
     initialValues: {
       userName: user.userName ?? "",
-      email: user.email ?? "",
       phoneNumber: user.phoneNumber ?? "",
       image: null as File | null,
     },
@@ -165,17 +164,7 @@ export default function EditProfileModal({
             fullWidth
           />
 
-          <TextField
-            name="email"
-            label="Email Address"
-            type="email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.email && Boolean(formik.errors.email)}
-            helperText={formik.touched.email && formik.errors.email}
-            fullWidth
-          />
+          
 
           <TextField
             name="phoneNumber"

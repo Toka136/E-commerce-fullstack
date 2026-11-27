@@ -13,7 +13,6 @@ export default function Sidebar({
   onNavigate,
   navItems,
   accountItems,
-  user,
 }: SidebarProps) {
   useEffect(() => {
     if (!open) return;
@@ -52,7 +51,7 @@ export default function Sidebar({
         aria-modal="true"
         aria-label="Main menu"
         className={`
-          bg-[#f8f9ff] border-r border-slate-200
+          bg-surface-tint border-r border-slate-200
 
           fixed left-0 top-0 z-70 flex h-full w-72 flex-col
           transition-transform duration-300 ease-in-out
@@ -100,29 +99,7 @@ export default function Sidebar({
           </ul>
         </nav>
 
-        {/* Footer / Profile */}
-        <div className="border-t border-slate-200 bg-surface-container-low p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#b6c4ff]/30">
-              {user?.image ? (
-                <img
-                  src={`${user.image}`}
-                  alt="avatar"
-                />
-              ) : (
-                <User size={26} />
-              )}
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <p className="truncate font-body text-sm font-bold text-[#0b1c30]">
-                {user?.name}
-              </p>
-              <p className="truncate font-headline text-xs text-on-surface-variant">
-                {user?.role}
-              </p>
-            </div>
-          </div>
-        </div>
+      
       </aside>
     </>
   );

@@ -1,4 +1,5 @@
 import { getPaymenDetails } from "@/features/orders/api/getPaymentDetails";
+import PaymentQRCode from "@/features/orders/components/QR_Component";
 
 type Params = {
   params: Promise<{ id: string }>;
@@ -43,6 +44,11 @@ export default async function PaymentDetails({ params }: Params) {
             </p>
           </div>
         )}
+        {payment.paymentUrl&&(
+          <div className="mt-4">
+            <a href={payment.paymentUrl} className="text-blue-500 hover:underline">Pay Now</a>
+          </div>
+        )}
 
         {/* Wallet QR */}
         {payment.isoQr && (
@@ -51,11 +57,7 @@ export default async function PaymentDetails({ params }: Params) {
               Scan QR Code to Pay
             </h2>
 
-            <img
-              src={payment.isoQr}
-              alt="Payment QR Code"
-              className="h-56 w-56 object-contain"
-            />
+            <PaymentQRCode value={payment.isoQr} />
           </div>
         )}
 

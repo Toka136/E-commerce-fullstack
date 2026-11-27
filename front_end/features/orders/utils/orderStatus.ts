@@ -33,5 +33,5 @@ export const ORDER_STATUS_CONFIG: Record<
 
 // Anything not yet delivered or cancelled counts as "Active" for the filter tab.
 export function isActiveStatus(status: OrderStatus) {
-  return status !== "delivered" && status !== "cancelled";
+  return status.toLocaleLowerCase() !== "delivered" && status.toLocaleLowerCase() !== "cancelled";
 }

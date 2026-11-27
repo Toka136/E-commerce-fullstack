@@ -17,20 +17,22 @@ import Link from "next/link";
 
 export default function SideCart({
   onCheckout,
-  shippingEstimate = 5.0,
+  shippingEstimate = 50.0,
 }: CartDrawerProps) {
   const {data,isPending,error}=useGetCart()
+  const cart = data?.data;
+  const items = cart?.items ?? [];
+  const subtotal = cart?.subtotal ?? 0;
   const {isOpen,onClose,}=useCartStore()
   const {setCount}=useCartStore()
   useEffect(() => {
-     if(data)
-      setCount(data.data.items.length)
-  }, [data])
+  setCount(items.length);
+}, [items.length, setCount]);
   console.log("cart",data)
   
   return (
     <>
-    {(!isPending&& data)&&
+    {(!isPending&& cart)&&
     <Drawer
       anchor="right"
       open={isOpen}
@@ -52,10 +54,10 @@ export default function SideCart({
       {/* Items */}
       {/* {console.log("cart items",data?.data.items)} */}
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
-        {data?.data.items.length === 0 ? (
+        {items.length === 0 ? (
           <p className="text-sm text-gray-500 text-center mt-8">Your cart is empty.</p>
         ) : (
-          data?.data.items.map((item) => (
+          items.map((item) => (
             <div key={item.book.id}>
           <SideCartItem  item= {{
               id:item.book.id,
@@ -74,34 +76,25 @@ export default function SideCart({
         <div className="space-y-1.5 mb-4">
           <div className="flex justify-between text-sm text-[#5E616C]">
             <span>Subtotal</span>
-            <span>{(data?.data.subtotal)}$</span>
+            <span>{(subtotal)}$</span>
           </div>
           <div className="flex justify-between text-sm text-[#5E616C] mt-4">
             <span>Shipping (Estimated)</span>
-            <span>{(data?.data.items.length ? shippingEstimate : 0)}</span>
+            <span>{(Number(subtotal) + (items.length ? shippingEstimate : 0)).toFixed(2)}$</span>
           </div>
           <Divider className="my-2!" />
           <div className="flex justify-between text-base font-semibold text-gray-900">
             <span>Total</span>
-            <span>{(data?.data.subtotal??0+shippingEstimate)}$</span>
+            <span>{(subtotal??0+shippingEstimate)}$</span>
           </div>
         </div>
-        <Button
-          fullWidth
-          variant="contained"
-          disableElevation
-          onClick={()=>{onCheckout&& onCheckout();onClose()}}
-          disabled={data?.data.items.length === 0}
-          className="bg-primary hover:bg-blue-700 normal-case py-3! rounded-lg text-sm font-semibold"
-        >
-          Proceed to Checkout
-        </Button>
+      
          <Button
          onClick={onClose}
           fullWidth
           variant="contained"
           disableElevation
-          disabled={data?.data.items.length === 0}
+          disabled={items.length === 0}
           className="bg-primary mt-8! hover:bg-blue-700 normal-case  rounded-lg text-sm font-semibold"
         >
           <Link

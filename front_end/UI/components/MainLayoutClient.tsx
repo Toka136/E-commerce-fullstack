@@ -22,12 +22,13 @@ export default function MainLayoutClient({
   return (
     <>
       {userData?.role==="ADMIN" ? (
-        <AdminNavbar onMenuClick={() => setMenuOpen(true)}  />
+        <AdminNavbar onMenuClick={() => setMenuOpen(true)} userData={userData}  />
       ) : (
         <Navbar
           onCartClick={onOpen}
           onMenuClick={() => setMenuOpen(true)}
           guest={!userData}
+          userData={userData}
         />
       )}
 

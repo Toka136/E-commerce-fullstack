@@ -161,7 +161,6 @@ const paymentStyle = PAYMENT_STYLES[
               </div>
             </dl>
           </Card>
-
         <Card title="Payment" icon={CreditCard}>
   <p className="text-sm capitalize text-on-surface">
     {String(order.order.paymentMethod).replace(/[_-]/g, " ")}
@@ -171,31 +170,44 @@ const paymentStyle = PAYMENT_STYLES[
     {paymentStyle.label}
   </p>
 
-  {order.payment && order.order.paymentStatus.toLowerCase() === "pending" && (
-    <div className="mt-4 border-t border-outline-variant/30 pt-4">
-      <p className="mb-3 text-xs text-on-surface-variant">
-        Your payment is still pending. You can view your payment details
-        and retrieve your Fawry reference number or QR code.
-      </p>
-
-      <Link
-        href={`/payment/details/${order.payment.id}`}
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
-      >
-        View Payment Details
-      </Link>
-
-      {order.payment.expireDate && (
-        <p className="mt-2 text-xs text-on-surface-variant">
-          Expires at:{" "}
-          {formatPublishedDate(order.payment.expireDate)}
+    {order.payment && order.order.paymentStatus.toLowerCase() === "pending" && (
+      <div className="mt-4 border-t border-outline-variant/30 pt-4">
+        <p className="mb-3 text-xs text-on-surface-variant">
+          Your payment is still pending. You can view your payment details
+          and retrieve your Fawry reference number or QR code.
         </p>
-      )}
-    </div>
-  )}
-</Card>
 
-          
+        <Link
+          href={`/payment/details/${order.payment.id}`}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
+        >
+          View Payment Details
+        </Link>
+
+        {order.payment.expireDate && (
+          <p className="mt-2 text-xs text-on-surface-variant">
+            Expires at:{" "}
+            {formatPublishedDate(order.payment.expireDate)}
+          </p>
+        )}
+      </div>
+    )}
+           {order.order.paymentMethod.toLocaleLowerCase()==="online"&& (order.order.paymentStatus.toLowerCase() !== "completed"||order.order.paymentStatus.toLowerCase() === "failed")&&!order.payment&&
+
+    <div className="mt-4 border-t border-outline-variant/30 pt-4">
+        <p className="mb-3 text-xs text-on-surface-variant">
+          Your order is still unpaid. or failed You can view the paymentMethods and pay now 
+        </p>
+           <Link
+          href={`/payment/pay/${order.order.id}`}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
+        >
+          pay Now
+        </Link>
+        </div>}
+    </Card>
+       
+        
         </div>
       </div>
     </main>

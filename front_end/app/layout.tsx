@@ -4,16 +4,14 @@ import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import Header from "@/UI/userHeader/Header";
 import QueryProvider from "@/providers/query-provider";
+import { cookies } from "next/headers";
+import { getProfileApi } from "@/features/profile/api/getProfile";
+import { AuthProvider } from "@/providers/AuthProvider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { DM_Sans, DM_Serif_Display } from "next/font/google";
+ 
+const sans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
+const serif = DM_Serif_Display({ subsets: ["latin"], weight: "400", variable: "--font-serif" });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,22 +21,34 @@ export const metadata: Metadata = {
 interface ILayoutProps{
   children:React.ReactNode
 }
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }:ILayoutProps) {
+   const cookieStore = await cookies();
+  const token = cookieStore.get("accessToken")?.value;
+
+  let user = null;
+
+  if (token) {
+    try {
+      const res = await getProfileApi();
+      user = res?.data ?? null;
+    } catch {
+      user = null;
+    }
+  }
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${sans.variable} ${serif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" >
         <ToastContainer />
         {/* <Header /> */}
         <QueryProvider>
-        <main >
-          
-          {children}
-          </main>
+        <AuthProvider user={user}>
+            <main>{children}</main>
+          </AuthProvider>
         </QueryProvider>
         </body>
     </html>
